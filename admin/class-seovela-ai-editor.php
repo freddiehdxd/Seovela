@@ -62,11 +62,11 @@ class Seovela_AI_Editor {
         $provider = get_option( 'seovela_ai_provider', 'openai' );
         
         if ( $provider === 'openai' ) {
-            return ! empty( get_option( 'seovela_openai_api_key', '' ) );
+            return ! empty( Seovela_Helpers::decrypt( get_option( 'seovela_openai_api_key', '' ) ) );
         } elseif ( $provider === 'claude' ) {
-            return ! empty( get_option( 'seovela_claude_api_key', '' ) );
+            return ! empty( Seovela_Helpers::decrypt( get_option( 'seovela_claude_api_key', '' ) ) );
         } else {
-            return ! empty( get_option( 'seovela_gemini_api_key', '' ) );
+            return ! empty( Seovela_Helpers::decrypt( get_option( 'seovela_gemini_api_key', '' ) ) );
         }
     }
 
@@ -122,6 +122,8 @@ class Seovela_AI_Editor {
             'restUrl'      => esc_url_raw( rest_url() ),
             'restNonce'    => wp_create_nonce( 'wp_rest' ),
             'isConfigured' => $this->is_ai_configured(),
+            'isPro'        => true,
+            'upgradeUrl'   => admin_url( 'admin.php?page=seovela-settings&tab=ai' ),
             'settingsUrl'  => admin_url( 'admin.php?page=seovela-settings&tab=ai' ),
             'i18n'         => array(
                 'title'           => __( 'AI Content Assistant', 'seovela' ),
@@ -206,6 +208,8 @@ class Seovela_AI_Editor {
                 'restUrl'      => esc_url_raw( rest_url() ),
                 'restNonce'    => wp_create_nonce( 'wp_rest' ),
                 'isConfigured' => $this->is_ai_configured(),
+                'isPro'        => true,
+                'upgradeUrl'   => admin_url( 'admin.php?page=seovela-settings&tab=ai' ),
                 'settingsUrl'  => admin_url( 'admin.php?page=seovela-settings&tab=ai' ),
             ) );
         }
