@@ -121,6 +121,27 @@ class Seovela_Metabox {
                 return current_user_can( 'edit_posts' );
             },
         ) );
+
+        // Schema meta fields
+        register_post_meta( '', '_seovela_schema_type', array(
+            'show_in_rest'  => true,
+            'single'        => true,
+            'type'          => 'string',
+            'default'       => 'auto',
+            'auth_callback' => function () {
+                return current_user_can( 'edit_posts' );
+            },
+        ) );
+
+        register_post_meta( '', '_seovela_disable_schema', array(
+            'show_in_rest'  => true,
+            'single'        => true,
+            'type'          => 'string',
+            'default'       => '',
+            'auth_callback' => function () {
+                return current_user_can( 'edit_posts' );
+            },
+        ) );
     }
 
     /**
@@ -143,13 +164,47 @@ class Seovela_Metabox {
             true
         );
 
+        // Collapse empty meta-boxes area that WordPress renders even when no metaboxes exist.
+        wp_add_inline_script( 'seovela-gutenberg-sidebar', '
+            (function() {
+                if ( typeof wp !== "undefined" && wp.domReady ) {
+                    wp.domReady( function() {
+                        setTimeout( function() {
+                            var area = document.querySelector( ".edit-post-meta-boxes-main" );
+                            if ( ! area ) return;
+                            var boxes = area.querySelectorAll( ".meta-box-sortables > .postbox" );
+                            if ( boxes.length === 0 ) {
+                                area.style.display = "none";
+                            }
+                        }, 300 );
+                    } );
+                }
+            })();
+        ' );
+
         // Check if AI is configured
         $ai_configured = $this->is_ai_configured();
 
+        // Build schema types list for the sidebar.
+        $schema_types = array();
+        if ( class_exists( 'Seovela_Schema_Builder' ) || file_exists( SEOVELA_PLUGIN_DIR . 'modules/schema/class-schema-builder.php' ) ) {
+            require_once SEOVELA_PLUGIN_DIR . 'modules/schema/class-schema-builder.php';
+            Seovela_Schema_Builder::init();
+            $raw_types = Seovela_Schema_Builder::get_available_types();
+            foreach ( $raw_types as $key => $data ) {
+                $schema_types[] = array(
+                    'value' => $key,
+                    'label' => $data['name'],
+                );
+            }
+        }
+
         $localize_data = array(
-            'aiEnabled' => $ai_configured,
-            'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
-            'siteUrl'   => home_url( '/' ),
+            'aiEnabled'     => $ai_configured,
+            'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
+            'siteUrl'       => home_url( '/' ),
+            'analysisNonce' => wp_create_nonce( 'seovela_metabox_nonce' ),
+            'schemaTypes'   => $schema_types,
         );
 
         // Add AI nonce only when AI is available
@@ -165,7 +220,20 @@ class Seovela_Metabox {
      */
     public function add_meta_box() {
         $post_types = get_post_types( array( 'public' => true ), 'names' );
-        
+
+        // Detect block editor — skip the Classic metabox when Gutenberg is active
+        // because the Gutenberg sidebar (gutenberg-sidebar.js) provides SEO controls.
+        $is_block_editor = false;
+
+        $post = get_post();
+        if ( $post && function_exists( 'use_block_editor_for_post' ) ) {
+            $is_block_editor = use_block_editor_for_post( $post );
+        }
+
+        if ( $is_block_editor ) {
+            return;
+        }
+
         foreach ( $post_types as $post_type ) {
             if ( $post_type !== 'attachment' ) {
                 add_meta_box(
@@ -187,6 +255,12 @@ class Seovela_Metabox {
      */
     public function enqueue_metabox_assets( $hook ) {
         if ( ! in_array( $hook, array( 'post.php', 'post-new.php' ) ) ) {
+            return;
+        }
+
+        // Skip metabox assets in the block editor — the Gutenberg sidebar handles SEO there.
+        $post = get_post();
+        if ( $post && function_exists( 'use_block_editor_for_post' ) && use_block_editor_for_post( $post ) ) {
             return;
         }
 

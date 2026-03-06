@@ -94,6 +94,9 @@ class Seovela_AI {
      * @param WP_REST_Request $request Request object.
      */
     public function stream_ai_content( $request ) {
+        // Increase time limit for long-running streaming requests.
+        @set_time_limit( 300 );
+
         // Kill all output buffering
         while ( ob_get_level() > 0 ) {
             ob_end_clean();
@@ -135,6 +138,9 @@ class Seovela_AI {
         }
 
         $provider = get_option( 'seovela_ai_provider', 'openai' );
+
+        // Debug: log the request for troubleshooting.
+        error_log( '[Seovela AI Stream] Provider: ' . $provider . ', Action: ' . $action_type . ', Topic: ' . $topic );
 
         if ( $provider === 'openai' ) {
             $this->stream_openai( $prompt );
@@ -273,6 +279,8 @@ Requirements:
         $api_key = Seovela_Helpers::decrypt( get_option( 'seovela_openai_api_key', '' ) );
         $model   = get_option( 'seovela_openai_model', 'gpt-5-mini' );
 
+        error_log( '[Seovela AI Stream OpenAI] Model: ' . $model . ', Key length: ' . strlen( $api_key ) );
+
         if ( empty( $api_key ) ) {
             echo "data: " . wp_json_encode( array( 'error' => 'OpenAI API key not configured' ) ) . "\n\n";
             @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
@@ -281,9 +289,10 @@ Requirements:
         }
 
         $payload = wp_json_encode( array(
-            'model'    => $model,
-            'stream'   => true,
-            'messages' => array(
+            'model'                 => $model,
+            'stream'                => true,
+            'max_completion_tokens' => 4096,
+            'messages'              => array(
                 array(
                     'role'    => 'system',
                     'content' => 'You are an expert SEO content writer. Output clean HTML content without markdown formatting. Do not wrap content in code blocks.',
@@ -296,9 +305,12 @@ Requirements:
             'temperature' => floatval( get_option( 'seovela_ai_temperature', 0.7 ) ),
         ) );
 
+        $ca_path = $this->get_ca_bundle_path();
+        error_log( '[Seovela AI Stream OpenAI] CA path: ' . $ca_path . ', Payload length: ' . strlen( $payload ) );
+
         $ch = curl_init( $this->openai_endpoint ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_init -- Required for SSE streaming.
 
-        curl_setopt_array( $ch, array( // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt_array
+        $curl_opts = array( // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt_array
             CURLOPT_HTTPHEADER     => array(
                 'Content-Type: application/json',
                 'Authorization: Bearer ' . $api_key,
@@ -306,10 +318,24 @@ Requirements:
             CURLOPT_POST           => true,
             CURLOPT_POSTFIELDS     => $payload,
             CURLOPT_RETURNTRANSFER => false,
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_CAINFO         => $this->get_ca_bundle_path(),
+            CURLOPT_TIMEOUT        => 120,
             CURLOPT_WRITEFUNCTION  => function( $curl, $chunk ) {
+                error_log( '[Seovela AI Stream OpenAI] Chunk received: ' . strlen( $chunk ) . ' bytes' );
+
+                // Check if this is a non-SSE error response (raw JSON from API).
+                $trimmed = trim( $chunk );
+                if ( ! empty( $trimmed ) && $trimmed[0] === '{' ) {
+                    $json = json_decode( $trimmed, true );
+                    if ( $json && isset( $json['error'] ) ) {
+                        $err_msg = isset( $json['error']['message'] ) ? $json['error']['message'] : 'OpenAI API error';
+                        error_log( '[Seovela AI Stream OpenAI] API error (non-SSE): ' . $err_msg );
+                        echo "data: " . wp_json_encode( array( 'error' => $err_msg ) ) . "\n\n";
+                        @ob_flush();
+                        @flush();
+                        return strlen( $chunk );
+                    }
+                }
+
                 // Parse SSE data from OpenAI
                 $lines = explode( "\n", $chunk );
                 foreach ( $lines as $line ) {
@@ -325,19 +351,40 @@ Requirements:
                             echo "data: " . wp_json_encode( array( 'content' => $content ) ) . "\n\n";
                             @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
                             @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+                        } elseif ( $json && isset( $json['error'] ) ) {
+                            // API returned an error in the SSE stream
+                            $err_msg = isset( $json['error']['message'] ) ? $json['error']['message'] : 'Unknown API error';
+                            error_log( '[Seovela AI Stream OpenAI] API error: ' . $err_msg );
+                            echo "data: " . wp_json_encode( array( 'error' => $err_msg ) ) . "\n\n";
+                            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+                            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
                         }
                     }
                 }
                 return strlen( $chunk );
             },
-        ) );
+        );
 
-        curl_exec( $ch ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_exec
+        // Only set SSL options if CA bundle exists; otherwise let cURL use system defaults.
+        if ( ! empty( $ca_path ) && file_exists( $ca_path ) ) {
+            $curl_opts[ CURLOPT_SSL_VERIFYPEER ] = true;
+            $curl_opts[ CURLOPT_SSL_VERIFYHOST ] = 2;
+            $curl_opts[ CURLOPT_CAINFO ]         = $ca_path;
+        }
+
+        curl_setopt_array( $ch, $curl_opts ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt_array
+
+        $exec_result = curl_exec( $ch ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_exec
 
         if ( curl_errno( $ch ) ) {
-            echo "data: " . wp_json_encode( array( 'error' => 'Connection error: ' . curl_error( $ch ) ) ) . "\n\n";
+            $curl_error = curl_error( $ch );
+            error_log( '[Seovela AI Stream OpenAI] cURL error (' . curl_errno( $ch ) . '): ' . $curl_error );
+            echo "data: " . wp_json_encode( array( 'error' => 'Connection error: ' . $curl_error ) ) . "\n\n";
             @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
             @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+        } else {
+            $http_code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
+            error_log( '[Seovela AI Stream OpenAI] Completed. HTTP code: ' . $http_code );
         }
 
         curl_close( $ch ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_close
@@ -375,18 +422,17 @@ Requirements:
             ),
         ) );
 
+        $ca_path = $this->get_ca_bundle_path();
         $ch = curl_init( $url ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_init -- Required for SSE streaming.
 
-        curl_setopt_array( $ch, array( // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt_array
+        $curl_opts = array( // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt_array
             CURLOPT_HTTPHEADER     => array(
                 'Content-Type: application/json',
             ),
             CURLOPT_POST           => true,
             CURLOPT_POSTFIELDS     => $payload,
             CURLOPT_RETURNTRANSFER => false,
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_CAINFO         => $this->get_ca_bundle_path(),
+            CURLOPT_TIMEOUT        => 120,
             CURLOPT_WRITEFUNCTION  => function( $curl, $chunk ) {
                 // Parse SSE data from Gemini
                 $lines = explode( "\n", $chunk );
@@ -400,17 +446,32 @@ Requirements:
                             echo "data: " . wp_json_encode( array( 'content' => $content ) ) . "\n\n";
                             @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
                             @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+                        } elseif ( $json && isset( $json['error'] ) ) {
+                            $err_msg = isset( $json['error']['message'] ) ? $json['error']['message'] : 'Gemini API error';
+                            echo "data: " . wp_json_encode( array( 'error' => $err_msg ) ) . "\n\n";
+                            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+                            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
                         }
                     }
                 }
                 return strlen( $chunk );
             },
-        ) );
+        );
+
+        if ( ! empty( $ca_path ) && file_exists( $ca_path ) ) {
+            $curl_opts[ CURLOPT_SSL_VERIFYPEER ] = true;
+            $curl_opts[ CURLOPT_SSL_VERIFYHOST ] = 2;
+            $curl_opts[ CURLOPT_CAINFO ]         = $ca_path;
+        }
+
+        curl_setopt_array( $ch, $curl_opts ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt_array
 
         curl_exec( $ch ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_exec
 
         if ( curl_errno( $ch ) ) {
-            echo "data: " . wp_json_encode( array( 'error' => 'Connection error: ' . curl_error( $ch ) ) ) . "\n\n";
+            $curl_error = curl_error( $ch );
+            error_log( '[Seovela AI Stream Gemini] cURL error (' . curl_errno( $ch ) . '): ' . $curl_error );
+            echo "data: " . wp_json_encode( array( 'error' => 'Connection error: ' . $curl_error ) ) . "\n\n";
             @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
             @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
         }
@@ -860,9 +921,10 @@ Requirements:
             'temperature' => floatval( get_option( 'seovela_ai_temperature', 0.7 ) ),
         ) );
 
+        $ca_path = $this->get_ca_bundle_path();
         $ch = curl_init( $this->claude_endpoint ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_init -- Required for SSE streaming.
 
-        curl_setopt_array( $ch, array( // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt_array
+        $curl_opts = array( // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt_array
             CURLOPT_HTTPHEADER     => array(
                 'Content-Type: application/json',
                 'x-api-key: ' . $api_key,
@@ -871,9 +933,7 @@ Requirements:
             CURLOPT_POST           => true,
             CURLOPT_POSTFIELDS     => $payload,
             CURLOPT_RETURNTRANSFER => false,
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_CAINFO         => $this->get_ca_bundle_path(),
+            CURLOPT_TIMEOUT        => 120,
             CURLOPT_WRITEFUNCTION  => function( $curl, $chunk ) {
                 $lines = explode( "\n", $chunk );
                 foreach ( $lines as $line ) {
@@ -889,17 +949,32 @@ Requirements:
                             echo "data: " . wp_json_encode( array( 'content' => $content ) ) . "\n\n";
                             @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
                             @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+                        } elseif ( $json && isset( $json['type'] ) && $json['type'] === 'error' ) {
+                            $err_msg = isset( $json['error']['message'] ) ? $json['error']['message'] : 'Claude API error';
+                            echo "data: " . wp_json_encode( array( 'error' => $err_msg ) ) . "\n\n";
+                            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+                            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
                         }
                     }
                 }
                 return strlen( $chunk );
             },
-        ) );
+        );
+
+        if ( ! empty( $ca_path ) && file_exists( $ca_path ) ) {
+            $curl_opts[ CURLOPT_SSL_VERIFYPEER ] = true;
+            $curl_opts[ CURLOPT_SSL_VERIFYHOST ] = 2;
+            $curl_opts[ CURLOPT_CAINFO ]         = $ca_path;
+        }
+
+        curl_setopt_array( $ch, $curl_opts ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt_array
 
         curl_exec( $ch ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_exec
 
         if ( curl_errno( $ch ) ) {
-            echo "data: " . wp_json_encode( array( 'error' => 'Connection error: ' . curl_error( $ch ) ) ) . "\n\n";
+            $curl_error = curl_error( $ch );
+            error_log( '[Seovela AI Stream Claude] cURL error (' . curl_errno( $ch ) . '): ' . $curl_error );
+            echo "data: " . wp_json_encode( array( 'error' => 'Connection error: ' . $curl_error ) ) . "\n\n";
             @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
             @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
         }

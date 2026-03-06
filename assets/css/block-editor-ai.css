@@ -4,6 +4,14 @@
  * @package Seovela
  */
 
+/* Hide empty meta-boxes area in block editor (no Seovela metabox in Gutenberg) */
+.edit-post-meta-boxes-main:has(.meta-box-sortables:empty) {
+    display: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
 /* Sidebar Container */
 .seovela-ai-sidebar {
     padding: 16px;
