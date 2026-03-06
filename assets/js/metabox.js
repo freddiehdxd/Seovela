@@ -1,567 +1,532 @@
 /**
  * Seovela Metabox JavaScript
  *
+ * Handles all metabox interactions: tabs, counters, previews,
+ * SEO analysis, AI features (AJAX + streaming), schema, and editor integration.
+ *
  * @package Seovela
  */
 
-(function($) {
+(function ($) {
     'use strict';
 
-    var seovelaMetabox = {
-        analysisTimeout: null,
+    /* ---------------------------------------------------------------
+     * 0. Localized data alias
+     * ------------------------------------------------------------- */
+    var config = window.seovelaMetabox || {};
 
-        init: function() {
-            this.bindEvents();
-            this.updateCounters();
-            this.updatePreview();
-            this.animateScore();
-            
-            // Initial analysis for Gutenberg (waits for editor to load)
-            if (typeof wp !== 'undefined' && wp.data && wp.domReady) {
-                var self = this;
-                wp.domReady(function() {
-                    // Give it a moment to fully settle
-                    setTimeout(function() {
-                        self.updatePreview(); // Update preview URL from Gutenberg data
-                        self.scheduleAnalysis();
-                    }, 1000);
-                });
-            }
-        },
-
-        bindEvents: function() {
-            var self = this;
-
-            // Update counters, preview, and analyze on input
-            $('.seovela-title-input, .seovela-description-input, .seovela-keyword-input').off('input').on('input', function() {
-                self.updateCounters();
-                self.updatePreview();
-                self.scheduleAnalysis();
-            });
-
-            // Also analyze when content changes (for Gutenberg and Classic Editor)
-            if (typeof wp !== 'undefined' && wp.data && wp.data.subscribe) {
-                // Gutenberg
-                var initialContent = wp.data.select('core/editor').getEditedPostContent();
-                var initialTitle = wp.data.select('core/editor').getEditedPostAttribute('title');
-                
-                wp.data.subscribe(function() {
-                    var newContent = wp.data.select('core/editor').getEditedPostContent();
-                    var newTitle = wp.data.select('core/editor').getEditedPostAttribute('title');
-                    
-                    if (newContent !== initialContent || newTitle !== initialTitle) {
-                        initialContent = newContent;
-                        initialTitle = newTitle;
-                        self.updatePreview(); // Update preview immediately
-                        self.scheduleAnalysis();
-                    }
-                });
-            }
-
-            // Classic Editor (TinyMCE)
-            $(document).on('tinymce-editor-init', function(event, editor) {
-                if (editor.id === 'content') {
-                    // Listen for specific events that change content
-                    editor.on('keyup change paste setcontent input', function() {
-                        self.scheduleAnalysis();
-                    });
-                }
-            });
-
-            // Also check if TinyMCE is already initialized (re-binding safety)
-            if (typeof tinymce !== 'undefined' && tinymce.get('content')) {
-                var editor = tinymce.get('content');
-                editor.off('keyup change paste setcontent input').on('keyup change paste setcontent input', function() {
-                    self.scheduleAnalysis();
-                });
-            }
-
-            // Fallback for non-TinyMCE textareas
-            $(document).off('input.seovela').on('input.seovela', '#content, .editor-post-text-editor', function() {
-                self.scheduleAnalysis();
-            });
-
-            // Toggle analysis results
-            $('.seovela-toggle-analysis').off('click').on('click', function(e) {
-                e.preventDefault();
-                var $results = $('.seovela-analysis-results');
-                var $button = $(this);
-                
-                $results.slideToggle(300, function() {
-                if ($results.is(':visible')) {
-                    $button.text('Hide Analysis');
-                } else {
-                    $button.text('View Analysis');
-                }
-                });
-            });
-
-            // AI optimization buttons
-            if (typeof window.seovelaMetabox !== 'undefined' && window.seovelaMetabox.aiEnabled) {
-                $('.seovela-ai-optimize').off('click').on('click', function(e) {
-                    e.preventDefault();
-                    var field = $(this).data('field');
-                    self.optimizeWithAI(field, $(this));
-                });
-
-                // Suggest keywords button
-                $('.seovela-suggest-keywords').off('click').on('click', function(e) {
-                    e.preventDefault();
-                    self.suggestKeywords($(this));
-                });
-
-                // Keyword suggestion clicks
-                $(document).off('click.keyword').on('click.keyword', '.seovela-keyword-chip', function(e) {
-                    e.preventDefault();
-                    var keyword = $(this).data('keyword');
-                    $('.seovela-keyword-input').val(keyword).trigger('input');
-                    $('.seovela-keyword-suggestions').slideUp();
-                });
-
-            }
-        },
-
-        updateCounters: function() {
-            var self = this;
-
-            // Title counter
-            var titleInput = $('.seovela-title-input');
-            if (titleInput.length) {
-                var titleLength = titleInput.val().length;
-                var titleCounter = $('.seovela-count[data-field="title"]');
-                titleCounter.text(titleLength);
-                titleCounter.removeClass('seovela-count-short seovela-count-good seovela-count-long');
-                
-                if (titleLength < 30) {
-                    titleCounter.addClass('seovela-count-short');
-                    titleCounter.next('.seovela-status').text('Too short');
-                } else if (titleLength > 60) {
-                    titleCounter.addClass('seovela-count-long');
-                    titleCounter.next('.seovela-status').text('Too long');
-                } else {
-                    titleCounter.addClass('seovela-count-good');
-                    titleCounter.next('.seovela-status').text('Good length');
-                }
-            }
-
-            // Description counter
-            var descInput = $('.seovela-description-input');
-            if (descInput.length) {
-                var descLength = descInput.val().length;
-                var descCounter = $('.seovela-count[data-field="description"]');
-                descCounter.text(descLength);
-                descCounter.removeClass('seovela-count-short seovela-count-good seovela-count-long');
-                
-                if (descLength < 120) {
-                    descCounter.addClass('seovela-count-short');
-                    descCounter.next('.seovela-status').text('Too short');
-                } else if (descLength > 160) {
-                    descCounter.addClass('seovela-count-long');
-                    descCounter.next('.seovela-status').text('Too long');
-                } else {
-                    descCounter.addClass('seovela-count-good');
-                    descCounter.next('.seovela-status').text('Good length');
-                }
-            }
-        },
-
-        updatePreview: function() {
-            var title = $('.seovela-title-input').val();
-            var description = $('.seovela-description-input').val();
-            var url = '';
-
-            // Try to get URL from Gutenberg
-            if (typeof wp !== 'undefined' && wp.data && wp.data.select('core/editor')) {
-                url = wp.data.select('core/editor').getPermalink();
-            } 
-            
-            // Fallback to Classic Editor / DOM
-            if (!url) {
-                var $samplePermalink = $('#sample-permalink');
-                if ($samplePermalink.length) {
-                    // Get the actual permalink href first (this is the real URL)
-                    var $link = $samplePermalink.find('a');
-                    if ($link.length) {
-                        url = $link.attr('href');
-                        
-                        // If href gives us ?p=XX (draft/preview URL), try to construct pretty URL
-                        if (url && url.indexOf('?p=') !== -1 || url.indexOf('?page_id=') !== -1) {
-                            // Get the editable slug
-                            var slug = $('#editable-post-name').text().trim() || $('#editable-post-name-full').text().trim();
-                            if (slug) {
-                                // Get base URL from the link
-                                var baseUrl = url.split('?')[0];
-                                // Construct pretty permalink
-                                url = baseUrl.replace(/\/$/, '') + '/' + slug + '/';
-                            }
-                        }
-                    }
-                    
-                    // Fallback: try to get from visible text if href failed
-                    if (!url || url === 'undefined') {
-                        var $clone = $samplePermalink.clone();
-                        $clone.find('#edit-slug-buttons, button, .screen-reader-text').remove();
-                        url = $clone.text().replace('Permalink:', '').trim();
-                    }
-                }
-                
-                // Last resort fallback
-                if (!url || url === 'undefined') {
-                    url = $('.seovela-preview-url').text();
-                }
-            }
-
-            $('.seovela-preview-title').text(title);
-            $('.seovela-preview-description').text(description);
-            
-            // Update URL if we found a valid one
-            if (url && url !== 'undefined') {
-                $('.seovela-preview-url').text(url);
-            }
-        },
-
-        scheduleAnalysis: function() {
-            var self = this;
-            
-            // Clear existing timeout
-            if (this.analysisTimeout) {
-                clearTimeout(this.analysisTimeout);
-            }
-            
-            // Add updating state immediately
-            $('.seovela-score-widget').addClass('seovela-updating');
-            
-            // Schedule analysis after 500ms (more responsive)
-            this.analysisTimeout = setTimeout(function() {
-                self.analyzeContent();
-            }, 500);
-        },
-
-        analyzeContent: function() {
-            if (!window.seovelaMetabox || !window.seovelaMetabox.ajaxUrl) {
-                return;
-            }
-
-            var postId = $('#post_ID').val();
-            var keyword = $('.seovela-keyword-input').val();
-            var title = $('.seovela-title-input').val();
-            var description = $('.seovela-description-input').val();
-            var url = '';
-            
-            // Get content and URL
-            var content = '';
-            if (typeof wp !== 'undefined' && wp.data && wp.data.select('core/editor')) {
-                // Gutenberg
-                var editor = wp.data.select('core/editor');
-                content = editor.getEditedPostContent();
-                url = editor.getPermalink();
-            } else {
-                // Classic Editor
-                if (typeof tinymce !== 'undefined' && tinymce.get('content')) {
-                    content = tinymce.get('content').getContent();
-            } else {
-                content = $('#content').val() || '';
-                }
-                
-                // Get URL from Classic Editor permalink box  
-                var $permalink = $('#sample-permalink');
-                if ($permalink.length) {
-                    var $link = $permalink.find('a');
-                    if ($link.length) {
-                        url = $link.attr('href');
-                        
-                        // If href gives us ?p=XX (draft/preview URL), try to construct pretty URL
-                        if (url && (url.indexOf('?p=') !== -1 || url.indexOf('?page_id=') !== -1)) {
-                            var slug = $('#editable-post-name').text().trim() || $('#editable-post-name-full').text().trim();
-                            if (slug) {
-                                var baseUrl = url.split('?')[0];
-                                url = baseUrl.replace(/\/$/, '') + '/' + slug + '/';
-                            }
-                        }
-                    } else {
-                        // Fallback to text content
-                        url = $permalink.text().replace('Permalink:', '').trim();
-                    }
-                }
-            }
-
-            // Show loading state
-            var $scoreWidget = $('.seovela-score-widget');
-            
-            // Don't add 'seovela-loading' here as we want a subtle update, 
-            // but keep it for the initial load or button clicks if needed.
-            // We use 'seovela-updating' for the typing feedback.
-
-            $.ajax({
-                url: window.seovelaMetabox.ajaxUrl,
-                type: 'POST',
-                data: {
-                    action: 'seovela_analyze_content',
-                    nonce: window.seovelaMetabox.analysisNonce,
-                    post_id: postId,
-                    focus_keyword: keyword,
-                    title: title,
-                    description: description,
-                    content: content,
-                    url: url
-                },
-                success: function(response) {
-                    if (response.success) {
-                        seovelaMetabox.updateAnalysisUI(response.data);
-                    }
-                },
-                complete: function() {
-                    $scoreWidget.removeClass('seovela-loading seovela-updating');
-                }
-            });
-        },
-
-        updateAnalysisUI: function(data) {
-            var score = data.score;
-            var status = data.status;
-            var $scoreNum = $('.seovela-score-number');
-            var currentScore = parseInt($scoreNum.text(), 10);
-            
-            // Update score circle
-            var $circle = $('.seovela-score-circle');
-            $circle.attr('data-score', score);
-            $circle.attr('data-status', status);
-            
-            // Update score number with animation if changed
-            if (currentScore !== score) {
-                $scoreNum.addClass('seovela-pulse');
-                setTimeout(function() {
-                    $scoreNum.removeClass('seovela-pulse');
-                }, 300);
-                $scoreNum.text(score);
-            }
-            
-            $('.seovela-score-label').text(this.getStatusLabel(status));
-            
-            // Animate progress circle
-            var circumference = 339.29; // 2 * PI * 54
-            var offset = circumference - (score / 100) * circumference;
-            $('.seovela-score-progress').css('stroke-dashoffset', offset);
-            
-            // Update analysis sections (if results panel is visible)
-            // Note: Full implementation would rebuild the analysis sections here
-            // For now, we're just updating the score
-        },
-
-        getStatusLabel: function(status) {
-            var labels = {
-                'good': 'Good',
-                'warning': 'Needs Improvement',
-                'error': 'Poor'
+    /* ---------------------------------------------------------------
+     * 1. Helpers
+     * ------------------------------------------------------------- */
+    var Helpers = {
+        debounce: function (fn, delay) {
+            var timer;
+            return function () {
+                var ctx = this, args = arguments;
+                clearTimeout(timer);
+                timer = setTimeout(function () { fn.apply(ctx, args); }, delay);
             };
-            return labels[status] || 'Unknown';
         },
 
-        animateScore: function() {
-            var $circle = $('.seovela-score-circle');
-            if ($circle.length === 0) return;
-            
-            var score = parseInt($circle.attr('data-score'), 10) || 0;
-            var circumference = 339.29; // 2 * PI * 54
-            var offset = circumference - (score / 100) * circumference;
-            
-            // Set initial state (full circle hidden)
-            $('.seovela-score-progress').css('stroke-dashoffset', circumference);
-            
-            // Animate to current score after short delay
-            setTimeout(function() {
-                $('.seovela-score-progress').css('stroke-dashoffset', offset);
-            }, 150);
+        stripHTML: function (html) {
+            var tmp = document.createElement('div');
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || '';
         },
 
-        optimizeWithAI: function(field, $button) {
-            var self = this;
-            var postId = $('#post_ID').val();
-            var fieldInput = field === 'title' ? $('.seovela-title-input') : $('.seovela-description-input');
-            var focusKeyword = $('.seovela-keyword-input').val();
-            var originalButtonText = $button.text();
-
-            // Get content from editor
-            var content = '';
+        getEditorContent: function () {
             if (typeof wp !== 'undefined' && wp.data && wp.data.select('core/editor')) {
-                content = wp.data.select('core/editor').getEditedPostContent();
-            } else if (typeof tinymce !== 'undefined' && tinymce.get('content')) {
-                content = tinymce.get('content').getContent();
-            } else {
-                content = $('#content').val() || '';
+                return wp.data.select('core/editor').getEditedPostContent();
             }
-
-            // Strip HTML tags for cleaner content
-            var tempDiv = document.createElement('div');
-            tempDiv.innerHTML = content;
-            content = tempDiv.textContent || tempDiv.innerText || '';
-
-            if (!content || content.trim().length < 50) {
-                alert('Please add more content to your post before generating AI suggestions. At least 50 characters are required.');
-                return;
+            if (typeof tinymce !== 'undefined' && tinymce.get('content')) {
+                return tinymce.get('content').getContent();
             }
-
-            // Disable button and show loading
-            $button.prop('disabled', true).addClass('seovela-ai-loading');
-            $button.html('<span class="seovela-spinner"></span> Generating...');
-
-            $.ajax({
-                url: window.seovelaMetabox.ajaxUrl,
-                type: 'POST',
-                data: {
-                    action: 'seovela_generate_ai_content',
-                    nonce: window.seovelaMetabox.aiNonce,
-                    post_id: postId,
-                    type: field,
-                    content: content.substring(0, 3000),
-                    focus_keyword: focusKeyword
-                },
-                success: function(response) {
-                    if (response.success && response.data.content) {
-                        var generatedContent = response.data.content;
-                        
-                        // Clean up any quotes or extra whitespace
-                        generatedContent = generatedContent.replace(/^["']|["']$/g, '').trim();
-                        
-                        // Set the value and trigger updates
-                        fieldInput.val(generatedContent).trigger('input');
-                        
-                        // Show success notification
-                        self.showAINotification(fieldInput, 'success', field === 'title' ? 'Title generated!' : 'Description generated!');
-                        
-                        // Highlight the field briefly
-                        fieldInput.addClass('seovela-ai-updated');
-                        setTimeout(function() {
-                            fieldInput.removeClass('seovela-ai-updated');
-                        }, 2000);
-                    } else {
-                        var errorMsg = response.data && response.data.message ? response.data.message : 'Failed to generate content';
-                        self.showAINotification($button, 'error', errorMsg);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    var errorMsg = 'Network error. Please check your connection and try again.';
-                    if (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.message) {
-                        errorMsg = xhr.responseJSON.data.message;
-                    }
-                    self.showAINotification($button, 'error', errorMsg);
-                },
-                complete: function() {
-                    $button.prop('disabled', false).removeClass('seovela-ai-loading');
-                    $button.html(originalButtonText);
-                }
-            });
+            return $('#content').val() || '';
         },
 
-        showAINotification: function($element, type, message) {
-            // Remove any existing notifications
-            $('.seovela-ai-notification').remove();
-            
-            var $notification = $('<div class="seovela-ai-notification seovela-ai-' + type + '">' +
-                '<span class="dashicons dashicons-' + (type === 'success' ? 'yes-alt' : 'warning') + '"></span>' +
-                '<span class="seovela-notification-text">' + message + '</span>' +
-            '</div>');
-            
-            $element.closest('.seovela-field').append($notification);
-            
-            // Animate in
-            setTimeout(function() {
-                $notification.addClass('show');
-            }, 10);
-            
-            // Auto-remove after 4 seconds
-            setTimeout(function() {
-                $notification.removeClass('show');
-                setTimeout(function() {
-                    $notification.remove();
-                }, 300);
-            }, 4000);
+        getEditorText: function () {
+            return Helpers.stripHTML(Helpers.getEditorContent());
         },
 
-        suggestKeywords: function($button) {
-            var self = this;
-            var originalText = $button.html();
-
-            // Get content
-            var content = this.getEditorContent();
-            var title = this.getPostTitle();
-
-            if (!content && !title) {
-                alert('Please add some content or a title first.');
-                return;
-            }
-
-            $button.prop('disabled', true).html('<span class="seovela-spinner"></span>');
-
-            $.ajax({
-                url: window.seovelaMetabox.ajaxUrl,
-                type: 'POST',
-                data: {
-                    action: 'seovela_suggest_keywords',
-                    nonce: window.seovelaMetabox.aiNonce,
-                    content: content.substring(0, 3000),
-                    title: title
-                },
-                success: function(response) {
-                    if (response.success && response.data.keywords) {
-                        var $suggestions = $('.seovela-keyword-suggestions');
-                        var $list = $suggestions.find('.seovela-suggestions-list');
-                        $list.empty();
-
-                        response.data.keywords.forEach(function(keyword) {
-                            $list.append('<span class="seovela-keyword-chip" data-keyword="' + keyword + '">' + keyword + '</span>');
-                        });
-
-                        $suggestions.slideDown();
-                    } else {
-                        alert(response.data.message || 'Failed to get keyword suggestions.');
-                    }
-                },
-                error: function() {
-                    alert('Error connecting to AI service.');
-                },
-                complete: function() {
-                    $button.prop('disabled', false).html(originalText);
-                }
-            });
-        },
-
-        getEditorContent: function() {
-            var content = '';
-            
-            if (typeof wp !== 'undefined' && wp.data && wp.data.select('core/editor')) {
-                content = wp.data.select('core/editor').getEditedPostContent();
-            } else if (typeof tinymce !== 'undefined' && tinymce.get('content')) {
-                content = tinymce.get('content').getContent();
-            } else {
-                content = $('#content').val() || '';
-            }
-
-            // Strip HTML for text content
-            var tempDiv = document.createElement('div');
-            tempDiv.innerHTML = content;
-            return tempDiv.textContent || tempDiv.innerText || '';
-        },
-
-        getPostTitle: function() {
+        getPostTitle: function () {
             if (typeof wp !== 'undefined' && wp.data && wp.data.select('core/editor')) {
                 return wp.data.select('core/editor').getEditedPostAttribute('title') || '';
-                }
+            }
             return $('#title').val() || '';
+        },
+
+        getPermalink: function () {
+            if (typeof wp !== 'undefined' && wp.data && wp.data.select('core/editor')) {
+                var url = wp.data.select('core/editor').getPermalink();
+                if (url) return url;
+            }
+            var $sample = $('#sample-permalink');
+            if ($sample.length) {
+                var $a = $sample.find('a');
+                if ($a.length) return $a.attr('href');
+            }
+            return $('.seovela-preview-url').text();
+        },
+
+        notify: function ($anchor, type, message) {
+            $('.seovela-ai-notification').remove();
+            var icon = type === 'success' ? 'yes-alt' : 'warning';
+            var $el = $(
+                '<div class="seovela-ai-notification seovela-ai-' + type + '">' +
+                    '<span class="dashicons dashicons-' + icon + '"></span> ' + message +
+                '</div>'
+            );
+            $anchor.closest('.seovela-field, .seovela-field-group, .seovela-ai-panel').append($el);
+            setTimeout(function () { $el.addClass('show'); }, 10);
+            setTimeout(function () {
+                $el.removeClass('show');
+                setTimeout(function () { $el.remove(); }, 300);
+            }, 4000);
         }
     };
 
-    // Schema selector functionality
-    var seovelaSchema = {
+    /* ---------------------------------------------------------------
+     * 2. Tabs
+     * ------------------------------------------------------------- */
+    var Tabs = {
+        init: function () {
+            // Main tabs (already handled by inline <script>; rebind for safety)
+            $(document).on('click', '.seovela-tab-btn[data-tab]', function () {
+                var tab = $(this).data('tab');
+                var $box = $(this).closest('.seovela-metabox');
+                $box.find('.seovela-tab-btn').removeClass('active');
+                $(this).addClass('active');
+                $box.find('.seovela-tab-panel').removeClass('active')
+                    .filter('[data-panel="' + tab + '"]').addClass('active');
+            });
+
+            // Social sub-tabs
+            $(document).on('click', '.seovela-social-tab[data-social]', function () {
+                var key = $(this).data('social');
+                var $wrap = $(this).closest('.seovela-tab-panel');
+                $wrap.find('.seovela-social-tab').removeClass('active');
+                $(this).addClass('active');
+                $wrap.find('.seovela-social-panel').removeClass('active')
+                    .filter('[data-social-panel="' + key + '"]').addClass('active');
+            });
+
+        }
+    };
+
+    /* ---------------------------------------------------------------
+     * 3. Character Counters
+     * ------------------------------------------------------------- */
+    var Counters = {
+        init: function () {
+            this.update();
+            $(document).on('input', '.seovela-title-input, .seovela-description-input', function () {
+                Counters.update();
+            });
+        },
+
+        update: function () {
+            this._count('.seovela-title-input', 'title', 30, 60);
+            this._count('.seovela-description-input', 'description', 120, 160);
+        },
+
+        _count: function (selector, field, min, max) {
+            var $input = $(selector);
+            if (!$input.length) return;
+            var len = $input.val().length;
+            var $counter = $('.seovela-count[data-field="' + field + '"]');
+            var $status = $counter.siblings('.seovela-status');
+
+            $counter.text(len)
+                .removeClass('seovela-count-short seovela-count-good seovela-count-long');
+
+            if (len < min) {
+                $counter.addClass('seovela-count-short');
+                $status.text('Too short');
+            } else if (len > max) {
+                $counter.addClass('seovela-count-long');
+                $status.text('Too long');
+            } else {
+                $counter.addClass('seovela-count-good');
+                $status.text('Good length');
+            }
+        }
+    };
+
+    /* ---------------------------------------------------------------
+     * 4. Google Preview
+     * ------------------------------------------------------------- */
+    var Preview = {
+        init: function () {
+            this.update();
+            $(document).on('input', '.seovela-title-input, .seovela-description-input', function () {
+                Preview.update();
+            });
+        },
+
+        update: function () {
+            var title = $('.seovela-title-input').val() || '';
+            var desc  = $('.seovela-description-input').val() || '';
+            var url   = Helpers.getPermalink();
+
+            $('.seovela-preview-title').text(title);
+            $('.seovela-preview-description').text(desc);
+            if (url) $('.seovela-preview-url').text(url);
+        }
+    };
+
+    /* ---------------------------------------------------------------
+     * 5. OG Preview
+     * ------------------------------------------------------------- */
+    var OGPreview = {
+        init: function () {
+            this.update();
+            $(document).on(
+                'input',
+                '#seovela_og_title, #seovela_og_description, .seovela-title-input, .seovela-description-input',
+                function () { OGPreview.update(); }
+            );
+        },
+
+        update: function () {
+            var ogTitle = $('#seovela_og_title').val() || $('.seovela-title-input').val() || '';
+            var ogDesc  = $('#seovela_og_description').val() || $('.seovela-description-input').val() || '';
+            $('.seovela-og-preview-title').text(ogTitle);
+            $('.seovela-og-preview-desc').text(ogDesc);
+        }
+    };
+
+    /* ---------------------------------------------------------------
+     * 6. SEO Analysis
+     * ------------------------------------------------------------- */
+    var Analysis = {
+        _timer: null,
+
+        init: function () {
+            var self = this;
+
+            // Manual refresh
+            $(document).on('click', '.seovela-refresh-analysis', function () {
+                self.run();
+            });
+
+            // Toggle results panel
+            $(document).on('click', '.seovela-toggle-analysis', function () {
+                var $results = $('.seovela-analysis-results');
+                var $btn = $(this);
+                $results.slideToggle(300, function () {
+                    $btn.text($results.is(':visible') ? 'Hide Analysis' : 'View Analysis');
+                });
+            });
+
+            // Inputs schedule auto-analysis
+            $(document).on(
+                'input',
+                '.seovela-title-input, .seovela-description-input, .seovela-keyword-input',
+                Helpers.debounce(function () { self.run(); }, 1500)
+            );
+
+            // Animate score circle on load
+            this._animateScore();
+        },
+
+        schedule: function () {
+            var self = this;
+            clearTimeout(this._timer);
+            this._timer = setTimeout(function () { self.run(); }, 1500);
+        },
+
+        run: function () {
+            if (!config.ajaxUrl) return;
+
+            var data = {
+                action:        'seovela_analyze_content',
+                nonce:         config.analysisNonce,
+                post_id:       $('#post_ID').val(),
+                focus_keyword: $('.seovela-keyword-input').val(),
+                title:         $('.seovela-title-input').val(),
+                description:   $('.seovela-description-input').val(),
+                content:       Helpers.getEditorContent(),
+                url:           Helpers.getPermalink()
+            };
+
+            $.post(config.ajaxUrl, data, function (res) {
+                if (res.success) Analysis._updateUI(res.data);
+            });
+        },
+
+        _updateUI: function (d) {
+            var score  = d.score || 0;
+            var status = d.status || 'unknown';
+
+            // Score number
+            var $num = $('.seovela-score-number');
+            $num.text(score);
+
+            // Label
+            var labels = { good: 'Good', warning: 'Needs Improvement', error: 'Poor' };
+            $('.seovela-score-label').text(labels[status] || 'Unknown');
+
+            // Circle
+            var circumference = 339.29;
+            var offset = circumference - (score / 100) * circumference;
+            var colors = { good: '#10b981', warning: '#f59e0b', error: '#ef4444' };
+            var color  = colors[status] || '#94a3b8';
+
+            $('.seovela-score-progress').css('stroke-dashoffset', offset).attr('stroke', color);
+            $('.seovela-score-circle').attr({ 'data-score': score, 'data-status': status });
+
+            // Tab badge
+            var $badge = $('.seovela-tab-score');
+            $badge.find('.seovela-tab-score-number').text(score);
+            $badge.css('color', color);
+
+            // Results HTML
+            if (d.errors || d.warnings || d.good) {
+                var html = '';
+                if (d.errors && d.errors.length) {
+                    html += '<div class="seovela-analysis-section seovela-errors"><h4>Errors (' + d.errors.length + ')</h4><ul>';
+                    $.each(d.errors, function (_, m) { html += '<li>' + $('<span>').text(m).html() + '</li>'; });
+                    html += '</ul></div>';
+                }
+                if (d.warnings && d.warnings.length) {
+                    html += '<div class="seovela-analysis-section seovela-warnings"><h4>Warnings (' + d.warnings.length + ')</h4><ul>';
+                    $.each(d.warnings, function (_, m) { html += '<li>' + $('<span>').text(m).html() + '</li>'; });
+                    html += '</ul></div>';
+                }
+                if (d.good && d.good.length) {
+                    html += '<div class="seovela-analysis-section seovela-good"><h4>Good (' + d.good.length + ')</h4><ul>';
+                    $.each(d.good, function (_, m) { html += '<li>' + $('<span>').text(m).html() + '</li>'; });
+                    html += '</ul></div>';
+                }
+                $('.seovela-analysis-results').html(html);
+            }
+        },
+
+        _animateScore: function () {
+            var $circle = $('.seovela-score-circle');
+            if (!$circle.length) return;
+            var score = parseInt($circle.attr('data-score'), 10) || 0;
+            var circumference = 339.29;
+            var offset = circumference - (score / 100) * circumference;
+            $('.seovela-score-progress').css('stroke-dashoffset', circumference);
+            setTimeout(function () {
+                $('.seovela-score-progress').css('stroke-dashoffset', offset);
+            }, 150);
+        }
+    };
+
+    /* ---------------------------------------------------------------
+     * 7. AI – Keyword Suggestions
+     * ------------------------------------------------------------- */
+    var AIKeywords = {
+        init: function () {
+            if (!config.aiEnabled) return;
+
+            $(document).on('click', '.seovela-suggest-keywords', function (e) {
+                e.preventDefault();
+                AIKeywords.suggest($(this));
+            });
+
+            $(document).on('click', '.seovela-keyword-chip', function (e) {
+                e.preventDefault();
+                $('.seovela-keyword-input').val($(this).data('keyword')).trigger('input');
+                $('.seovela-keyword-suggestions').slideUp();
+            });
+        },
+
+        suggest: function ($btn) {
+            var text  = Helpers.getEditorText();
+            var title = Helpers.getPostTitle();
+            if (!text && !title) { alert('Please add some content or a title first.'); return; }
+
+            var original = $btn.html();
+            $btn.prop('disabled', true).html('<span class="seovela-spinner"></span>');
+
+            $.post(config.ajaxUrl, {
+                action: 'seovela_suggest_keywords',
+                nonce:  config.aiNonce,
+                content: text.substring(0, 3000),
+                title:   title
+            }, function (res) {
+                if (res.success && res.data.keywords) {
+                    var $list = $('.seovela-suggestions-list').empty();
+                    $.each(res.data.keywords, function (_, kw) {
+                        $list.append(
+                            '<span class="seovela-keyword-chip" data-keyword="' +
+                            $('<span>').text(kw).html() + '">' + $('<span>').text(kw).html() + '</span>'
+                        );
+                    });
+                    $('.seovela-keyword-suggestions').slideDown();
+                } else {
+                    alert((res.data && res.data.message) || 'Failed to get keyword suggestions.');
+                }
+            }).fail(function () {
+                alert('Error connecting to AI service.');
+            }).always(function () {
+                $btn.prop('disabled', false).html(original);
+            });
+        }
+    };
+
+    /* ---------------------------------------------------------------
+     * 8. AI – Generate Title / Description
+     * ------------------------------------------------------------- */
+    var AIOptimize = {
+        init: function () {
+            if (!config.aiEnabled) return;
+
+            $(document).on('click', '.seovela-ai-optimize[data-field]', function (e) {
+                e.preventDefault();
+                AIOptimize.generate($(this).data('field'), $(this));
+            });
+        },
+
+        generate: function (field, $btn) {
+            var text = Helpers.getEditorText();
+            if (!text || text.trim().length < 50) {
+                alert('Please add more content (at least 50 characters) before generating AI suggestions.');
+                return;
+            }
+
+            var $input = field === 'title' ? $('.seovela-title-input') : $('.seovela-description-input');
+            var original = $btn.html();
+            $btn.prop('disabled', true).html('<span class="seovela-spinner"></span> Generating...');
+
+            $.post(config.ajaxUrl, {
+                action:        'seovela_generate_ai_content',
+                nonce:         config.aiNonce,
+                post_id:       $('#post_ID').val(),
+                type:          field,
+                content:       text.substring(0, 3000),
+                focus_keyword: $('.seovela-keyword-input').val()
+            }, function (res) {
+                if (res.success && res.data.content) {
+                    var val = res.data.content.replace(/^["']|["']$/g, '').trim();
+                    $input.val(val).trigger('input');
+                    $input.addClass('seovela-ai-updated');
+                    setTimeout(function () { $input.removeClass('seovela-ai-updated'); }, 2000);
+                    Helpers.notify($btn, 'success', field === 'title' ? 'Title generated!' : 'Description generated!');
+                } else {
+                    Helpers.notify($btn, 'error', (res.data && res.data.message) || 'Failed to generate content');
+                }
+            }).fail(function (xhr) {
+                var msg = 'Network error. Please try again.';
+                if (xhr.responseJSON && xhr.responseJSON.data) msg = xhr.responseJSON.data.message || msg;
+                Helpers.notify($btn, 'error', msg);
+            }).always(function () {
+                $btn.prop('disabled', false).html(original);
+            });
+        }
+    };
+
+    /* ---------------------------------------------------------------
+     * 9. Robot Chips
+     * ------------------------------------------------------------- */
+    var RobotChips = {
+        init: function () {
+            $(document).on('change', '.seovela-robot-chip input[type="checkbox"]', function () {
+                $(this).closest('.seovela-robot-chip').toggleClass('checked', this.checked);
+            });
+        }
+    };
+
+    /* ---------------------------------------------------------------
+     * 10. Media Uploader (OG Image)
+     * ------------------------------------------------------------- */
+    var MediaUploader = {
+        frame: null,
+
+        init: function () {
+            var self = this;
+            $(document).on('click', '.seovela-upload-og-image', function (e) {
+                e.preventDefault();
+                self.open();
+            });
+        },
+
+        open: function () {
+            if (this.frame) { this.frame.open(); return; }
+
+            this.frame = wp.media({
+                title:    'Select OG Image',
+                button:   { text: 'Use this image' },
+                multiple: false,
+                library:  { type: 'image' }
+            });
+
+            this.frame.on('select', function () {
+                var attachment = this.frame.state().get('selection').first().toJSON();
+                $('#seovela_og_image').val(attachment.url).trigger('input');
+
+                // Update preview image
+                var $imgWrap = $('.seovela-og-preview-image');
+                $imgWrap.html('<img src="' + attachment.url + '" alt="" />');
+            }.bind(this));
+
+            this.frame.open();
+        }
+    };
+
+    /* ---------------------------------------------------------------
+     * 11. Editor Integration (Gutenberg + TinyMCE auto-analysis)
+     * ------------------------------------------------------------- */
+    var EditorBridge = {
+        init: function () {
+            var scheduleAnalysis = Helpers.debounce(function () {
+                Analysis.schedule();
+            }, 2000);
+
+            // Gutenberg subscribe
+            if (typeof wp !== 'undefined' && wp.data && wp.data.subscribe) {
+                var prevContent = '';
+                var prevTitle   = '';
+                try {
+                    prevContent = wp.data.select('core/editor').getEditedPostContent();
+                    prevTitle   = wp.data.select('core/editor').getEditedPostAttribute('title');
+                } catch (_) { /* editor not ready */ }
+
+                wp.data.subscribe(function () {
+                    try {
+                        var c = wp.data.select('core/editor').getEditedPostContent();
+                        var t = wp.data.select('core/editor').getEditedPostAttribute('title');
+                        if (c !== prevContent || t !== prevTitle) {
+                            prevContent = c;
+                            prevTitle   = t;
+                            Preview.update();
+                            scheduleAnalysis();
+                        }
+                    } catch (_) {}
+                });
+            }
+
+            // Classic Editor – TinyMCE
+            $(document).on('tinymce-editor-init', function (_e, editor) {
+                if (editor.id === 'content') {
+                    editor.on('keyup change paste setcontent input', scheduleAnalysis);
+                }
+            });
+            if (typeof tinymce !== 'undefined' && tinymce.get('content')) {
+                tinymce.get('content').on('keyup change paste setcontent input', scheduleAnalysis);
+            }
+
+            // Classic fallback textarea
+            $(document).on('input', '#content', scheduleAnalysis);
+        }
+    };
+
+    /* ---------------------------------------------------------------
+     * 12. Schema
+     * ------------------------------------------------------------- */
+    var Schema = {
         initialized: false,
-        
-        schemaDescriptions: {
-            'Article': 'Suitable for news articles, blog posts, and editorial content. Provides rich search results.',
-            'FAQ': 'Frequently Asked Questions. Displays Q&A directly in search results with expandable answers.',
-            'HowTo': 'Step-by-step instructions. Perfect for tutorials, recipes, and guides. Shows steps in search results.',
-            'LocalBusiness': 'For local businesses. Shows business hours, location, contact info in search and maps. Uses Local SEO settings.',
-            'Person': 'For author profiles and people pages. Shows person info, job title, and social profiles in knowledge panels.',
-            'Product': 'For product pages. Shows price, availability, and ratings in search results. Not for WooCommerce (use WooCommerce schema).'
+
+        descriptions: {
+            'Article':       'Suitable for news articles, blog posts, and editorial content.',
+            'FAQ':           'Frequently Asked Questions. Displays Q&A directly in search results.',
+            'HowTo':         'Step-by-step instructions for tutorials, recipes, and guides.',
+            'LocalBusiness': 'For local businesses. Shows hours, location, contact info in search and maps.',
+            'Person':        'For author profiles and people pages. Shows person info in knowledge panels.',
+            'Product':       'For product pages. Shows price, availability, and ratings in search results.'
         },
 
         compatibilityRules: {
@@ -573,381 +538,190 @@
             'Product': ['FAQ', 'HowTo']
         },
 
-        init: function() {
-            // Prevent duplicate initialization
-            if (this.initialized) {
-                return;
-            }
+        init: function () {
+            if (this.initialized) return;
             this.initialized = true;
-            
             var self = this;
-            
-            // Main schema header toggle (collapse/expand the whole section)
-            // Use .off().on() to prevent duplicate handlers
-            $('#seovela-schema-header').off('click').on('click', function(e) {
+
+            // Header toggle
+            $('#seovela-schema-header').on('click', function (e) {
                 e.preventDefault();
-                e.stopPropagation();
-                var $header = $(this);
-                var $content = $('#seovela-schema-content');
-                
-                $header.toggleClass('open');
-                $content.slideToggle(300);
-            });
-            
-            // Additional schema types accordion toggle
-            $('.seovela-accordion-header').off('click').on('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                var $header = $(this);
-                var targetId = $header.data('target');
-                var $content = $('#' + targetId);
-                
-                $header.toggleClass('open');
-                $content.toggleClass('open').slideToggle(250);
-            });
-            
-            // Schema type-specific accordions (FAQ, HowTo, Product, Person)
-            $(document).off('click.schemaAccordion').on('click.schemaAccordion', '.seovela-schema-accordion-header', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                var $header = $(this);
-                var targetId = $header.data('target');
-                var $content = $('#' + targetId);
-                
-                $header.toggleClass('open');
-                $content.toggleClass('open').slideToggle(250);
-            });
-            
-            // Schema type chip selection
-            $(document).on('change', '.seovela-schema-type-chip input', function() {
-                var $chip = $(this).closest('.seovela-schema-type-chip');
-                
-                if ($(this).is(':checked')) {
-                    $chip.addClass('selected');
-                } else {
-                    $chip.removeClass('selected');
-                }
-                
-                // Update badge count
-                var selectedCount = $('.seovela-schema-type-chip.selected').length;
-                $('.seovela-accordion-badge').text(selectedCount);
-                
-                self.checkCompatibility();
-                self.toggleSchemaFields();
+                $(this).toggleClass('open');
+                $('#seovela-schema-content').slideToggle(300);
             });
 
-            // Schema type selector change
-            $('#seovela_schema_type').on('change', function() {
-                self.updateSchemaDescription();
-                self.toggleSchemaFields();
-                self.checkCompatibility();
-            });
-
-            // Disable schema checkbox with status update
-            $('#seovela_disable_schema').on('change', function() {
-                var isDisabled = $(this).is(':checked');
-                $('#seovela-schema-selector').slideToggle(!isDisabled);
-                $('#seovela-schema-fields-wrapper').slideToggle(!isDisabled);
-                
-                // Update status badge
-                var $status = $('.seovela-schema-status');
-                if (isDisabled) {
-                    $status.removeClass('active').addClass('disabled').text('Disabled');
-                } else {
-                    $status.removeClass('disabled').addClass('active').text('Active');
-                }
-            });
-
-            // Additional schema types (legacy support)
-            $('.seovela-additional-schema').on('change', function() {
-                self.checkCompatibility();
-                self.toggleSchemaFields();
-            });
-
-            // Preview schema button
-            $('#seovela-preview-schema').on('click', function(e) {
+            // Accordion headers
+            $(document).on('click', '.seovela-accordion-header', function (e) {
                 e.preventDefault();
-                self.previewSchema();
+                $(this).toggleClass('open');
+                $('#' + $(this).data('target')).toggleClass('open').slideToggle(250);
             });
-            
-            // Close preview button
-            $('#seovela-preview-close').on('click', function(e) {
+
+            $(document).on('click', '.seovela-schema-accordion-header', function (e) {
                 e.preventDefault();
-                $('#seovela-schema-preview').slideUp(200);
+                $(this).toggleClass('open');
+                $('#' + $(this).data('target')).toggleClass('open').slideToggle(250);
             });
+
+            // Type chip selection
+            $(document).on('change', '.seovela-schema-type-chip input', function () {
+                $(this).closest('.seovela-schema-type-chip').toggleClass('selected', this.checked);
+                var count = $('.seovela-schema-type-chip.selected').length;
+                $('.seovela-accordion-badge').text(count);
+                self._checkCompat();
+                self._toggleFields();
+            });
+
+            // Primary selector
+            $('#seovela_schema_type').on('change', function () {
+                self._updateDesc();
+                self._toggleFields();
+                self._checkCompat();
+            });
+
+            // Disable toggle
+            $('#seovela_disable_schema').on('change', function () {
+                var off = $(this).is(':checked');
+                $('#seovela-schema-selector, #seovela-schema-fields-wrapper').slideToggle(!off);
+                var $s = $('.seovela-schema-status');
+                $s.toggleClass('active', !off).toggleClass('disabled', off)
+                    .text(off ? 'Disabled' : 'Active');
+            });
+
+            // Preview
+            $('#seovela-preview-schema').on('click', function (e) { e.preventDefault(); self._preview(); });
+            $('#seovela-preview-close').on('click', function (e) { e.preventDefault(); $('#seovela-schema-preview').slideUp(200); });
 
             // FAQ repeater
-            $('.seovela-add-faq').on('click', function(e) {
+            $(document).on('click', '.seovela-add-faq', function (e) { e.preventDefault(); self._addFAQ(); });
+            $(document).on('click', '.seovela-remove-faq', function (e) {
                 e.preventDefault();
-                self.addFAQItem();
-            });
-
-            $(document).on('click', '.seovela-remove-faq', function(e) {
-                e.preventDefault();
-                $(this).closest('.seovela-faq-item').fadeOut(300, function() {
-                    $(this).remove();
-                    self.reindexFAQItems();
-                    self.updateFAQCount();
-                });
+                $(this).closest('.seovela-faq-item').fadeOut(300, function () { $(this).remove(); self._reindex('.seovela-faq-item', '.seovela-faq-item-number'); });
             });
 
             // HowTo repeater
-            $('.seovela-add-howto-step').on('click', function(e) {
+            $(document).on('click', '.seovela-add-howto-step', function (e) { e.preventDefault(); self._addStep(); });
+            $(document).on('click', '.seovela-remove-howto-step', function (e) {
                 e.preventDefault();
-                self.addHowToStep();
+                $(this).closest('.seovela-howto-step').fadeOut(300, function () { $(this).remove(); self._reindex('.seovela-howto-step', '.seovela-howto-step-number'); });
             });
 
-            $(document).on('click', '.seovela-remove-howto-step', function(e) {
-                e.preventDefault();
-                $(this).closest('.seovela-howto-step').fadeOut(300, function() {
-                    $(this).remove();
-                    self.reindexHowToSteps();
-                    self.updateHowToCount();
-                });
-            });
-
-            // Initial state
-            this.updateSchemaDescription();
-            this.toggleSchemaFields();
-            this.checkCompatibility();
-            
-            // Initialize chip states
-            $('.seovela-schema-type-chip input:checked').each(function() {
+            // Init chips
+            $('.seovela-schema-type-chip input:checked').each(function () {
                 $(this).closest('.seovela-schema-type-chip').addClass('selected');
             });
-        },
-        
-        updateFAQCount: function() {
-            var count = $('.seovela-faq-item').filter(function() {
-                return $(this).find('.seovela-faq-question').val() !== '';
-            }).length;
-            
-            $('.seovela-faq-fields .seovela-schema-count').text(count > 0 ? count + ' items' : '');
-        },
-        
-        updateHowToCount: function() {
-            var count = $('.seovela-howto-step').filter(function() {
-                return $(this).find('.seovela-howto-step-name').val() !== '';
-            }).length;
-            
-            $('.seovela-howto-fields .seovela-schema-count').text(count > 0 ? count + ' steps' : '');
+
+            this._updateDesc();
+            this._toggleFields();
+            this._checkCompat();
         },
 
-        updateSchemaDescription: function() {
-            var selectedType = $('#seovela_schema_type').val();
-            var description = '';
-            
-            if (selectedType && selectedType !== 'auto' && this.schemaDescriptions[selectedType]) {
-                description = this.schemaDescriptions[selectedType];
-            }
-            
-            if (description) {
-                $('#seovela-schema-description').html(description).show();
-            } else {
-                $('#seovela-schema-description').hide();
-            }
+        _updateDesc: function () {
+            var type = $('#seovela_schema_type').val();
+            var desc = (type && type !== 'auto') ? (this.descriptions[type] || '') : '';
+            var $el  = $('#seovela-schema-description');
+            desc ? $el.html(desc).show() : $el.hide();
         },
 
-        toggleSchemaFields: function() {
-            var selectedType = $('#seovela_schema_type').val();
-            
-            // Hide all schema-specific accordions
+        _toggleFields: function () {
+            var type = $('#seovela_schema_type').val();
             $('.seovela-schema-accordion').hide();
-            
-            // Show fields for selected type
-            if (selectedType && selectedType !== 'auto') {
-                $('.seovela-schema-accordion[data-schema="' + selectedType + '"]').show();
-            }
-
-            // Also check additional types
-            $('.seovela-additional-schema:checked').each(function() {
-                var type = $(this).data('schema-type');
+            if (type && type !== 'auto') {
                 $('.seovela-schema-accordion[data-schema="' + type + '"]').show();
+            }
+            $('.seovela-additional-schema:checked').each(function () {
+                $('.seovela-schema-accordion[data-schema="' + $(this).data('schema-type') + '"]').show();
             });
         },
 
-        checkCompatibility: function() {
-            var primaryType = $('#seovela_schema_type').val();
+        _checkCompat: function () {
+            var primary = $('#seovela_schema_type').val();
+            if (!primary || primary === 'auto') { $('#seovela-schema-warnings').empty().hide(); return; }
+            var compat = this.compatibilityRules[primary] || [];
             var warnings = [];
-            
-            if (!primaryType || primaryType === 'auto') {
-                $('#seovela-schema-warnings').empty();
-                return;
-            }
-
-            var compatibleTypes = this.compatibilityRules[primaryType] || [];
-            
-            $('.seovela-additional-schema:checked').each(function() {
-                var additionalType = $(this).data('schema-type');
-                
-                if (additionalType === primaryType) {
-                    return; // Skip same type
-                }
-                
-                if (compatibleTypes.indexOf(additionalType) === -1) {
-                    warnings.push(primaryType + ' and ' + additionalType + ' schemas may not be compatible. Choose one primary schema type.');
+            $('.seovela-additional-schema:checked').each(function () {
+                var t = $(this).data('schema-type');
+                if (t !== primary && compat.indexOf(t) === -1) {
+                    warnings.push(primary + ' and ' + t + ' schemas may not be compatible.');
                 }
             });
-
-            // Display warnings
-            if (warnings.length > 0) {
-                var warningsHTML = '';
-                warnings.forEach(function(warning) {
-                    warningsHTML += '<div class="seovela-schema-warning">' + warning + '</div>';
-                });
-                $('#seovela-schema-warnings').html(warningsHTML).show();
+            var $w = $('#seovela-schema-warnings');
+            if (warnings.length) {
+                $w.html(warnings.map(function (w) { return '<div class="seovela-schema-warning">' + w + '</div>'; }).join('')).show();
             } else {
-                $('#seovela-schema-warnings').empty().hide();
+                $w.empty().hide();
             }
         },
 
-        previewSchema: function() {
-            var self = this;
-            var $button = $('#seovela-preview-schema');
-            var $container = $('#seovela-schema-preview');
-            
-            // Get post ID
+        _preview: function () {
             var postId = $('#post_ID').val();
-            
-            if (!postId) {
-                alert('Please save the post first before previewing schema.');
-                return;
-            }
-
-            $button.prop('disabled', true).text('⏳ Loading...');
-
-            $.ajax({
-                url: seovelaMetabox.ajaxUrl,
-                type: 'POST',
-                data: {
-                    action: 'seovela_preview_schema',
-                    nonce: seovelaMetabox.analysisNonce,
-                    post_id: postId
-                },
-                success: function(response) {
-                    if (response.success && response.data.preview) {
-                        $container.find('.seovela-schema-json').text(response.data.preview);
-                        $container.slideDown(300);
-                    } else {
-                        alert('No schema data available. Please configure schema settings and save the post.');
-                    }
-                },
-                error: function() {
-                    alert('Error loading schema preview. Please try again.');
-                },
-                complete: function() {
-                    $button.prop('disabled', false).text('👁 Preview Schema');
+            if (!postId) { alert('Please save the post first.'); return; }
+            var $btn = $('#seovela-preview-schema').prop('disabled', true).text('Loading...');
+            $.post(config.ajaxUrl, {
+                action: 'seovela_preview_schema', nonce: config.analysisNonce, post_id: postId
+            }, function (res) {
+                if (res.success && res.data.preview) {
+                    $('#seovela-schema-preview').find('.seovela-schema-json').text(res.data.preview).end().slideDown(300);
+                } else {
+                    alert('No schema data available.');
                 }
-            });
+            }).always(function () { $btn.prop('disabled', false).text('Preview Schema'); });
         },
 
-        addFAQItem: function() {
-            var $repeater = $('.seovela-faq-repeater');
-            var index = $repeater.find('.seovela-faq-item').length;
-            
-            var html = '<div class="seovela-faq-item" data-index="' + index + '" style="display:none;">' +
-                '<div class="seovela-faq-item-header">' +
-                    '<span class="seovela-faq-item-number">' + (index + 1) + '</span>' +
-                    '<button type="button" class="seovela-remove-faq" title="Remove">' +
-                        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-                            '<line x1="18" y1="6" x2="6" y2="18"/>' +
-                            '<line x1="6" y1="6" x2="18" y2="18"/>' +
-                        '</svg>' +
-                    '</button>' +
-                '</div>' +
-                '<div class="seovela-faq-fields-group">' +
-                    '<div class="seovela-input-wrapper">' +
-                        '<label class="seovela-input-label">Question</label>' +
-                        '<input type="text" name="seovela_faq_items[' + index + '][question]" value="" placeholder="e.g., What is your return policy?" class="seovela-input seovela-faq-question" />' +
-                    '</div>' +
-                    '<div class="seovela-input-wrapper">' +
-                        '<label class="seovela-input-label">Answer</label>' +
-                        '<textarea name="seovela_faq_items[' + index + '][answer]" rows="3" placeholder="Provide a clear and helpful answer..." class="seovela-textarea seovela-faq-answer"></textarea>' +
-                    '</div>' +
-                '</div>' +
-            '</div>';
-            
-            $repeater.append(html);
-            $repeater.find('.seovela-faq-item:last').fadeIn(300);
-            this.updateFAQCount();
+        _addFAQ: function () {
+            var i = $('.seovela-faq-repeater .seovela-faq-item').length;
+            var html =
+                '<div class="seovela-faq-item" data-index="' + i + '" style="display:none">' +
+                    '<div class="seovela-faq-item-header"><span class="seovela-faq-item-number">' + (i + 1) + '</span>' +
+                        '<button type="button" class="seovela-remove-faq" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>' +
+                    '<div class="seovela-faq-fields-group">' +
+                        '<div class="seovela-input-wrapper"><label class="seovela-input-label">Question</label><input type="text" name="seovela_faq_items[' + i + '][question]" value="" placeholder="e.g., What is your return policy?" class="seovela-input seovela-faq-question"/></div>' +
+                        '<div class="seovela-input-wrapper"><label class="seovela-input-label">Answer</label><textarea name="seovela_faq_items[' + i + '][answer]" rows="3" placeholder="Provide a clear and helpful answer..." class="seovela-textarea seovela-faq-answer"></textarea></div>' +
+                    '</div></div>';
+            $('.seovela-faq-repeater').append(html).find('.seovela-faq-item:last').fadeIn(300);
         },
 
-        reindexFAQItems: function() {
-            $('.seovela-faq-item').each(function(index) {
-                $(this).attr('data-index', index);
-                $(this).find('.seovela-faq-item-number').text(index + 1);
-                $(this).find('input, textarea').each(function() {
+        _addStep: function () {
+            var i = $('.seovela-howto-repeater .seovela-howto-step').length;
+            var html =
+                '<div class="seovela-howto-step" data-index="' + i + '" style="display:none">' +
+                    '<div class="seovela-howto-step-header"><span class="seovela-howto-step-number">' + (i + 1) + '</span>' +
+                        '<button type="button" class="seovela-remove-howto-step" title="Remove"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>' +
+                    '<div class="seovela-howto-fields-group">' +
+                        '<div class="seovela-input-wrapper"><label class="seovela-input-label">Step Title</label><input type="text" name="seovela_howto_steps[' + i + '][name]" value="" placeholder="e.g., Mix the ingredients" class="seovela-input seovela-howto-step-name"/></div>' +
+                        '<div class="seovela-input-wrapper"><label class="seovela-input-label">Instructions</label><textarea name="seovela_howto_steps[' + i + '][text]" rows="2" placeholder="Describe what to do in this step..." class="seovela-textarea seovela-howto-step-text"></textarea></div>' +
+                    '</div></div>';
+            $('.seovela-howto-repeater').append(html).find('.seovela-howto-step:last').fadeIn(300);
+        },
+
+        _reindex: function (itemSel, numSel) {
+            $(itemSel).each(function (idx) {
+                $(this).attr('data-index', idx).find(numSel).text(idx + 1);
+                $(this).find('input, textarea').each(function () {
                     var name = $(this).attr('name');
-                    if (name) {
-                        name = name.replace(/\[\d+\]/, '[' + index + ']');
-                        $(this).attr('name', name);
-                    }
-                });
-            });
-        },
-
-        addHowToStep: function() {
-            var $repeater = $('.seovela-howto-repeater');
-            var index = $repeater.find('.seovela-howto-step').length;
-            
-            var html = '<div class="seovela-howto-step" data-index="' + index + '" style="display:none;">' +
-                '<div class="seovela-howto-step-header">' +
-                    '<span class="seovela-howto-step-number">' + (index + 1) + '</span>' +
-                    '<button type="button" class="seovela-remove-howto-step" title="Remove">' +
-                        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-                            '<line x1="18" y1="6" x2="6" y2="18"/>' +
-                            '<line x1="6" y1="6" x2="18" y2="18"/>' +
-                        '</svg>' +
-                    '</button>' +
-                '</div>' +
-                '<div class="seovela-howto-fields-group">' +
-                    '<div class="seovela-input-wrapper">' +
-                        '<label class="seovela-input-label">Step Title</label>' +
-                        '<input type="text" name="seovela_howto_steps[' + index + '][name]" value="" placeholder="e.g., Mix the ingredients" class="seovela-input seovela-howto-step-name" />' +
-                    '</div>' +
-                    '<div class="seovela-input-wrapper">' +
-                        '<label class="seovela-input-label">Instructions</label>' +
-                        '<textarea name="seovela_howto_steps[' + index + '][text]" rows="2" placeholder="Describe what to do in this step..." class="seovela-textarea seovela-howto-step-text"></textarea>' +
-                    '</div>' +
-                '</div>' +
-            '</div>';
-            
-            $repeater.append(html);
-            $repeater.find('.seovela-howto-step:last').fadeIn(300);
-            this.updateHowToCount();
-        },
-
-        reindexHowToSteps: function() {
-            $('.seovela-howto-step').each(function(index) {
-                $(this).attr('data-index', index);
-                $(this).find('.seovela-howto-step-number').text(index + 1);
-                $(this).find('input, textarea').each(function() {
-                    var name = $(this).attr('name');
-                    if (name) {
-                        name = name.replace(/\[\d+\]/, '[' + index + ']');
-                        $(this).attr('name', name);
-                    }
+                    if (name) $(this).attr('name', name.replace(/\[\d+\]/, '[' + idx + ']'));
                 });
             });
         }
     };
 
-    // Initialize on document ready
-    $(document).ready(function() {
-        seovelaMetabox.init();
-        seovelaSchema.init();
-    });
-
-    // Also initialize for Gutenberg
-    if (typeof wp !== 'undefined' && wp.domReady) {
-        wp.domReady(function() {
-            setTimeout(function() {
-                seovelaMetabox.init();
-                seovelaSchema.init();
-            }, 1000);
-        });
+    /* ---------------------------------------------------------------
+     * 13. Boot
+     * ------------------------------------------------------------- */
+    function boot() {
+        Tabs.init();
+        Counters.init();
+        Preview.init();
+        OGPreview.init();
+        Analysis.init();
+        AIKeywords.init();
+        AIOptimize.init();
+        RobotChips.init();
+        MediaUploader.init();
+        EditorBridge.init();
+        Schema.init();
     }
 
+    $(document).ready(boot);
+
 })(jQuery);
-
-

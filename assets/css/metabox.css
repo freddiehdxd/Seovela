@@ -1,17 +1,30 @@
 /**
- * Seovela Metabox Styles - Modern Design
+ * Seovela Metabox Styles
+ *
+ * Premium tabbed SEO metabox UI.
+ * Brand color: #6366f1 (indigo)
  *
  * @package Seovela
  */
 
-/* Hide Classic metabox in the block editor — Gutenberg sidebar is used instead. */
+/* ==========================================================================
+   0. RESET & BASE
+   ========================================================================== */
+
+/* Hide Classic metabox in the block editor -- Gutenberg sidebar is used instead. */
 .block-editor-page #seovela_meta_box {
     display: none !important;
 }
 
 #seovela_meta_box {
     border: none !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04) !important;
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+
+#seovela_meta_box .postbox-header {
+    border-bottom: none;
 }
 
 #seovela_meta_box .inside {
@@ -20,413 +33,323 @@
 }
 
 .seovela-metabox {
-    padding: 20px;
-    background: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    background: #fff;
+    line-height: 1.5;
+    color: #1e293b;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
+.seovela-metabox *,
+.seovela-metabox *::before,
+.seovela-metabox *::after {
+    box-sizing: border-box;
+}
+
+/* ==========================================================================
+   1. TAB NAVIGATION
+   ========================================================================== */
+
+.seovela-tabs-nav {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: #f8f9fa;
+    border-bottom: 2px solid #e5e7eb;
+    padding: 0 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.seovela-tabs-nav::-webkit-scrollbar {
+    display: none;
+}
+
+.seovela-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 18px;
+    height: 48px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: #64748b;
+    white-space: nowrap;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    outline: none;
+}
+
+.seovela-tab-btn:hover {
+    color: #334155;
+    background: rgba(99, 102, 241, 0.04);
+}
+
+.seovela-tab-btn:focus-visible {
+    outline: 2px solid #6366f1;
+    outline-offset: -2px;
+    border-radius: 4px 4px 0 0;
+}
+
+.seovela-tab-btn.active {
+    color: #6366f1;
+    font-weight: 600;
+    border-bottom-color: #6366f1;
+    background: rgba(99, 102, 241, 0.04);
+}
+
+.seovela-tab-btn svg {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    transition: color 0.2s ease;
+}
+
+.seovela-tab-btn.active svg {
+    color: #6366f1;
+}
+
+/* SEO Score badge in tab bar */
+.seovela-tab-score {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    white-space: nowrap;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.seovela-tab-score-number {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+/* ==========================================================================
+   2. TAB PANELS
+   ========================================================================== */
+
+.seovela-tab-panel {
+    display: none;
+    padding: 28px 24px;
+    background: #fff;
+    animation: seovelaPanelIn 0.2s ease;
+}
+
+.seovela-tab-panel.active {
+    display: block;
+}
+
+@keyframes seovelaPanelIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   3. COMMON: FIELDS, INPUTS, LABELS
+   ========================================================================== */
+
 .seovela-field {
-    margin-bottom: 28px;
-    padding-bottom: 24px;
-    border-bottom: 2px solid #f1f5f9;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f1f5f9;
 }
 
 .seovela-field:last-child {
     border-bottom: none;
     margin-bottom: 0;
+    padding-bottom: 0;
 }
 
 .seovela-field label {
     display: block;
-    margin-bottom: 10px;
-    font-size: 15px;
+    margin-bottom: 8px;
+    font-size: 14px;
     font-weight: 600;
     color: #1e293b;
+}
+
+.seovela-field label strong {
+    font-weight: 700;
 }
 
 .seovela-field input[type="text"],
-.seovela-field textarea {
+.seovela-field input[type="url"],
+.seovela-field textarea,
+.seovela-field select {
     width: 100%;
     max-width: 100%;
+    padding: 10px 14px;
     border: 2px solid #e2e8f0;
     border-radius: 8px;
-    transition: all 0.3s ease;
-    font-size: 15px;
+    font-family: inherit;
+    font-size: 14px;
     color: #1e293b;
-}
-
-.seovela-field input[type="text"]:focus,
-.seovela-field textarea:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    outline: none;
-}
-
-.seovela-title-input,
-.seovela-description-input {
-    font-size: 15px;
-    padding: 12px 16px;
+    background: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
     line-height: 1.5;
 }
 
-/* Character Counter */
-.seovela-counter {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 10px;
-    padding: 10px 14px;
-    background: #f8fafc;
-    border-radius: 6px;
-    font-size: 13px;
+.seovela-field input[type="text"]:focus,
+.seovela-field input[type="url"]:focus,
+.seovela-field textarea:focus,
+.seovela-field select:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+    outline: none;
+}
+
+.seovela-field input::placeholder,
+.seovela-field textarea::placeholder {
+    color: #94a3b8;
+}
+
+.seovela-field .description {
+    margin-top: 6px;
+    font-size: 12.5px;
     color: #64748b;
-    font-weight: 600;
+    font-style: italic;
+    line-height: 1.5;
 }
 
-.seovela-count {
-    font-weight: 700;
-    font-size: 18px;
+/* Field groups (used in Advanced etc.) */
+.seovela-field-group {
+    margin-bottom: 28px;
 }
 
-.seovela-count-short {
-    color: #ef4444;
-}
-
-.seovela-count-good {
-    color: #10b981;
-}
-
-.seovela-count-long {
-    color: #f59e0b;
-}
-
-.seovela-status {
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 4px 10px;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.8);
-}
-
-/* Spin Animation */
-@keyframes seovela-spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Meta Title & Description Field Enhancements */
-.seovela-field:has(.seovela-title-input),
-.seovela-field:has(.seovela-description-input) {
-    position: relative;
-}
-
-.seovela-field:has(.seovela-title-input)::before,
-.seovela-field:has(.seovela-description-input)::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(180deg, #6366f1 0%, #a855f7 100%);
-    border-radius: 4px 0 0 4px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.seovela-field:has(.seovela-title-input):hover::before,
-.seovela-field:has(.seovela-description-input):hover::before {
-    opacity: 1;
-}
-
-/* Google Preview */
-.seovela-google-preview {
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 20px;
-    font-family: Arial, Helvetica, sans-serif;
-    margin-top: 16px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.seovela-google-preview:before {
-    content: 'Google Search Preview';
-    display: block;
-    font-size: 11px;
-    font-weight: 700;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 16px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
-
-.seovela-preview-url {
-    color: #1a73e8;
-    font-size: 14px;
-    line-height: 1.3;
-    margin-bottom: 4px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-}
-
-.seovela-preview-url:before {
-    content: '🌐';
-    margin-right: 6px;
-    font-size: 12px;
-}
-
-.seovela-preview-title {
-    color: #1a0dab;
-    font-size: 20px;
-    font-weight: normal;
-    line-height: 1.3;
-    margin-bottom: 4px;
-    cursor: pointer;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    transition: all 0.2s ease;
-}
-
-.seovela-preview-title:hover {
-    text-decoration: underline;
-    color: #1a0dab;
-}
-
-.seovela-preview-description {
-    color: #4d5156;
-    font-size: 14px;
-    line-height: 1.58;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-}
-
-/* Checkbox Group */
-.seovela-checkbox-group {
-    margin-top: 12px;
-    padding: 14px;
-    background: #f8fafc;
-    border-radius: 8px;
-}
-
-.seovela-checkbox-group label {
-    display: block;
-    margin: 0 0 10px 0;
-    font-weight: 500;
-    color: #475569;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.seovela-checkbox-group label:hover {
-    color: #1e293b;
-}
-
-.seovela-checkbox-group label:last-child {
+.seovela-field-group:last-child {
     margin-bottom: 0;
 }
 
-.seovela-checkbox-group input[type="checkbox"] {
-    margin-right: 8px;
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    vertical-align: middle;
+.seovela-field-group h4 {
+    margin: 0 0 10px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1e293b;
 }
 
-/* Loading State */
+.seovela-field-group .description {
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* Help tip */
+.seovela-help-tip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 17px;
+    height: 17px;
+    background: #6366f1;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: help;
+    margin-left: 5px;
+    vertical-align: middle;
+    transition: background 0.2s ease;
+}
+
+.seovela-help-tip:hover {
+    background: #4f46e5;
+}
+
+/* Loading overlay */
 .seovela-loading {
-    opacity: 0.6;
+    opacity: 0.5;
     pointer-events: none;
     position: relative;
 }
 
-.seovela-loading:after {
+.seovela-loading::after {
     content: '';
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 24px;
-    height: 24px;
-    margin: -12px 0 0 -12px;
-    border: 3px solid rgba(59, 130, 246, 0.3);
+    width: 22px;
+    height: 22px;
+    margin: -11px 0 0 -11px;
+    border: 3px solid rgba(99, 102, 241, 0.25);
     border-radius: 50%;
-    border-top-color: #3b82f6;
-    animation: seovela-spin 0.8s linear infinite;
+    border-top-color: #6366f1;
+    animation: seovela-spin 0.7s linear infinite;
 }
 
-/* Message Boxes */
-.seovela-error {
-    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-    color: #991b1b;
-    padding: 14px 18px;
-    border-radius: 8px;
-    margin-top: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    border-left: 4px solid #ef4444;
+@keyframes seovela-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   4. GENERAL TAB -- Score Widget
+   ========================================================================== */
+
+.seovela-score-compact {
     display: flex;
     align-items: center;
-    gap: 10px;
-}
-
-.seovela-error:before {
-    content: '⚠️';
-    font-size: 18px;
-}
-
-.seovela-success {
-    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-    color: #166534;
-    padding: 14px 18px;
-    border-radius: 8px;
-    margin-top: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    border-left: 4px solid #10b981;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    animation: seovela-slide-in 0.3s ease;
-}
-
-.seovela-success:before {
-    content: '✓';
-    font-size: 20px;
-    font-weight: 700;
-}
-
-@keyframes seovela-slide-in {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Gutenberg Compatibility */
-.block-editor .seovela-metabox {
-    padding: 24px;
-}
-
-.block-editor #seovela_meta_box {
-    background: #ffffff;
-    border-radius: 8px;
-}
-
-/* Post Editor Sidebar Panel */
-.components-panel__body.is-opened .seovela-metabox {
-    padding: 16px;
-}
-
-/* Responsive */
-@media (max-width: 782px) {
-    .seovela-metabox {
-        padding: 16px;
-    }
-    
-    .seovela-preview-title {
-        font-size: 18px;
-    }
-    
-    .seovela-preview-description {
-        font-size: 13px;
-    }
-    
-    .seovela-field input[type="text"],
-    .seovela-field textarea {
-        font-size: 16px; /* Prevent iOS zoom */
-    }
-}
-
-/* SEO Score Widget */
-.seovela-score-widget {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    padding: 24px;
-    background: #ffffff;
-    border-radius: 16px;
-    margin-bottom: 32px;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-    border: 1px solid #f1f5f9;
-    position: relative;
-    transition: all 0.3s ease;
-}
-
-.seovela-score-widget:hover {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    transform: translateY(-2px);
+    gap: 20px;
+    padding: 18px 20px;
+    background: #f8f9fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    margin-bottom: 24px;
 }
 
 .seovela-score-circle {
     position: relative;
-    width: 120px !important;
-    height: 120px !important;
-    min-width: 120px;
-    min-height: 120px;
-    max-width: 120px;
-    max-height: 120px;
+    width: 100px;
+    height: 100px;
     flex-shrink: 0;
-    transition: opacity 0.3s ease;
-}
-
-.seovela-updating .seovela-score-circle {
-    opacity: 0.6;
 }
 
 .seovela-score-svg {
-    width: 120px !important;
-    height: 120px !important;
+    width: 100px;
+    height: 100px;
     transform: rotate(-90deg);
     display: block;
 }
 
 .seovela-score-bg {
     fill: none !important;
-    stroke: #f1f5f9;
-    stroke-width: 8;
+    stroke: #e5e7eb;
+    stroke-width: 10;
 }
 
 .seovela-score-progress {
     fill: none !important;
-    stroke: #94a3b8; /* Default gray color */
-    stroke-width: 8;
+    stroke: #94a3b8;
+    stroke-width: 10;
     stroke-linecap: round;
     stroke-dasharray: 339.29;
     stroke-dashoffset: 339.29;
     transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s ease;
-    filter: drop-shadow(0 0 2px rgba(0,0,0,0.1));
 }
 
 .seovela-score-circle[data-status="good"] .seovela-score-progress {
     stroke: #10b981 !important;
-    filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.4));
+    filter: drop-shadow(0 0 4px rgba(16, 185, 129, 0.35));
 }
 
 .seovela-score-circle[data-status="warning"] .seovela-score-progress {
     stroke: #f59e0b !important;
-    filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.4));
+    filter: drop-shadow(0 0 4px rgba(245, 158, 11, 0.35));
 }
 
 .seovela-score-circle[data-status="error"] .seovela-score-progress {
     stroke: #ef4444 !important;
-    filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.4));
+    filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.35));
 }
 
 .seovela-score-text {
@@ -435,29 +358,17 @@
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    z-index: 10;
     pointer-events: none;
     width: 100%;
 }
 
 .seovela-score-number {
     display: block;
-    font-size: 36px;
+    font-size: 28px;
     font-weight: 800;
     line-height: 1;
     color: #1e293b;
-    letter-spacing: -1px;
-    transition: transform 0.2s ease, color 0.2s ease;
-}
-
-.seovela-pulse {
-    animation: seovela-pulse 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes seovela-pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
+    letter-spacing: -0.5px;
 }
 
 .seovela-score-label {
@@ -465,67 +376,83 @@
     font-size: 9px;
     font-weight: 700;
     color: #64748b;
-    margin-top: 4px;
+    margin-top: 3px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    line-height: 1.2;
-    padding: 0 10px;
-    word-break: break-word;
+    letter-spacing: 0.4px;
 }
 
 .seovela-score-info {
     flex: 1;
+    min-width: 0;
 }
 
 .seovela-score-info h3 {
-    margin: 0 0 8px 0;
-    font-size: 20px;
+    margin: 0 0 4px;
+    font-size: 15px;
     font-weight: 700;
     color: #1e293b;
 }
 
 .seovela-score-info p {
-    margin: 0 0 16px 0;
+    margin: 0 0 10px;
     color: #64748b;
-    font-size: 14px;
-    line-height: 1.6;
+    font-size: 13px;
+    line-height: 1.5;
 }
 
-.seovela-toggle-analysis {
-    background: #3b82f6;
-    color: #ffffff;
-    border: none;
-    padding: 10px 20px;
+.seovela-score-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.seovela-score-actions .button {
     border-radius: 8px;
     font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
+    font-size: 12.5px;
+    transition: all 0.2s ease;
 }
 
-.seovela-toggle-analysis:hover {
-    background: #2563eb;
-    color: #ffffff;
-    transform: translateY(-2px);
+.seovela-score-actions .button:hover {
+    transform: translateY(-1px);
 }
 
-.seovela-toggle-analysis:active {
-    transform: translateY(0);
+.seovela-updating .seovela-score-circle {
+    opacity: 0.5;
+}
+
+.seovela-pulse {
+    animation: seovela-pulse 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes seovela-pulse {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.15); }
+    100% { transform: scale(1); }
 }
 
 /* Analysis Results */
 .seovela-analysis-results {
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
-    border-radius: 10px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
     padding: 20px;
-    margin-bottom: 28px;
-    animation: seovela-slide-in 0.3s ease;
+    margin-bottom: 24px;
+    animation: seovelaPanelIn 0.25s ease;
+}
+
+.seovela-no-analysis {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 13px;
+    padding: 12px 0;
+    margin: 0;
 }
 
 .seovela-analysis-section {
-    margin-bottom: 20px;
-    padding: 16px;
-    border-radius: 8px;
+    margin-bottom: 16px;
+    padding: 14px 16px;
+    border-radius: 10px;
 }
 
 .seovela-analysis-section:last-child {
@@ -533,12 +460,12 @@
 }
 
 .seovela-analysis-section h4 {
-    margin: 0 0 12px 0;
-    font-size: 15px;
+    margin: 0 0 10px;
+    font-size: 13px;
     font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .seovela-analysis-section ul {
@@ -548,119 +475,702 @@
 }
 
 .seovela-analysis-section li {
-    margin-bottom: 8px;
-    padding-left: 24px;
+    margin-bottom: 6px;
+    padding-left: 20px;
     position: relative;
-    font-size: 14px;
-    line-height: 1.6;
+    font-size: 13px;
+    line-height: 1.5;
 }
 
 .seovela-analysis-section li:last-child {
     margin-bottom: 0;
 }
 
-.seovela-analysis-section li:before {
-    content: '•';
+.seovela-analysis-section li::before {
+    content: '';
     position: absolute;
-    left: 8px;
-    font-weight: 700;
-    font-size: 18px;
+    left: 4px;
+    top: 7px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
 }
 
-/* Errors Section */
+/* Errors */
 .seovela-errors {
-    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-    border-left: 4px solid #ef4444;
+    background: #fef2f2;
+    border-left: 3px solid #ef4444;
 }
 
-.seovela-errors h4 {
-    color: #991b1b;
-}
+.seovela-errors h4    { color: #991b1b; }
+.seovela-errors li    { color: #991b1b; }
+.seovela-errors li::before { background: #ef4444; }
 
-.seovela-errors li {
-    color: #991b1b;
-}
-
-.seovela-errors li:before {
-    color: #ef4444;
-}
-
-/* Warnings Section */
+/* Warnings */
 .seovela-warnings {
-    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-    border-left: 4px solid #f59e0b;
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
 }
 
-.seovela-warnings h4 {
+.seovela-warnings h4    { color: #92400e; }
+.seovela-warnings li    { color: #92400e; }
+.seovela-warnings li::before { background: #f59e0b; }
+
+/* Good */
+.seovela-good {
+    background: #f0fdf4;
+    border-left: 3px solid #10b981;
+}
+
+.seovela-good h4    { color: #166534; }
+.seovela-good li    { color: #166534; }
+.seovela-good li::before { background: #10b981; }
+
+/* Toggle analysis button */
+.seovela-toggle-analysis {
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* ==========================================================================
+   5. GENERAL TAB -- Focus Keyword
+   ========================================================================== */
+
+.seovela-keyword-field {
+    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+    border: 1px solid #c7d2fe;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.seovela-keyword-field::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.seovela-keyword-field > label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.seovela-keyword-field > label strong {
+    font-size: 15px;
+    font-weight: 700;
+    color: #3730a3;
+}
+
+.seovela-keyword-field .seovela-help-tip {
+    background: #6366f1;
+}
+
+.seovela-keyword-field .description {
+    color: #6366f1;
+    font-style: normal;
+    margin-top: 10px;
+    font-size: 12px;
+}
+
+.seovela-keyword-wrapper {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+    position: relative;
+    z-index: 1;
+}
+
+.seovela-keyword-wrapper .seovela-keyword-input {
+    flex: 1;
+    padding: 11px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    border: 2px solid #a5b4fc;
+    border-radius: 8px;
+    background: #fff;
+    color: #312e81;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.seovela-keyword-wrapper .seovela-keyword-input::placeholder {
+    color: #a5b4fc;
+}
+
+.seovela-keyword-wrapper .seovela-keyword-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    outline: none;
+}
+
+/* Suggest keywords button */
+.seovela-suggest-keywords,
+button.seovela-suggest-keywords,
+.seovela-suggest-keywords.button {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    white-space: nowrap !important;
+    padding: 10px 18px !important;
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-family: inherit !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3) !important;
+    transition: all 0.2s ease !important;
+    line-height: 1.4 !important;
+}
+
+.seovela-suggest-keywords:hover,
+button.seovela-suggest-keywords:hover,
+.seovela-suggest-keywords.button:hover {
+    background: linear-gradient(135deg, #d97706, #b45309) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4) !important;
+}
+
+.seovela-suggest-keywords:active {
+    transform: translateY(0) !important;
+}
+
+.seovela-suggest-keywords svg {
+    flex-shrink: 0;
+    color: #fff !important;
+}
+
+/* Keyword Suggestions */
+.seovela-keyword-suggestions {
+    margin-top: 14px;
+    padding: 16px;
+    background: #fff;
+    border: 1px solid #fbbf24;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(245, 158, 11, 0.1);
+}
+
+.seovela-keyword-suggestions .description {
+    margin: 0 0 10px !important;
+    font-style: normal !important;
+    font-weight: 600;
+    font-size: 12px;
     color: #92400e;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
-.seovela-warnings li {
-    color: #92400e;
+.seovela-suggestions-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-.seovela-warnings li:before {
+.seovela-keyword-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 7px 14px;
+    background: #fefce8;
+    border: 1px solid #fbbf24;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #78350f;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.seovela-keyword-chip::before {
+    content: '+';
+    font-weight: 700;
+    font-size: 13px;
     color: #f59e0b;
 }
 
-/* Good Section */
-.seovela-good {
-    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-    border-left: 4px solid #10b981;
+.seovela-keyword-chip:hover {
+    background: #fbbf24;
+    color: #fff;
+    border-color: #d97706;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(245, 158, 11, 0.25);
 }
 
-.seovela-good h4 {
-    color: #166534;
+.seovela-keyword-chip:hover::before {
+    color: #fff;
 }
 
-.seovela-good li {
-    color: #166534;
+/* ==========================================================================
+   6. GENERAL TAB -- Title & Description Inputs
+   ========================================================================== */
+
+.seovela-title-input,
+.seovela-description-input {
+    font-size: 14px;
+    padding: 10px 14px;
+    line-height: 1.5;
 }
 
-.seovela-good li:before {
-    color: #10b981;
+/* Character Counter */
+.seovela-counter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
 }
 
-/* Help Tip */
-.seovela-help-tip {
+.seovela-count {
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.seovela-count-short { color: #ef4444; }
+.seovela-count-good  { color: #10b981; }
+.seovela-count-long  { color: #f59e0b; }
+
+.seovela-status {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+/* ==========================================================================
+   7. GENERAL TAB -- Google Preview
+   ========================================================================== */
+
+.seovela-google-preview {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-top: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.seovela-google-preview::before {
+    content: 'Search Preview';
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.seovela-preview-url {
+    color: #202124;
+    font-size: 13px;
+    line-height: 1.4;
+    margin-bottom: 3px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.seovela-preview-title {
+    color: #1a0dab;
+    font-size: 18px;
+    font-weight: normal;
+    line-height: 1.3;
+    margin-bottom: 4px;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    transition: color 0.15s ease;
+}
+
+.seovela-preview-title:hover {
+    text-decoration: underline;
+}
+
+.seovela-preview-description {
+    color: #4d5156;
+    font-size: 13px;
+    line-height: 1.55;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* ==========================================================================
+   8. GENERAL TAB -- AI Optimize Buttons (inline)
+   ========================================================================== */
+
+.seovela-ai-optimize,
+button.seovela-ai-optimize,
+.seovela-ai-optimize.button {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 8px 14px !important;
+    background: linear-gradient(135deg, #6366f1, #818cf8) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-family: inherit !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3) !important;
+    transition: all 0.2s ease !important;
+    line-height: 1.4 !important;
+    white-space: nowrap !important;
+    min-height: 36px !important;
+}
+
+.seovela-ai-optimize *,
+.seovela-ai-optimize svg {
+    color: #fff !important;
+}
+
+.seovela-ai-optimize:hover,
+button.seovela-ai-optimize:hover {
+    background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4) !important;
+}
+
+.seovela-ai-optimize:active {
+    transform: translateY(0) !important;
+}
+
+.seovela-ai-optimize:disabled {
+    opacity: 0.55 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+.seovela-ai-optimize.seovela-ai-loading {
+    background: linear-gradient(135deg, #94a3b8, #64748b) !important;
+    pointer-events: none !important;
+}
+
+.seovela-spinner {
+    display: inline-block !important;
+    width: 14px !important;
+    height: 14px !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    border-radius: 50% !important;
+    border-top-color: #fff !important;
+    animation: seovela-spin 0.7s linear infinite !important;
+}
+
+/* AI Field updated flash */
+.seovela-ai-updated {
+    animation: seovela-field-highlight 0.5s ease;
+}
+
+@keyframes seovela-field-highlight {
+    0%   { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5); border-color: #6366f1; }
+    100% { box-shadow: 0 0 0 0 transparent; border-color: #e2e8f0; }
+}
+
+/* AI notification toasts */
+.seovela-ai-notification {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.seovela-ai-notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.seovela-ai-success {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #6ee7b7;
+}
+
+.seovela-ai-error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+}
+
+/* AI setup link (when not configured) */
+.seovela-ai-setup-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: #f8fafc !important;
+    color: #64748b !important;
+    border: 2px dashed #cbd5e1 !important;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.seovela-ai-setup-link:hover {
+    background: #eef2ff !important;
+    border-color: #6366f1 !important;
+    color: #4f46e5 !important;
+}
+
+/* ==========================================================================
+   9. ADVANCED TAB -- Robots Chips
+   ========================================================================== */
+
+.seovela-robots-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.seovela-robot-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 16px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 24px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.seovela-robot-chip:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.seovela-robot-chip input[type="checkbox"] {
+    display: none;
+}
+
+.seovela-robot-chip svg {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+/* Checked / active state */
+.seovela-robot-chip.checked,
+.seovela-robot-chip:has(input:checked) {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #dc2626;
+}
+
+.seovela-robot-chip.checked svg,
+.seovela-robot-chip:has(input:checked) svg {
+    opacity: 1;
+    color: #ef4444;
+}
+
+/* ==========================================================================
+   10. SOCIAL TAB -- Sub-tabs
+   ========================================================================== */
+
+.seovela-social-subtabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    padding: 4px;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.seovela-social-tab {
+    flex: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 18px;
-    height: 18px;
-    background: #3b82f6;
-    color: #ffffff;
-    border-radius: 50%;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: help;
-    margin-left: 6px;
-    vertical-align: middle;
-}
-
-.seovela-help-tip:hover {
-    background: #2563eb;
-}
-
-/* Description text */
-.seovela-field .description {
-    margin-top: 8px;
+    gap: 7px;
+    padding: 9px 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: inherit;
     font-size: 13px;
+    font-weight: 500;
     color: #64748b;
-    font-style: italic;
+    border-radius: 7px;
+    transition: all 0.2s ease;
 }
 
-/* ============================================================================
-   SCHEMA MARKUP STYLES - MODERN ACCORDION DESIGN
-   ========================================================================= */
+.seovela-social-tab:hover {
+    color: #334155;
+}
+
+.seovela-social-tab.active[data-social="facebook"] {
+    background: #1877F2;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(24, 119, 242, 0.3);
+}
+
+.seovela-social-tab.active[data-social="twitter"] {
+    background: #0f1419;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(15, 20, 25, 0.3);
+}
+
+.seovela-social-tab svg {
+    flex-shrink: 0;
+}
+
+/* Social panels */
+.seovela-social-panel {
+    display: none;
+}
+
+.seovela-social-panel.active {
+    display: block;
+    animation: seovelaPanelIn 0.2s ease;
+}
+
+/* ==========================================================================
+   11. SOCIAL TAB -- OG Preview
+   ========================================================================== */
+
+.seovela-og-preview {
+    background: #f0f2f5;
+    border: 1px solid #dadde1;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.seovela-og-preview-image {
+    width: 100%;
+    height: 180px;
+    background: #e4e6ea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8a8d91;
+    font-size: 13px;
+}
+
+.seovela-og-preview-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.seovela-og-preview-body {
+    padding: 14px 16px;
+}
+
+.seovela-og-preview-domain {
+    font-size: 11px;
+    color: #65676b;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 4px;
+}
+
+.seovela-og-preview-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1c1e21;
+    line-height: 1.3;
+    margin-bottom: 4px;
+}
+
+.seovela-og-preview-desc {
+    font-size: 13px;
+    color: #65676b;
+    line-height: 1.4;
+}
+
+/* ==========================================================================
+   12. MESSAGES (error / success)
+   ========================================================================== */
+
+.seovela-error {
+    background: #fef2f2;
+    color: #991b1b;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-top: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    border-left: 3px solid #ef4444;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.seovela-success {
+    background: #f0fdf4;
+    color: #166534;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-top: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    border-left: 3px solid #10b981;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: seovelaPanelIn 0.25s ease;
+}
+
+/* ==========================================================================
+   13. SCHEMA TAB
+   ========================================================================== */
 
 /* Schema Section Container */
 .seovela-schema-section {
     background: transparent;
     padding: 0;
-    border-radius: 16px;
     border: none;
-    overflow: hidden;
+    overflow: visible;
 }
 
 /* Schema Header - Main Toggle */
@@ -668,82 +1178,81 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 24px;
-    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-    border-radius: 14px;
+    padding: 18px 22px;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    border-radius: 12px;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.25);
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
 }
 
 .seovela-schema-header:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(14, 165, 233, 0.35);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+    transform: translateY(-1px);
 }
 
 .seovela-schema-header.open {
-    border-radius: 14px 14px 0 0;
+    border-radius: 12px 12px 0 0;
 }
 
 .seovela-schema-header-content {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
 }
 
 .seovela-schema-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    color: #ffffff;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
+    color: #fff;
 }
 
 .seovela-schema-icon svg {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
 }
 
 .seovela-schema-header-text {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
 }
 
 .seovela-schema-header-text strong {
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 700;
-    color: #ffffff;
-    letter-spacing: -0.3px;
+    color: #fff;
 }
 
 .seovela-schema-subtitle {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.8);
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.75);
     font-weight: 500;
 }
 
 .seovela-schema-header-toggle {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .seovela-schema-status {
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 16px;
+    font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
 }
 
 .seovela-schema-status.active {
-    background: rgba(255, 255, 255, 0.25);
-    color: #ffffff;
+    background: rgba(255, 255, 255, 0.22);
+    color: #fff;
 }
 
 .seovela-schema-status.disabled {
@@ -755,24 +1264,24 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: rgba(255, 255, 255, 0.15);
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.14);
     border-radius: 8px;
-    color: #ffffff;
-    transition: transform 0.3s ease;
+    color: #fff;
+    transition: transform 0.25s ease;
 }
 
 .seovela-schema-header.open .seovela-schema-chevron {
     transform: rotate(180deg);
 }
 
-/* Schema Content */
+/* Schema Content Panel */
 .seovela-schema-content {
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
     border-top: none;
-    border-radius: 0 0 14px 14px;
+    border-radius: 0 0 12px 12px;
     padding: 24px;
 }
 
@@ -780,18 +1289,18 @@
 .seovela-schema-toggle-row {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 16px 20px;
+    gap: 12px;
+    padding: 14px 18px;
     background: #f8fafc;
-    border-radius: 12px;
+    border-radius: 10px;
     margin-bottom: 24px;
 }
 
 .seovela-toggle-switch {
     position: relative;
     display: inline-block;
-    width: 52px;
-    height: 28px;
+    width: 48px;
+    height: 26px;
     flex-shrink: 0;
 }
 
@@ -804,26 +1313,23 @@
 .seovela-toggle-slider {
     position: absolute;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background: #cbd5e1;
-    border-radius: 28px;
-    transition: all 0.3s ease;
+    border-radius: 26px;
+    transition: background 0.25s ease;
 }
 
 .seovela-toggle-slider::before {
-    position: absolute;
     content: "";
-    height: 22px;
-    width: 22px;
+    position: absolute;
+    height: 20px;
+    width: 20px;
     left: 3px;
     bottom: 3px;
-    background: #ffffff;
+    background: #fff;
     border-radius: 50%;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: transform 0.25s ease;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
 .seovela-toggle-switch input:checked + .seovela-toggle-slider {
@@ -831,19 +1337,19 @@
 }
 
 .seovela-toggle-switch input:checked + .seovela-toggle-slider::before {
-    transform: translateX(24px);
+    transform: translateX(22px);
 }
 
 .seovela-toggle-label {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: #475569;
 }
 
-/* Schema Card */
+/* Schema Card (primary type selector) */
 .seovela-schema-card {
     background: #f8fafc;
-    border: 2px solid #e2e8f0;
+    border: 1.5px solid #e2e8f0;
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 20px;
@@ -852,16 +1358,16 @@
 .seovela-schema-card-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
 .seovela-schema-card-icon {
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .seovela-schema-card-header label {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: #1e293b;
     margin: 0;
@@ -869,44 +1375,44 @@
 
 .seovela-select-modern {
     width: 100%;
-    padding: 14px 16px;
+    padding: 12px 42px 12px 14px;
     border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    font-size: 15px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
     font-weight: 500;
     color: #1e293b;
-    background: #ffffff;
+    background: #fff;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 14px center;
-    padding-right: 44px;
 }
 
 .seovela-select-modern:focus {
-    border-color: #0ea5e9;
-    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15);
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
     outline: none;
 }
 
 .seovela-schema-type-description {
-    margin-top: 12px;
-    padding: 12px 16px;
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    border-left: 4px solid #0ea5e9;
-    border-radius: 8px;
-    font-size: 13px;
-    color: #0369a1;
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: #eef2ff;
+    border-left: 3px solid #6366f1;
+    border-radius: 6px;
+    font-size: 12.5px;
+    color: #4338ca;
     line-height: 1.5;
 }
 
 /* Additional Types Accordion */
 .seovela-accordion {
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
     overflow: hidden;
     margin-bottom: 20px;
 }
@@ -914,11 +1420,11 @@
 .seovela-accordion-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 16px 20px;
+    gap: 10px;
+    padding: 14px 18px;
     background: #f8fafc;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.15s ease;
 }
 
 .seovela-accordion-header:hover {
@@ -926,17 +1432,17 @@
 }
 
 .seovela-accordion-header.open {
-    background: #e0f2fe;
-    border-bottom: 2px solid #bae6fd;
+    background: #eef2ff;
+    border-bottom: 1px solid #c7d2fe;
 }
 
 .seovela-accordion-icon {
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .seovela-accordion-title {
     flex: 1;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: #1e293b;
 }
@@ -945,20 +1451,20 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 24px;
-    height: 24px;
-    padding: 0 8px;
-    background: #0ea5e9;
-    color: #ffffff;
-    border-radius: 12px;
-    font-size: 12px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 7px;
+    background: #6366f1;
+    color: #fff;
+    border-radius: 11px;
+    font-size: 11px;
     font-weight: 700;
 }
 
 .seovela-accordion-chevron {
     display: flex;
     color: #64748b;
-    transition: transform 0.3s ease;
+    transition: transform 0.25s ease;
 }
 
 .seovela-accordion-header.open .seovela-accordion-chevron {
@@ -967,7 +1473,7 @@
 
 .seovela-accordion-content {
     display: none;
-    padding: 20px;
+    padding: 18px;
 }
 
 .seovela-accordion-content.open {
@@ -975,8 +1481,8 @@
 }
 
 .seovela-accordion-desc {
-    margin: 0 0 16px 0;
-    font-size: 13px;
+    margin: 0 0 14px;
+    font-size: 12.5px;
     color: #64748b;
 }
 
@@ -984,34 +1490,34 @@
 .seovela-schema-types-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
 }
 
 .seovela-schema-type-chip {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
+    gap: 7px;
+    padding: 9px 14px;
     background: #f8fafc;
-    border: 2px solid #e2e8f0;
-    border-radius: 10px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .seovela-schema-type-chip:hover {
-    border-color: #0ea5e9;
-    background: #f0f9ff;
+    border-color: #6366f1;
+    background: #eef2ff;
 }
 
 .seovela-schema-type-chip.selected {
-    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
     border-color: transparent;
-    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
 }
 
 .seovela-schema-type-chip.selected .seovela-type-name {
-    color: #ffffff;
+    color: #fff;
 }
 
 .seovela-schema-type-chip input {
@@ -1019,21 +1525,21 @@
 }
 
 .seovela-type-name {
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 600;
     color: #334155;
 }
 
 .seovela-type-check {
     display: none;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     background: rgba(255, 255, 255, 0.3);
     border-radius: 50%;
-    font-size: 12px;
-    line-height: 20px;
+    font-size: 11px;
+    line-height: 18px;
     text-align: center;
-    color: #ffffff;
+    color: #fff;
 }
 
 .seovela-schema-type-chip.selected .seovela-type-check {
@@ -1042,151 +1548,150 @@
 
 /* Schema Warnings */
 .seovela-schema-warnings {
-    margin-top: 16px;
+    margin-top: 14px;
 }
 
 .seovela-schema-warning {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-    padding: 14px 18px;
-    background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
-    border-left: 4px solid #f59e0b;
+    gap: 8px;
+    padding: 12px 16px;
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
     border-radius: 8px;
-    margin-bottom: 10px;
-    font-size: 13px;
+    margin-bottom: 8px;
+    font-size: 12.5px;
     color: #92400e;
     line-height: 1.5;
-}
-
-.seovela-schema-warning::before {
-    content: "⚠️";
-    flex-shrink: 0;
 }
 
 /* Schema Actions */
 .seovela-schema-actions-row {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     margin-top: 24px;
     padding-top: 20px;
-    border-top: 2px solid #f1f5f9;
+    border-top: 1px solid #f1f5f9;
+    flex-wrap: wrap;
 }
 
 .seovela-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 12px 20px;
-    border-radius: 10px;
-    font-size: 14px;
+    gap: 7px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     text-decoration: none;
     border: none;
+    line-height: 1.4;
 }
 
 .seovela-btn svg {
     width: 16px;
     height: 16px;
+    flex-shrink: 0;
 }
 
 .seovela-btn-secondary {
     background: #1e293b;
-    color: #ffffff;
+    color: #fff;
 }
 
 .seovela-btn-secondary:hover {
     background: #0f172a;
-    color: #ffffff;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(30, 41, 59, 0.25);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(30, 41, 59, 0.2);
 }
 
 .seovela-btn-outline {
-    background: #ffffff;
+    background: #fff;
     color: #1e293b;
-    border: 2px solid #e2e8f0;
+    border: 1.5px solid #e2e8f0;
 }
 
 .seovela-btn-outline:hover {
     background: #f8fafc;
     border-color: #cbd5e1;
     color: #1e293b;
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
 .seovela-btn-add {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: #ffffff;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
 }
 
 .seovela-btn-add:hover {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    color: #ffffff;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    background: linear-gradient(135deg, #059669, #047857);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
 }
 
 /* Schema Preview Container */
 .seovela-schema-preview-container {
     margin-top: 20px;
     background: #0f172a;
-    border-radius: 12px;
+    border-radius: 10px;
     overflow: hidden;
-    border: 2px solid #1e293b;
+    border: 1px solid #1e293b;
 }
 
 .seovela-schema-preview-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 18px;
+    padding: 12px 16px;
     background: #1e293b;
     border-bottom: 1px solid #334155;
 }
 
 .seovela-schema-preview-header span {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     color: #94a3b8;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
 }
 
 .seovela-preview-close {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     background: #334155;
     border: none;
     border-radius: 6px;
     color: #94a3b8;
-    font-size: 18px;
+    font-size: 16px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
 }
 
 .seovela-preview-close:hover {
     background: #475569;
-    color: #ffffff;
+    color: #fff;
 }
 
 .seovela-schema-json {
     margin: 0;
-    padding: 20px;
+    padding: 18px;
     background: transparent;
     color: #67e8f9;
-    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
     font-size: 12px;
     line-height: 1.7;
     overflow-x: auto;
-    max-height: 350px;
+    max-height: 340px;
 }
 
 /* Schema Fields Wrapper */
@@ -1194,32 +1699,32 @@
     margin-top: 24px;
 }
 
-/* ============================================================================
-   SCHEMA TYPE ACCORDIONS (FAQ, HowTo, Product, Person)
-   ========================================================================= */
+/* ==========================================================================
+   14. SCHEMA TYPE ACCORDIONS (FAQ, HowTo, Product, Person)
+   ========================================================================== */
 
 .seovela-schema-accordion {
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
-    border-radius: 14px;
-    margin-top: 16px;
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    margin-top: 14px;
     overflow: hidden;
-    transition: all 0.3s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .seovela-schema-accordion:hover {
     border-color: #cbd5e1;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .seovela-schema-accordion-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 22px;
+    padding: 16px 20px;
     background: #f8fafc;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.15s ease;
 }
 
 .seovela-schema-accordion-header:hover {
@@ -1227,29 +1732,29 @@
 }
 
 .seovela-schema-accordion-header.open {
-    background: #ffffff;
-    border-bottom: 2px solid #f1f5f9;
+    background: #fff;
+    border-bottom: 1px solid #f1f5f9;
 }
 
 .seovela-schema-accordion-info {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
 }
 
 .seovela-schema-type-icon {
-    font-size: 28px;
+    font-size: 24px;
     line-height: 1;
 }
 
 .seovela-schema-type-text {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 2px;
 }
 
 .seovela-schema-type-title {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: #1e293b;
 }
@@ -1262,70 +1767,64 @@
 .seovela-schema-accordion-meta {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .seovela-schema-count {
-    padding: 5px 12px;
-    background: #e0f2fe;
-    color: #0369a1;
+    padding: 4px 10px;
+    background: #eef2ff;
+    color: #4338ca;
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
 }
 
 .seovela-schema-accordion-chevron {
     display: flex;
     color: #94a3b8;
-    transition: transform 0.3s ease;
+    transition: transform 0.25s ease;
 }
 
 .seovela-schema-accordion-header.open .seovela-schema-accordion-chevron {
     transform: rotate(180deg);
-    color: #0ea5e9;
+    color: #6366f1;
 }
 
 .seovela-schema-accordion-content {
     display: none;
-    padding: 24px;
+    padding: 22px;
 }
 
 .seovela-schema-accordion-content.open {
     display: block;
-    animation: slideDown 0.3s ease;
+    animation: seovelaSlideDown 0.25s ease;
 }
 
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+@keyframes seovelaSlideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Schema Option Card (Toggle with text) */
+/* Schema Option Card */
 .seovela-schema-option-card {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 18px 20px;
+    gap: 14px;
+    padding: 16px 18px;
     background: #f8fafc;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
     margin-bottom: 20px;
 }
 
 .seovela-toggle-text {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 2px;
 }
 
 .seovela-toggle-title {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     color: #1e293b;
 }
@@ -1338,12 +1837,12 @@
 
 /* Time Card */
 .seovela-time-card {
-    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+    background: #faf5ff;
     border-color: #e9d5ff;
 }
 
 .seovela-time-icon {
-    font-size: 32px;
+    font-size: 28px;
 }
 
 .seovela-time-content {
@@ -1358,20 +1857,20 @@
 .seovela-manual-header {
     display: flex;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .seovela-manual-title {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     color: #1e293b;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
 }
 
-/* Input Styles */
+/* Inputs (schema context) */
 .seovela-input-wrapper {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .seovela-input-wrapper:last-child {
@@ -1380,8 +1879,8 @@
 
 .seovela-input-label {
     display: block;
-    margin-bottom: 8px;
-    font-size: 13px;
+    margin-bottom: 6px;
+    font-size: 12.5px;
     font-weight: 600;
     color: #475569;
 }
@@ -1389,28 +1888,29 @@
 .seovela-optional {
     font-weight: 400;
     color: #94a3b8;
-    font-size: 12px;
-    margin-left: 4px;
+    font-size: 11px;
+    margin-left: 3px;
 }
 
 .seovela-input,
 .seovela-textarea,
 .seovela-select {
     width: 100%;
-    padding: 12px 16px;
+    padding: 10px 14px;
     border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    font-size: 14px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
     color: #1e293b;
-    background: #ffffff;
-    transition: all 0.2s ease;
+    background: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .seovela-input:focus,
 .seovela-textarea:focus,
 .seovela-select:focus {
-    border-color: #0ea5e9;
-    box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1);
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
     outline: none;
 }
 
@@ -1421,32 +1921,32 @@
 
 .seovela-input-hint {
     display: block;
-    margin-top: 6px;
-    font-size: 12px;
+    margin-top: 5px;
+    font-size: 11.5px;
     color: #94a3b8;
 }
 
-/* FAQ Items */
+/* FAQ & HowTo Repeaters */
 .seovela-faq-repeater,
 .seovela-howto-repeater {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .seovela-faq-item,
 .seovela-howto-step {
-    margin-bottom: 16px;
-    padding: 20px;
+    margin-bottom: 14px;
+    padding: 18px;
     background: #f8fafc;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
     position: relative;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .seovela-faq-item:hover,
 .seovela-howto-step:hover {
     border-color: #cbd5e1;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
 .seovela-faq-item:last-child,
@@ -1459,7 +1959,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
 }
 
 .seovela-faq-item-number,
@@ -1467,19 +1967,19 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    color: #ffffff;
-    border-radius: 10px;
-    font-size: 14px;
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 13px;
     font-weight: 700;
-    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.25);
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
 }
 
 .seovela-howto-step-number {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.25);
+    background: linear-gradient(135deg, #10b981, #059669);
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
 }
 
 .seovela-remove-faq,
@@ -1487,8 +1987,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     background: #fee2e2;
     color: #ef4444;
     border: none;
@@ -1500,8 +2000,7 @@
 .seovela-remove-faq:hover,
 .seovela-remove-howto-step:hover {
     background: #ef4444;
-    color: #ffffff;
-    transform: scale(1.05);
+    color: #fff;
 }
 
 .seovela-remove-faq svg,
@@ -1514,657 +2013,137 @@
 .seovela-howto-fields-group {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 /* Product Grid */
 .seovela-product-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 14px;
+    margin-bottom: 14px;
 }
 
-@media (max-width: 600px) {
-    .seovela-product-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Legacy Overrides */
+/* Checkbox inline */
 .seovela-checkbox-inline {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    font-size: 14px;
+    gap: 6px;
+    font-size: 13px;
     font-weight: 500;
     color: #334155;
     cursor: pointer;
 }
 
-.seovela-field-group {
-    margin-bottom: 20px;
+/* Checkbox group */
+.seovela-checkbox-group {
+    margin-top: 10px;
+    padding: 14px;
+    background: #f8fafc;
+    border-radius: 8px;
 }
 
-.seovela-field-group label {
+.seovela-checkbox-group label {
     display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #1e293b;
-}
-
-/* Responsive */
-@media (max-width: 782px) {
-    .seovela-schema-header {
-        padding: 16px 18px;
-    }
-    
-    .seovela-schema-header-content {
-        gap: 12px;
-    }
-    
-    .seovela-schema-icon {
-        width: 38px;
-        height: 38px;
-    }
-    
-    .seovela-schema-header-text strong {
-        font-size: 15px;
-    }
-    
-    .seovela-schema-actions-row {
-        flex-direction: column;
-    }
-    
-    .seovela-btn {
-        width: 100%;
-    }
-    
-    .seovela-schema-accordion-header {
-        padding: 14px 16px;
-    }
-    
-    .seovela-schema-accordion-content {
-        padding: 18px;
-    }
-}
-
-/* Responsive Design */
-@media (max-width: 782px) {
-    .seovela-field-row {
-        flex-direction: column;
-    }
-    
-    .seovela-schema-actions {
-        flex-direction: column;
-    }
-    
-    .seovela-schema-actions .button {
-        width: 100%;
-        text-align: center;
-    }
-}
-
-/* ============================================================================
-   AI GENERATION STYLES - MODERN DESIGN
-   ========================================================================= */
-
-/* Generate with AI Button - Premium Glass Style */
-.seovela-metabox .seovela-ai-optimize,
-.seovela-ai-optimize.button,
-button.seovela-ai-optimize {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 10px !important;
-    margin-top: 14px !important;
-    padding: 14px 28px !important;
-    min-height: 48px !important;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 40%, #a855f7 100%) !important;
-    color: #ffffff !important;
-    border: none !important;
-    border-radius: 12px !important;
-    font-weight: 700 !important;
-    font-size: 14px !important;
-    letter-spacing: 0.5px !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
-    cursor: pointer !important;
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    box-shadow: 
-        0 4px 15px rgba(99, 102, 241, 0.4),
-        0 2px 4px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
-    position: relative !important;
-    overflow: visible !important;
-    z-index: 1 !important;
-    line-height: 1.4 !important;
-    text-decoration: none !important;
-    -webkit-appearance: none !important;
-    appearance: none !important;
-}
-
-/* Ensure text is visible */
-.seovela-ai-optimize,
-.seovela-ai-optimize * {
-    color: #ffffff !important;
-}
-
-.seovela-ai-optimize .dashicons {
-    font-size: 18px !important;
-    width: 18px !important;
-    height: 18px !important;
-    line-height: 18px !important;
-    color: #ffffff !important;
-    transition: transform 0.3s ease !important;
-    position: relative !important;
-    z-index: 2 !important;
-}
-
-/* Hover state */
-.seovela-metabox .seovela-ai-optimize:hover,
-.seovela-ai-optimize.button:hover,
-button.seovela-ai-optimize:hover {
-    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 40%, #9333ea 100%) !important;
-    color: #ffffff !important;
-    transform: translateY(-3px) !important;
-    box-shadow: 
-        0 8px 25px rgba(99, 102, 241, 0.5),
-        0 4px 12px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
-}
-
-.seovela-ai-optimize:hover .dashicons {
-    transform: scale(1.1) !important;
-}
-
-.seovela-ai-optimize:active {
-    transform: translateY(-1px) !important;
-    box-shadow: 
-        0 4px 15px rgba(99, 102, 241, 0.4),
-        0 2px 6px rgba(0, 0, 0, 0.1) !important;
-}
-
-.seovela-ai-optimize:disabled {
-    opacity: 0.6 !important;
-    cursor: not-allowed !important;
-    transform: none !important;
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2) !important;
-}
-
-/* AI Loading State */
-.seovela-ai-optimize.seovela-ai-loading {
-    background: linear-gradient(135deg, #64748b 0%, #475569 100%) !important;
-    pointer-events: none !important;
-    box-shadow: 0 2px 8px rgba(71, 85, 105, 0.3) !important;
-}
-
-.seovela-spinner {
-    display: inline-block !important;
-    width: 16px !important;
-    height: 16px !important;
-    border: 2.5px solid rgba(255, 255, 255, 0.25) !important;
-    border-radius: 50% !important;
-    border-top-color: #ffffff !important;
-    animation: seovela-spin 0.7s linear infinite !important;
-}
-
-/* AI Badge Label - ensure visibility */
-.seovela-ai-optimize span:not(.dashicons):not(.seovela-spinner) {
-    position: relative !important;
-    z-index: 2 !important;
-    color: #ffffff !important;
-}
-
-/* AI Setup Link - Modern Dashed Style */
-.seovela-ai-setup-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 14px;
-    padding: 12px 20px;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
-    color: #64748b !important;
-    border: 2px dashed #cbd5e1 !important;
-    border-radius: 12px;
+    margin: 0 0 8px;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
     font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
 }
 
-.seovela-ai-setup-link::before {
-    content: '⚙️';
-    font-size: 16px;
+.seovela-checkbox-group label:last-child {
+    margin-bottom: 0;
 }
 
-.seovela-ai-setup-link .dashicons {
-    display: none;
+.seovela-checkbox-group input[type="checkbox"] {
+    margin-right: 7px;
+    cursor: pointer;
+    vertical-align: middle;
 }
 
-.seovela-ai-setup-link:hover {
-    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%) !important;
-    border-color: #818cf8 !important;
-    color: #4338ca !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+/* ==========================================================================
+   15. SCORE WIDGET (legacy / standalone)
+   ========================================================================== */
+
+.seovela-score-widget {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding: 22px;
+    background: #fff;
+    border-radius: 12px;
+    margin-bottom: 28px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.04);
+    border: 1px solid #f1f5f9;
+    transition: box-shadow 0.2s ease;
 }
 
-/* Pro Teaser Button - Shows feature but requires upgrade */
+.seovela-score-widget:hover {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+/* ==========================================================================
+   16. PRO TEASER
+   ========================================================================== */
+
 .seovela-ai-pro-teaser {
     display: inline-flex !important;
     align-items: center !important;
-    justify-content: center !important;
-    gap: 8px !important;
-    margin-top: 14px !important;
-    padding: 14px 24px !important;
-    min-height: 48px !important;
-    background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%) !important;
-    color: #ffffff !important;
+    gap: 6px !important;
+    padding: 10px 18px !important;
+    background: linear-gradient(135deg, #94a3b8, #64748b) !important;
+    color: #fff !important;
     border: none !important;
-    border-radius: 12px !important;
-    font-weight: 700 !important;
-    font-size: 14px !important;
-    letter-spacing: 0.3px !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
     cursor: pointer !important;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3) !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 2px 8px rgba(100, 116, 139, 0.25) !important;
     text-decoration: none !important;
-    position: relative !important;
-}
-
-.seovela-ai-pro-teaser .dashicons {
-    font-size: 18px !important;
-    width: 18px !important;
-    height: 18px !important;
-    color: #ffffff !important;
 }
 
 .seovela-ai-pro-teaser .seovela-pro-badge {
     display: inline-block;
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    color: #ffffff;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #fff;
     font-size: 9px;
     font-weight: 700;
-    padding: 3px 6px;
+    padding: 2px 6px;
     border-radius: 4px;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-left: 4px;
-    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+    letter-spacing: 0.3px;
+    margin-left: 2px;
 }
 
 .seovela-ai-pro-teaser:hover {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
-    color: #ffffff !important;
-    transform: translateY(-2px) !important;
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4) !important;
-    text-decoration: none !important;
-}
-
-.seovela-ai-pro-teaser:hover .dashicons {
-    color: #ffffff !important;
-}
-
-/* Smaller Pro Teaser for inline buttons */
-.seovela-ai-pro-teaser-small {
-    margin-top: 0 !important;
-    padding: 8px 14px !important;
-    min-height: auto !important;
-    font-size: 12px !important;
-    border-radius: 8px !important;
-}
-
-.seovela-ai-pro-teaser-small .dashicons {
-    font-size: 14px !important;
-    width: 14px !important;
-    height: 14px !important;
-}
-
-.seovela-ai-pro-teaser-small .seovela-pro-badge {
-    font-size: 8px;
-    padding: 2px 5px;
-}
-
-/* AI Field Updated Animation - Enhanced */
-.seovela-ai-updated {
-    animation: seovela-field-highlight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes seovela-field-highlight {
-    0% {
-        box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.6);
-        border-color: #8b5cf6;
-    }
-    50% {
-        box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.2);
-        border-color: #a855f7;
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
-        border-color: #e2e8f0;
-    }
-}
-
-/* AI Notification - Modern Toast Style */
-.seovela-ai-notification {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 14px;
-    padding: 14px 18px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 600;
-    opacity: 0;
-    transform: translateY(-15px) scale(0.95);
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.seovela-ai-notification.show {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-}
-
-.seovela-ai-notification .dashicons {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-}
-
-.seovela-ai-success {
-    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-    color: #047857;
-    border: 1px solid #6ee7b7;
-    border-left: 4px solid #10b981;
-}
-
-.seovela-ai-error {
-    background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
-    color: #b91c1c;
-    border: 1px solid #fca5a5;
-    border-left: 4px solid #ef4444;
-}
-
-/* ============================================================================
-   FOCUS KEYWORD & AI BUTTONS - MODERN DESIGN
-   ========================================================================= */
-
-/* Focus Keyword Field Card */
-.seovela-field:has(.seovela-keyword-wrapper),
-.seovela-keyword-field {
-    background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 50%, #ede9fe 100%);
-    border-radius: 16px;
-    padding: 24px;
-    border: 2px solid #e9d5ff;
-    margin-bottom: 32px;
-    position: relative;
-    overflow: hidden;
-}
-
-.seovela-field:has(.seovela-keyword-wrapper)::before,
-.seovela-keyword-field::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 120px;
-    height: 120px;
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
-    border-radius: 0 0 0 100%;
-    pointer-events: none;
-}
-
-.seovela-field:has(.seovela-keyword-wrapper) > label,
-.seovela-keyword-field > label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 16px;
-    font-size: 16px;
-    color: #6b21a8;
-}
-
-.seovela-field:has(.seovela-keyword-wrapper) > label strong,
-.seovela-keyword-field > label strong {
-    font-size: 17px;
-    font-weight: 700;
-    letter-spacing: -0.3px;
-}
-
-/* Keyword Input Wrapper */
-.seovela-keyword-wrapper {
-    display: flex;
-    gap: 12px;
-    align-items: stretch;
-    position: relative;
-    z-index: 1;
-}
-
-.seovela-keyword-wrapper .seovela-keyword-input {
-    flex: 1;
-    padding: 14px 18px;
-    font-size: 15px;
-    font-weight: 500;
-    border: 2px solid #d8b4fe;
-    border-radius: 12px;
-    background: #ffffff;
-    color: #581c87;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.seovela-keyword-wrapper .seovela-keyword-input::placeholder {
-    color: #a78bfa;
-}
-
-.seovela-keyword-wrapper .seovela-keyword-input:focus {
-    border-color: #a855f7;
-    box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.15), 0 4px 12px rgba(168, 85, 247, 0.1);
-    outline: none;
-}
-
-/* Suggest Keywords Button - Modern Style */
-.seovela-metabox .seovela-suggest-keywords,
-.seovela-suggest-keywords.button,
-button.seovela-suggest-keywords {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 8px !important;
-    white-space: nowrap !important;
-    padding: 12px 20px !important;
-    min-width: 130px !important;
-    min-height: 48px !important;
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
-    color: #ffffff !important;
-    border: none !important;
-    border-radius: 12px !important;
-    font-size: 14px !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.5px !important;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) !important;
-    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4), 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    cursor: pointer !important;
-    -webkit-appearance: none !important;
-    appearance: none !important;
-    line-height: 1.4 !important;
-}
-
-/* Ensure text is visible */
-.seovela-suggest-keywords,
-.seovela-suggest-keywords * {
-    color: #ffffff !important;
-}
-
-.seovela-metabox .seovela-suggest-keywords:hover,
-.seovela-suggest-keywords.button:hover,
-button.seovela-suggest-keywords:hover {
-    background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
-    color: #ffffff !important;
-    transform: translateY(-3px) !important;
-    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.5), 0 4px 8px rgba(0, 0, 0, 0.15) !important;
-}
-
-.seovela-suggest-keywords:active {
+    background: linear-gradient(135deg, #6366f1, #818cf8) !important;
     transform: translateY(-1px) !important;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35) !important;
 }
 
-.seovela-suggest-keywords .dashicons {
-    font-size: 18px !important;
-    width: 18px !important;
-    height: 18px !important;
-    line-height: 18px !important;
-    color: #ffffff !important;
+.seovela-ai-pro-teaser-small {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
 }
 
-/* Keyword Suggestions Panel */
-.seovela-keyword-suggestions {
-    margin-top: 16px;
-    padding: 18px;
-    background: #ffffff;
-    border-radius: 14px;
-    border: 2px solid #fcd34d;
-    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.15);
-    position: relative;
+/* ==========================================================================
+   17. ACCESSIBILITY
+   ========================================================================== */
+
+.seovela-tab-btn:focus-visible,
+.seovela-social-tab:focus-visible,
+.seovela-robot-chip:focus-visible,
+.seovela-schema-type-chip:focus-visible {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
 }
-
-.seovela-keyword-suggestions::before {
-    content: '✨';
-    position: absolute;
-    top: -12px;
-    left: 20px;
-    background: #fbbf24;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-}
-
-.seovela-keyword-suggestions .description {
-    margin: 0 0 14px 0 !important;
-    font-style: normal;
-    font-weight: 700;
-    font-size: 13px;
-    color: #78350f;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.seovela-suggestions-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.seovela-keyword-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 18px;
-    background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
-    border: 2px solid #fbbf24;
-    border-radius: 25px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #78350f;
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-.seovela-keyword-chip::before {
-    content: '+';
-    font-weight: 800;
-    font-size: 14px;
-    color: #f59e0b;
-    transition: transform 0.2s ease;
-}
-
-.seovela-keyword-chip:hover {
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    color: #ffffff;
-    border-color: #d97706;
-    transform: translateY(-3px) scale(1.03);
-    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.35);
-}
-
-.seovela-keyword-chip:hover::before {
-    color: #ffffff;
-    transform: rotate(45deg);
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-    .seovela-keyword-wrapper {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .seovela-suggest-keywords {
-        width: 100%;
-        padding: 14px 20px !important;
-    }
-}
-
-/* ============================================================================
-   AI ACTION BAR - MODERN BUTTON CONTAINER
-   ========================================================================= */
-
-/* Action bar container for AI buttons */
-.seovela-field .seovela-ai-optimize,
-.seovela-field .seovela-ai-setup-link {
-    margin-top: 16px;
-}
-
-/* AI Icon Badge for buttons */
-.seovela-ai-optimize::after {
-    content: none; /* Remove the glow effect we defined, keep only for hover */
-}
-
-/* Enhanced Counter + Button Layout */
-.seovela-counter + .seovela-ai-optimize,
-.seovela-counter + .seovela-ai-setup-link {
-    margin-top: 16px;
-}
-
-/* Button Group for multiple action buttons */
-.seovela-field .seovela-ai-optimize + .seovela-ai-optimize {
-    margin-left: 10px;
-}
-
-/* ============================================================================
-   FOCUS KEYWORD SPECIFIC OVERRIDES
-   ========================================================================= */
-
-/* Make the focus keyword section stand out more */
-.seovela-field:has(.seovela-keyword-wrapper) .seovela-help-tip,
-.seovela-keyword-field .seovela-help-tip {
-    background: #a855f7;
-}
-
-.seovela-field:has(.seovela-keyword-wrapper) .seovela-help-tip:hover,
-.seovela-keyword-field .seovela-help-tip:hover {
-    background: #9333ea;
-}
-
-.seovela-field:has(.seovela-keyword-wrapper) .description,
-.seovela-keyword-field .description {
-    color: #7c3aed;
-    font-style: normal;
-    margin-top: 12px;
-}
-
-/* ============================================================================
-   ACCESSIBILITY & FOCUS STATES
-   ========================================================================= */
 
 .seovela-ai-optimize:focus-visible,
 .seovela-suggest-keywords:focus-visible {
-    outline: 3px solid rgba(139, 92, 246, 0.5);
-    outline-offset: 2px;
+    outline: 2px solid rgba(99, 102, 241, 0.5) !important;
+    outline-offset: 2px !important;
 }
 
 .seovela-keyword-chip:focus-visible {
@@ -2172,76 +2151,140 @@ button.seovela-suggest-keywords:hover {
     outline-offset: 2px;
 }
 
-/* ============================================================================
-   DARK MODE SUPPORT
-   ========================================================================= */
+/* ==========================================================================
+   18. RESPONSIVE
+   ========================================================================== */
 
-@media (prefers-color-scheme: dark) {
-    .seovela-metabox {
-        background: #1e293b;
+@media (max-width: 782px) {
+    .seovela-tab-btn span {
+        display: none;
     }
-    
-    .seovela-field label {
-        color: #f1f5f9;
+
+    .seovela-tab-btn.active span {
+        display: inline;
     }
-    
+
+    .seovela-tab-btn {
+        padding: 0 12px;
+    }
+
+    .seovela-tab-panel {
+        padding: 20px 16px;
+    }
+
+    .seovela-score-compact {
+        flex-direction: column;
+        text-align: center;
+        gap: 14px;
+    }
+
+    .seovela-score-actions {
+        justify-content: center;
+    }
+
+    .seovela-keyword-wrapper {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .seovela-suggest-keywords {
+        width: 100%;
+    }
+
+    .seovela-social-subtabs {
+        max-width: 100%;
+    }
+
+    .seovela-product-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .seovela-schema-header {
+        padding: 14px 16px;
+    }
+
+    .seovela-schema-header-content {
+        gap: 10px;
+    }
+
+    .seovela-schema-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .seovela-schema-header-text strong {
+        font-size: 14px;
+    }
+
+    .seovela-schema-actions-row {
+        flex-direction: column;
+    }
+
+    .seovela-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .seovela-schema-accordion-header {
+        padding: 12px 14px;
+    }
+
+    .seovela-schema-accordion-content {
+        padding: 16px;
+    }
+
+    .seovela-og-preview-image {
+        height: 140px;
+    }
+
     .seovela-field input[type="text"],
     .seovela-field textarea {
-        background: #334155;
-        color: #f1f5f9;
-        border-color: #475569;
+        font-size: 16px; /* Prevent iOS zoom */
     }
-    
-    .seovela-score-widget {
-        background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+
+    .seovela-preview-title {
+        font-size: 16px;
     }
-    
-    .seovela-score-number {
-        color: #f1f5f9;
+}
+
+@media (max-width: 480px) {
+    .seovela-tab-panel {
+        padding: 16px 12px;
     }
-    
-    .seovela-analysis-results {
-        background: #334155;
-        border-color: #475569;
+
+    .seovela-tab-score {
+        padding: 4px 10px;
+        font-size: 12px;
     }
-    
-    .seovela-schema-section {
-        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-        border-color: #334155;
+
+    .seovela-tab-score-number {
+        font-size: 14px;
     }
-    
-    .seovela-schema-fields {
-        background: #1e293b;
-        border-color: #334155;
-    }
-    
-    /* Focus Keyword Dark Mode */
-    .seovela-field:has(.seovela-keyword-wrapper),
-    .seovela-keyword-field {
-        background: linear-gradient(135deg, #312e81 0%, #1e1b4b 100%);
-        border-color: #4c1d95;
-    }
-    
-    .seovela-field:has(.seovela-keyword-wrapper) > label,
-    .seovela-field:has(.seovela-keyword-wrapper) > label strong,
-    .seovela-keyword-field > label,
-    .seovela-keyword-field > label strong {
-        color: #e9d5ff;
-    }
-    
-    .seovela-keyword-wrapper .seovela-keyword-input {
-        background: #1e1b4b;
-        color: #e9d5ff;
-        border-color: #6d28d9;
-    }
-    
-    .seovela-keyword-suggestions {
-        background: #292524;
-        border-color: #a16207;
-    }
-    
-    .seovela-keyword-chip {
-        background: #292524;
-        color: #fbbf24;
+}
+
+/* ==========================================================================
+   19. GUTENBERG COMPAT
+   ========================================================================== */
+
+.block-editor .seovela-metabox {
+    padding: 0;
+}
+
+.block-editor #seovela_meta_box {
+    background: #fff;
+    border-radius: 8px;
+}
+
+.components-panel__body.is-opened .seovela-metabox {
+    padding: 0;
+}
+
+/* ==========================================================================
+   20. PRINT STYLES
+   ========================================================================== */
+
+@media print {
+    .seovela-metabox {
+        display: none !important;
     }
 }

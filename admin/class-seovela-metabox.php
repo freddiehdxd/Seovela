@@ -56,13 +56,17 @@ class Seovela_Metabox {
             return false;
         }
         
+        // API keys are stored encrypted — decrypt before checking
         switch ( $provider ) {
             case 'openai':
-                return ! empty( get_option( 'seovela_openai_api_key', '' ) );
+                $key = get_option( 'seovela_openai_api_key', '' );
+                return ! empty( Seovela_Helpers::decrypt( $key ) );
             case 'gemini':
-                return ! empty( get_option( 'seovela_gemini_api_key', '' ) );
+                $key = get_option( 'seovela_gemini_api_key', '' );
+                return ! empty( Seovela_Helpers::decrypt( $key ) );
             case 'claude':
-                return ! empty( get_option( 'seovela_claude_api_key', '' ) );
+                $key = get_option( 'seovela_claude_api_key', '' );
+                return ! empty( Seovela_Helpers::decrypt( $key ) );
             default:
                 return false;
         }
@@ -264,6 +268,9 @@ class Seovela_Metabox {
             return;
         }
 
+        // Required for the OG Image media uploader in the Social tab.
+        wp_enqueue_media();
+
         wp_enqueue_style(
             'seovela-metabox',
             SEOVELA_PLUGIN_URL . 'assets/css/metabox.css',
@@ -295,11 +302,11 @@ class Seovela_Metabox {
             $localize_data['aiNonce'] = wp_create_nonce( 'seovela_ai_nonce' );
         }
 
-            wp_localize_script(
-                'seovela-metabox',
-                'seovelaMetabox',
+        wp_localize_script(
+            'seovela-metabox',
+            'seovelaMetabox',
             $localize_data
-            );
+        );
     }
 
     /**
@@ -315,11 +322,25 @@ class Seovela_Metabox {
         wp_nonce_field( 'seovela_save_meta_box', 'seovela_meta_box_nonce' );
 
         // Get current values
-        $meta_title = get_post_meta( $post->ID, '_seovela_meta_title', true );
+        $meta_title       = get_post_meta( $post->ID, '_seovela_meta_title', true );
         $meta_description = get_post_meta( $post->ID, '_seovela_meta_description', true );
-        $focus_keyword = get_post_meta( $post->ID, '_seovela_focus_keyword', true );
-        $noindex = get_post_meta( $post->ID, '_seovela_noindex', true );
-        $nofollow = get_post_meta( $post->ID, '_seovela_nofollow', true );
+        $focus_keyword    = get_post_meta( $post->ID, '_seovela_focus_keyword', true );
+        $noindex          = get_post_meta( $post->ID, '_seovela_noindex', true );
+        $nofollow         = get_post_meta( $post->ID, '_seovela_nofollow', true );
+
+        // Social meta
+        $og_title            = get_post_meta( $post->ID, '_seovela_og_title', true );
+        $og_description      = get_post_meta( $post->ID, '_seovela_og_description', true );
+        $og_image            = get_post_meta( $post->ID, '_seovela_og_image', true );
+        $twitter_card        = get_post_meta( $post->ID, '_seovela_twitter_card', true ) ?: 'summary_large_image';
+        $twitter_title       = get_post_meta( $post->ID, '_seovela_twitter_title', true );
+        $twitter_description = get_post_meta( $post->ID, '_seovela_twitter_description', true );
+
+        // Advanced meta
+        $canonical_url = get_post_meta( $post->ID, '_seovela_canonical_url', true );
+        $noarchive     = get_post_meta( $post->ID, '_seovela_noarchive', true );
+        $nosnippet     = get_post_meta( $post->ID, '_seovela_nosnippet', true );
+        $noimageindex   = get_post_meta( $post->ID, '_seovela_noimageindex', true );
 
         // Default values
         if ( empty( $meta_title ) ) {
@@ -329,13 +350,12 @@ class Seovela_Metabox {
             $meta_description = wp_trim_words( $post->post_content, 20 );
         }
 
-        // Load cached SEO score from post meta instead of running analysis synchronously
+        // Load cached SEO score from post meta
         $cached_score = get_post_meta( $post->ID, '_seovela_seo_score', true );
 
         if ( ! empty( $cached_score ) && is_array( $cached_score ) ) {
             $analysis = $cached_score;
         } else {
-            // No cached score available — show a neutral placeholder
             $analysis = array(
                 'score'    => 0,
                 'status'   => 'unknown',
@@ -344,6 +364,8 @@ class Seovela_Metabox {
                 'good'     => array(),
             );
         }
+
+        $score = $analysis['score'];
 
         // Determine progress color based on status
         $progress_color = '#94a3b8';
@@ -357,7 +379,7 @@ class Seovela_Metabox {
 
         // Calculate stroke offset for server-side rendering
         $circumference = 339.29;
-        $offset = $circumference - ( $analysis['score'] / 100 ) * $circumference;
+        $offset = $circumference - ( $score / 100 ) * $circumference;
 
         // Load status label helper if available
         $status_label = '';
@@ -367,204 +389,471 @@ class Seovela_Metabox {
         } else {
             $status_label = __( 'Not analyzed', 'seovela' );
         }
+
+        // Score color for tab badge
+        $score_color = '#94a3b8';
+        if ( $score >= 80 ) {
+            $score_color = '#10b981';
+        } elseif ( $score >= 50 ) {
+            $score_color = '#f59e0b';
+        } elseif ( $score > 0 ) {
+            $score_color = '#ef4444';
+        }
+
+        $ai_configured = $this->is_ai_configured();
         ?>
         <div class="seovela-metabox">
             <style>
-                /* Critical styles fallback */
-                .seovela-score-bg, .seovela-score-progress { fill: none; stroke-width: 10; }
-                .seovela-score-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
-                .seovela-score-circle { position: relative; width: 120px; height: 120px; }
+                /* Critical inline styles — full styles in metabox.css */
+                .seovela-tabs-nav{display:flex;align-items:center;gap:0;background:#f8f9fa;border-bottom:2px solid #e5e7eb;padding:0 4px;overflow-x:auto}
+                .seovela-tab-btn{display:inline-flex;align-items:center;gap:6px;padding:12px 16px;background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;cursor:pointer;font-size:13px;font-weight:500;color:#64748b;white-space:nowrap;transition:all .2s}
+                .seovela-tab-btn:hover{color:#334155}
+                .seovela-tab-btn.active{color:#6366f1;border-bottom-color:#6366f1;font-weight:600}
+                .seovela-tab-btn svg{flex-shrink:0}
+                .seovela-tab-score{margin-left:auto;display:flex;align-items:center;gap:4px;padding:4px 12px;font-size:13px;font-weight:600;color:#64748b;white-space:nowrap}
+                .seovela-tab-score-number{font-size:16px;font-weight:700}
+                .seovela-tab-panel{display:none;padding:24px;background:#fff}
+                .seovela-tab-panel.active{display:block}
+                .seovela-field-group{margin-bottom:24px}
+                .seovela-field-group h4{margin:0 0 12px;font-size:14px;font-weight:600;color:#1e293b}
+                .seovela-score-bg,.seovela-score-progress{fill:none;stroke-width:10}
+                .seovela-score-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+                .seovela-score-circle{position:relative;width:100px;height:100px}
+                .seovela-score-compact{display:flex;align-items:center;gap:20px;padding:16px;background:#f8f9fa;border-radius:10px;margin-bottom:20px}
+                .seovela-score-compact .seovela-score-actions{display:flex;gap:8px;margin-top:8px}
+                .seovela-robots-chips{display:flex;flex-wrap:wrap;gap:8px}
+                .seovela-robot-chip{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:20px;cursor:pointer;font-size:13px;color:#475569;transition:all .2s;user-select:none}
+                .seovela-robot-chip:hover{background:#e8ecf1}
+                .seovela-robot-chip input[type="checkbox"]{display:none}
+                .seovela-robot-chip.checked,.seovela-robot-chip:has(input:checked){background:#fef2f2;border-color:#fca5a5;color:#dc2626}
+                .seovela-social-subtabs{display:flex;gap:0;margin-bottom:20px;background:#f1f5f9;border-radius:8px;padding:3px;overflow:hidden}
+                .seovela-social-tab{flex:1;padding:10px 16px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:500;color:#64748b;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .2s}
+                .seovela-social-tab.active[data-social="facebook"]{background:#1877f2;color:#fff}
+                .seovela-social-tab.active[data-social="twitter"]{background:#14171a;color:#fff}
+                .seovela-social-panel{display:none}
+                .seovela-social-panel.active{display:block}
+                .seovela-og-preview{background:#f0f2f5;border:1px solid #dddfe2;border-radius:8px;overflow:hidden;margin-bottom:20px}
+                .seovela-og-preview-image{width:100%;height:160px;background:#e4e6ea;display:flex;align-items:center;justify-content:center;color:#8a8d91;font-size:13px}
+                .seovela-og-preview-image img{width:100%;height:100%;object-fit:cover}
+                .seovela-og-preview-body{padding:12px}
+                .seovela-og-preview-domain{font-size:12px;color:#65676b;text-transform:uppercase;margin-bottom:4px}
+                .seovela-og-preview-title{font-size:16px;font-weight:600;color:#1c1e21;line-height:1.3;margin-bottom:4px}
+                .seovela-og-preview-desc{font-size:14px;color:#65676b;line-height:1.4}
+                @media(max-width:782px){.seovela-tab-btn span{display:none}.seovela-tab-btn.active span{display:inline}}
             </style>
-            <!-- SEO Score Widget -->
-            <div class="seovela-score-widget">
-                <div class="seovela-score-circle" data-score="<?php echo esc_attr( $analysis['score'] ); ?>" data-status="<?php echo esc_attr( $analysis['status'] ); ?>">
-                    <svg class="seovela-score-svg" width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
-                        <circle class="seovela-score-bg" cx="60" cy="60" r="54" fill="none" stroke="#e5e7eb" stroke-width="10"></circle>
-                        <circle class="seovela-score-progress" cx="60" cy="60" r="54" fill="none" stroke="<?php echo esc_attr( $progress_color ); ?>" stroke-width="10" style="stroke-dasharray: 339.29; stroke-dashoffset: <?php echo esc_attr( $offset ); ?>"></circle>
+
+            <!-- Tab Navigation -->
+            <div class="seovela-tabs-nav">
+                <button type="button" class="seovela-tab-btn active" data-tab="general">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="10" cy="10" r="8"/>
+                        <path d="M10 6v4l2.5 2.5"/>
                     </svg>
-                    <div class="seovela-score-text">
-                        <span class="seovela-score-number"><?php echo esc_html( $analysis['score'] ); ?></span>
-                        <span class="seovela-score-label"><?php echo esc_html( $status_label ); ?></span>
+                    <span><?php esc_html_e( 'General', 'seovela' ); ?></span>
+                </button>
+                <button type="button" class="seovela-tab-btn" data-tab="advanced">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="10" cy="10" r="3"/>
+                        <path d="M10 1.5v2M10 16.5v2M3.4 3.4l1.4 1.4M15.2 15.2l1.4 1.4M1.5 10h2M16.5 10h2M3.4 16.6l1.4-1.4M15.2 4.8l1.4-1.4"/>
+                    </svg>
+                    <span><?php esc_html_e( 'Advanced', 'seovela' ); ?></span>
+                </button>
+                <button type="button" class="seovela-tab-btn" data-tab="schema">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10 2L2 6l8 4 8-4-8-4z"/>
+                        <path d="M2 14l8 4 8-4"/>
+                        <path d="M2 10l8 4 8-4"/>
+                    </svg>
+                    <span><?php esc_html_e( 'Schema', 'seovela' ); ?></span>
+                </button>
+                <button type="button" class="seovela-tab-btn" data-tab="social">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="15" cy="5" r="3"/>
+                        <circle cx="5" cy="10" r="3"/>
+                        <circle cx="15" cy="15" r="3"/>
+                        <line x1="7.7" y1="8.8" x2="12.3" y2="6.2"/>
+                        <line x1="7.7" y1="11.2" x2="12.3" y2="13.8"/>
+                    </svg>
+                    <span><?php esc_html_e( 'Social', 'seovela' ); ?></span>
+                </button>
+                <!-- SEO Score badge -->
+                <div class="seovela-tab-score" data-score="<?php echo esc_attr( $score ); ?>" style="color: <?php echo esc_attr( $score_color ); ?>">
+                    <span class="seovela-tab-score-number"><?php echo esc_html( $score ); ?></span>/100
+                </div>
+            </div>
+
+            <!-- ==================== GENERAL TAB ==================== -->
+            <div class="seovela-tab-panel active" data-panel="general">
+
+                <!-- SEO Score Widget (compact) -->
+                <div class="seovela-score-compact">
+                    <div class="seovela-score-circle" data-score="<?php echo esc_attr( $score ); ?>" data-status="<?php echo esc_attr( $analysis['status'] ); ?>">
+                        <svg class="seovela-score-svg" width="100" height="100" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                            <circle class="seovela-score-bg" cx="60" cy="60" r="54" fill="none" stroke="#e5e7eb" stroke-width="10"></circle>
+                            <circle class="seovela-score-progress" cx="60" cy="60" r="54" fill="none" stroke="<?php echo esc_attr( $progress_color ); ?>" stroke-width="10" style="stroke-dasharray:339.29;stroke-dashoffset:<?php echo esc_attr( $offset ); ?>"></circle>
+                        </svg>
+                        <div class="seovela-score-text">
+                            <span class="seovela-score-number"><?php echo esc_html( $score ); ?></span>
+                            <span class="seovela-score-label"><?php echo esc_html( $status_label ); ?></span>
+                        </div>
+                    </div>
+                    <div class="seovela-score-info">
+                        <h3 style="margin:0 0 4px;font-size:15px;"><?php esc_html_e( 'SEO Score', 'seovela' ); ?></h3>
+                        <p style="margin:0 0 8px;font-size:13px;color:#64748b;"><?php esc_html_e( 'Optimize your content for better search engine rankings', 'seovela' ); ?></p>
+                        <div class="seovela-score-actions">
+                            <button type="button" class="button seovela-refresh-analysis"><?php esc_html_e( 'Refresh Analysis', 'seovela' ); ?></button>
+                            <button type="button" class="button seovela-toggle-analysis"><?php esc_html_e( 'View Analysis', 'seovela' ); ?></button>
+                        </div>
                     </div>
                 </div>
-                <div class="seovela-score-info">
-                    <h3><?php esc_html_e( 'SEO Score', 'seovela' ); ?></h3>
-                    <p><?php esc_html_e( 'Optimize your content for better search engine rankings', 'seovela' ); ?></p>
-                    <button type="button" class="button seovela-refresh-analysis"><?php esc_html_e( 'Refresh Analysis', 'seovela' ); ?></button>
-                    <button type="button" class="button seovela-toggle-analysis"><?php esc_html_e( 'View Analysis', 'seovela' ); ?></button>
-                </div>
-            </div>
 
-            <!-- Analysis Results (collapsible) -->
-            <div class="seovela-analysis-results" style="display: none;">
-                <?php if ( $analysis['status'] === 'unknown' ) : ?>
-                    <p class="seovela-no-analysis"><?php esc_html_e( 'No analysis available yet. Click "Refresh Analysis" to run the SEO check.', 'seovela' ); ?></p>
-                <?php else : ?>
-                    <?php if ( ! empty( $analysis['errors'] ) ) : ?>
-                        <div class="seovela-analysis-section seovela-errors">
-                            <h4>❌ <?php esc_html_e( 'Errors', 'seovela' ); ?> (<?php echo esc_html( count( $analysis['errors'] ) ); ?>)</h4>
-                            <ul>
-                                <?php foreach ( $analysis['errors'] as $error ) : ?>
-                                    <li><?php echo esc_html( $error ); ?></li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </div>
-                    <?php endif; ?>
+                <!-- Analysis Results (collapsible) -->
+                <div class="seovela-analysis-results" style="display: none;">
+                    <?php if ( $analysis['status'] === 'unknown' ) : ?>
+                        <p class="seovela-no-analysis"><?php esc_html_e( 'No analysis available yet. Click "Refresh Analysis" to run the SEO check.', 'seovela' ); ?></p>
+                    <?php else : ?>
+                        <?php if ( ! empty( $analysis['errors'] ) ) : ?>
+                            <div class="seovela-analysis-section seovela-errors">
+                                <h4><?php esc_html_e( 'Errors', 'seovela' ); ?> (<?php echo esc_html( count( $analysis['errors'] ) ); ?>)</h4>
+                                <ul>
+                                    <?php foreach ( $analysis['errors'] as $error ) : ?>
+                                        <li><?php echo esc_html( $error ); ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
+                        <?php endif; ?>
 
-                    <?php if ( ! empty( $analysis['warnings'] ) ) : ?>
-                        <div class="seovela-analysis-section seovela-warnings">
-                            <h4>⚠️ <?php esc_html_e( 'Warnings', 'seovela' ); ?> (<?php echo esc_html( count( $analysis['warnings'] ) ); ?>)</h4>
-                            <ul>
-                                <?php foreach ( $analysis['warnings'] as $warning ) : ?>
-                                    <li><?php echo esc_html( $warning ); ?></li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </div>
-                    <?php endif; ?>
+                        <?php if ( ! empty( $analysis['warnings'] ) ) : ?>
+                            <div class="seovela-analysis-section seovela-warnings">
+                                <h4><?php esc_html_e( 'Warnings', 'seovela' ); ?> (<?php echo esc_html( count( $analysis['warnings'] ) ); ?>)</h4>
+                                <ul>
+                                    <?php foreach ( $analysis['warnings'] as $warning ) : ?>
+                                        <li><?php echo esc_html( $warning ); ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
+                        <?php endif; ?>
 
-                    <?php if ( ! empty( $analysis['good'] ) ) : ?>
-                        <div class="seovela-analysis-section seovela-good">
-                            <h4>✓ <?php esc_html_e( 'Good', 'seovela' ); ?> (<?php echo esc_html( count( $analysis['good'] ) ); ?>)</h4>
-                            <ul>
-                                <?php foreach ( $analysis['good'] as $good ) : ?>
-                                    <li><?php echo esc_html( $good ); ?></li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </div>
-                    <?php endif; ?>
-                <?php endif; ?>
-            </div>
-
-            <!-- Focus Keyword -->
-            <div class="seovela-field seovela-keyword-field">
-                <label for="seovela_focus_keyword">
-                    <strong><?php esc_html_e( 'Focus Keyword', 'seovela' ); ?></strong>
-                    <span class="seovela-help-tip" title="<?php esc_attr_e( 'Enter the main keyword you want to optimize this content for', 'seovela' ); ?>">?</span>
-                </label>
-                <div class="seovela-keyword-wrapper">
-                <input 
-                    type="text" 
-                    id="seovela_focus_keyword" 
-                    name="seovela_focus_keyword" 
-                    value="<?php echo esc_attr( $focus_keyword ); ?>" 
-                    class="widefat seovela-keyword-input"
-                    placeholder="<?php esc_attr_e( 'e.g., WordPress SEO plugin', 'seovela' ); ?>"
-                />
-                    <?php if ( $this->is_ai_configured() ) : ?>
-                        <button type="button" class="button seovela-suggest-keywords">
-                            <span class="dashicons dashicons-lightbulb"></span>
-                            <?php esc_html_e( 'Suggest', 'seovela' ); ?>
-                        </button>
+                        <?php if ( ! empty( $analysis['good'] ) ) : ?>
+                            <div class="seovela-analysis-section seovela-good">
+                                <h4><?php esc_html_e( 'Good', 'seovela' ); ?> (<?php echo esc_html( count( $analysis['good'] ) ); ?>)</h4>
+                                <ul>
+                                    <?php foreach ( $analysis['good'] as $good ) : ?>
+                                        <li><?php echo esc_html( $good ); ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
-                <div class="seovela-keyword-suggestions" style="display: none;">
-                    <p class="description"><?php esc_html_e( 'Suggested keywords (click to use):', 'seovela' ); ?></p>
-                    <div class="seovela-suggestions-list"></div>
-                </div>
-                <p class="description"><?php esc_html_e( 'Enter a keyword or phrase to optimize this content for search engines', 'seovela' ); ?></p>
-            </div>
 
-            <!-- Meta Title -->
-            <div class="seovela-field">
-                <label for="seovela_meta_title">
-                    <strong><?php esc_html_e( 'Meta Title', 'seovela' ); ?></strong>
-                </label>
-                <input 
-                    type="text" 
-                    id="seovela_meta_title" 
-                    name="seovela_meta_title" 
-                    value="<?php echo esc_attr( $meta_title ); ?>" 
-                    class="widefat seovela-title-input"
-                    maxlength="70"
-                />
-                <div class="seovela-counter">
-                    <span class="seovela-count" data-field="title">0</span> / 60 <?php esc_html_e( 'characters', 'seovela' ); ?>
-                    <span class="seovela-status"></span>
-                </div>
-                <?php if ( $this->is_ai_configured() ) : ?>
-                    <button type="button" class="button seovela-ai-optimize" data-field="title">
-                        <span class="dashicons dashicons-superhero-alt"></span>
-                        <?php esc_html_e( 'Generate with AI', 'seovela' ); ?>
-                    </button>
-                <?php else : ?>
-                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=ai' ) ); ?>" class="button seovela-ai-setup-link">
-                        <span class="dashicons dashicons-admin-generic"></span>
-                        <?php esc_html_e( 'Setup AI', 'seovela' ); ?>
-                    </a>
-                <?php endif; ?>
-            </div>
-
-            <!-- Meta Description -->
-            <div class="seovela-field">
-                <label for="seovela_meta_description">
-                    <strong><?php esc_html_e( 'Meta Description', 'seovela' ); ?></strong>
-                </label>
-                <textarea 
-                    id="seovela_meta_description" 
-                    name="seovela_meta_description" 
-                    rows="3" 
-                    class="widefat seovela-description-input"
-                    maxlength="170"
-                ><?php echo esc_textarea( $meta_description ); ?></textarea>
-                <div class="seovela-counter">
-                    <span class="seovela-count" data-field="description">0</span> / 160 <?php esc_html_e( 'characters', 'seovela' ); ?>
-                    <span class="seovela-status"></span>
-                </div>
-                <?php if ( $this->is_ai_configured() ) : ?>
-                    <button type="button" class="button seovela-ai-optimize" data-field="description">
-                        <span class="dashicons dashicons-superhero-alt"></span>
-                        <?php esc_html_e( 'Generate with AI', 'seovela' ); ?>
-                    </button>
-                <?php else : ?>
-                    <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=ai' ) ); ?>" class="button seovela-ai-setup-link">
-                        <span class="dashicons dashicons-admin-generic"></span>
-                        <?php esc_html_e( 'Setup AI', 'seovela' ); ?>
-                    </a>
-                <?php endif; ?>
-            </div>
-
-            <!-- Google Preview -->
-            <div class="seovela-field">
-                <label><strong><?php esc_html_e( 'Google Preview', 'seovela' ); ?></strong></label>
-                <div class="seovela-google-preview">
-                    <div class="seovela-preview-url"><?php echo esc_url( get_permalink( $post->ID ) ); ?></div>
-                    <div class="seovela-preview-title"><?php echo esc_html( $meta_title ); ?></div>
-                    <div class="seovela-preview-description"><?php echo esc_html( $meta_description ); ?></div>
-                </div>
-            </div>
-
-
-            <!-- Indexing Settings -->
-            <div class="seovela-field">
-                <label><strong><?php esc_html_e( 'Indexing Settings', 'seovela' ); ?></strong></label>
-                <div class="seovela-checkbox-group">
-                    <label>
-                        <input 
-                            type="checkbox" 
-                            name="seovela_noindex" 
-                            value="1" 
-                            <?php checked( $noindex, true ); ?>
-                        />
-                        <?php esc_html_e( 'Noindex (hide from search engines)', 'seovela' ); ?>
+                <!-- Focus Keyword -->
+                <div class="seovela-field seovela-keyword-field">
+                    <label for="seovela_focus_keyword">
+                        <strong><?php esc_html_e( 'Focus Keyword', 'seovela' ); ?></strong>
+                        <span class="seovela-help-tip" title="<?php esc_attr_e( 'Enter the main keyword you want to optimize this content for', 'seovela' ); ?>">?</span>
                     </label>
-                    <br>
-                    <label>
-                        <input 
-                            type="checkbox" 
-                            name="seovela_nofollow" 
-                            value="1" 
-                            <?php checked( $nofollow, true ); ?>
+                    <div class="seovela-keyword-wrapper">
+                        <input
+                            type="text"
+                            id="seovela_focus_keyword"
+                            name="seovela_focus_keyword"
+                            value="<?php echo esc_attr( $focus_keyword ); ?>"
+                            class="widefat seovela-keyword-input"
+                            placeholder="<?php esc_attr_e( 'e.g., WordPress SEO plugin', 'seovela' ); ?>"
                         />
-                        <?php esc_html_e( 'Nofollow (don\'t follow links)', 'seovela' ); ?>
+                        <?php if ( $ai_configured ) : ?>
+                            <button type="button" class="button seovela-suggest-keywords">
+                                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v3M10 15v3M4.2 4.2l2.1 2.1M13.7 13.7l2.1 2.1M2 10h3M15 10h3M4.2 15.8l2.1-2.1M13.7 6.3l2.1-2.1"/><circle cx="10" cy="10" r="3"/></svg>
+                                <?php esc_html_e( 'Suggest', 'seovela' ); ?>
+                            </button>
+                        <?php endif; ?>
+                    </div>
+                    <div class="seovela-keyword-suggestions" style="display: none;">
+                        <p class="description"><?php esc_html_e( 'Suggested keywords (click to use):', 'seovela' ); ?></p>
+                        <div class="seovela-suggestions-list"></div>
+                    </div>
+                    <p class="description"><?php esc_html_e( 'Enter a keyword or phrase to optimize this content for search engines', 'seovela' ); ?></p>
+                </div>
+
+                <!-- Meta Title -->
+                <div class="seovela-field">
+                    <label for="seovela_meta_title">
+                        <strong><?php esc_html_e( 'Meta Title', 'seovela' ); ?></strong>
                     </label>
+                    <div style="display:flex;gap:8px;align-items:flex-start;">
+                        <div style="flex:1;">
+                            <input
+                                type="text"
+                                id="seovela_meta_title"
+                                name="seovela_meta_title"
+                                value="<?php echo esc_attr( $meta_title ); ?>"
+                                class="widefat seovela-title-input"
+                                maxlength="70"
+                            />
+                            <div class="seovela-counter">
+                                <span class="seovela-count" data-field="title">0</span> / 60 <?php esc_html_e( 'characters', 'seovela' ); ?>
+                                <span class="seovela-status"></span>
+                            </div>
+                        </div>
+                        <?php if ( $ai_configured ) : ?>
+                            <button type="button" class="button seovela-ai-optimize" data-field="title" title="<?php esc_attr_e( 'Generate with AI', 'seovela' ); ?>">
+                                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2l1.5 4.5L16 8l-4.5 1.5L10 14l-1.5-4.5L4 8l4.5-1.5L10 2z"/></svg>
+                                <?php esc_html_e( 'AI', 'seovela' ); ?>
+                            </button>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- Meta Description -->
+                <div class="seovela-field">
+                    <label for="seovela_meta_description">
+                        <strong><?php esc_html_e( 'Meta Description', 'seovela' ); ?></strong>
+                    </label>
+                    <div style="display:flex;gap:8px;align-items:flex-start;">
+                        <div style="flex:1;">
+                            <textarea
+                                id="seovela_meta_description"
+                                name="seovela_meta_description"
+                                rows="3"
+                                class="widefat seovela-description-input"
+                                maxlength="170"
+                            ><?php echo esc_textarea( $meta_description ); ?></textarea>
+                            <div class="seovela-counter">
+                                <span class="seovela-count" data-field="description">0</span> / 160 <?php esc_html_e( 'characters', 'seovela' ); ?>
+                                <span class="seovela-status"></span>
+                            </div>
+                        </div>
+                        <?php if ( $ai_configured ) : ?>
+                            <button type="button" class="button seovela-ai-optimize" data-field="description" title="<?php esc_attr_e( 'Generate with AI', 'seovela' ); ?>">
+                                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2l1.5 4.5L16 8l-4.5 1.5L10 14l-1.5-4.5L4 8l4.5-1.5L10 2z"/></svg>
+                                <?php esc_html_e( 'AI', 'seovela' ); ?>
+                            </button>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- Google Preview -->
+                <div class="seovela-field">
+                    <label><strong><?php esc_html_e( 'Google Preview', 'seovela' ); ?></strong></label>
+                    <div class="seovela-google-preview">
+                        <div class="seovela-preview-url"><?php echo esc_url( get_permalink( $post->ID ) ); ?></div>
+                        <div class="seovela-preview-title"><?php echo esc_html( $meta_title ); ?></div>
+                        <div class="seovela-preview-description"><?php echo esc_html( $meta_description ); ?></div>
+                    </div>
                 </div>
             </div>
 
-            <?php
-            // Render schema selector
-            $this->render_schema_selector( $post );
-            ?>
+            <!-- ==================== ADVANCED TAB ==================== -->
+            <div class="seovela-tab-panel" data-panel="advanced">
+
+                <!-- Robots Meta -->
+                <div class="seovela-field-group">
+                    <h4><?php esc_html_e( 'Robots Meta', 'seovela' ); ?></h4>
+                    <p class="description" style="margin-bottom:12px;"><?php esc_html_e( 'Control how search engines index and follow this page.', 'seovela' ); ?></p>
+                    <div class="seovela-robots-chips">
+                        <label class="seovela-robot-chip <?php echo $noindex ? 'checked' : ''; ?>">
+                            <input type="checkbox" name="seovela_noindex" value="1" <?php checked( $noindex, true ); ?> />
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8"/><line x1="6" y1="6" x2="14" y2="14"/></svg>
+                            <?php esc_html_e( 'Noindex', 'seovela' ); ?>
+                        </label>
+                        <label class="seovela-robot-chip <?php echo $nofollow ? 'checked' : ''; ?>">
+                            <input type="checkbox" name="seovela_nofollow" value="1" <?php checked( $nofollow, true ); ?> />
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-8 8"/><path d="M4 10V4h6"/></svg>
+                            <?php esc_html_e( 'Nofollow', 'seovela' ); ?>
+                        </label>
+                        <label class="seovela-robot-chip <?php echo $noarchive ? 'checked' : ''; ?>">
+                            <input type="checkbox" name="seovela_noarchive" value="1" <?php checked( $noarchive, true ); ?> />
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M3 8h14"/><path d="M8 8v9"/></svg>
+                            <?php esc_html_e( 'Noarchive', 'seovela' ); ?>
+                        </label>
+                        <label class="seovela-robot-chip <?php echo $nosnippet ? 'checked' : ''; ?>">
+                            <input type="checkbox" name="seovela_nosnippet" value="1" <?php checked( $nosnippet, true ); ?> />
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h12"/><path d="M4 10h8"/><path d="M4 15h5"/></svg>
+                            <?php esc_html_e( 'Nosnippet', 'seovela' ); ?>
+                        </label>
+                        <label class="seovela-robot-chip <?php echo $noimageindex ? 'checked' : ''; ?>">
+                            <input type="checkbox" name="seovela_noimageindex" value="1" <?php checked( $noimageindex, true ); ?> />
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="14" height="14" rx="2"/><circle cx="8" cy="8" r="2"/><path d="M17 13l-4-4-10 10"/></svg>
+                            <?php esc_html_e( 'Noimageindex', 'seovela' ); ?>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Canonical URL -->
+                <div class="seovela-field-group">
+                    <h4><?php esc_html_e( 'Canonical URL', 'seovela' ); ?></h4>
+                    <input
+                        type="url"
+                        id="seovela_canonical_url"
+                        name="seovela_canonical_url"
+                        value="<?php echo esc_attr( $canonical_url ); ?>"
+                        class="widefat"
+                        placeholder="<?php echo esc_attr( get_permalink( $post->ID ) ); ?>"
+                    />
+                    <p class="description"><?php esc_html_e( 'Override the default canonical URL for this page. Leave empty to use the current permalink.', 'seovela' ); ?></p>
+                </div>
+            </div>
+
+            <!-- ==================== SCHEMA TAB ==================== -->
+            <div class="seovela-tab-panel" data-panel="schema">
+                <?php $this->render_schema_selector( $post ); ?>
+            </div>
+
+            <!-- ==================== SOCIAL TAB ==================== -->
+            <div class="seovela-tab-panel" data-panel="social">
+
+                <!-- Social sub-tabs -->
+                <div class="seovela-social-subtabs">
+                    <button type="button" class="seovela-social-tab active" data-social="facebook">
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path d="M18 10a8 8 0 10-9.25 7.9v-5.59H6.74V10h2.01V8.12c0-1.99 1.19-3.09 3-3.09.87 0 1.78.16 1.78.16v1.96h-1a1.15 1.15 0 00-1.3 1.24V10h2.2l-.35 2.31h-1.85v5.59A8 8 0 0018 10z"/></svg>
+                        <?php esc_html_e( 'Facebook', 'seovela' ); ?>
+                    </button>
+                    <button type="button" class="seovela-social-tab" data-social="twitter">
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path d="M11.2 8.87L16.77 2.5h-1.32l-4.83 5.53L6.68 2.5H2.5l5.84 8.38L2.5 17.5h1.32l5.11-5.85 4.08 5.85H17.5l-6.06-8.7-.24.02zm-1.81 2.07l-.59-.83L4.4 3.5h2.03l3.8 5.36.59.83 4.94 6.96h-2.03l-4.03-5.71h-.01z"/></svg>
+                        <?php esc_html_e( 'Twitter / X', 'seovela' ); ?>
+                    </button>
+                </div>
+
+                <!-- Facebook Panel -->
+                <div class="seovela-social-panel active" data-social-panel="facebook">
+
+                    <!-- OG Live Preview -->
+                    <div class="seovela-og-preview">
+                        <div class="seovela-og-preview-image">
+                            <?php if ( ! empty( $og_image ) ) : ?>
+                                <img src="<?php echo esc_url( $og_image ); ?>" alt="" />
+                            <?php else : ?>
+                                <?php esc_html_e( 'No image set', 'seovela' ); ?>
+                            <?php endif; ?>
+                        </div>
+                        <div class="seovela-og-preview-body">
+                            <div class="seovela-og-preview-domain"><?php echo esc_html( wp_parse_url( home_url(), PHP_URL_HOST ) ); ?></div>
+                            <div class="seovela-og-preview-title" id="seovela-og-preview-title"><?php echo esc_html( ! empty( $og_title ) ? $og_title : $meta_title ); ?></div>
+                            <div class="seovela-og-preview-desc" id="seovela-og-preview-desc"><?php echo esc_html( ! empty( $og_description ) ? $og_description : $meta_description ); ?></div>
+                        </div>
+                    </div>
+
+                    <div class="seovela-field">
+                        <label for="seovela_og_title"><strong><?php esc_html_e( 'OG Title', 'seovela' ); ?></strong></label>
+                        <input
+                            type="text"
+                            id="seovela_og_title"
+                            name="seovela_og_title"
+                            value="<?php echo esc_attr( $og_title ); ?>"
+                            class="widefat"
+                            placeholder="<?php echo esc_attr( $meta_title ); ?>"
+                        />
+                        <p class="description"><?php esc_html_e( 'Leave empty to use the meta title.', 'seovela' ); ?></p>
+                    </div>
+
+                    <div class="seovela-field">
+                        <label for="seovela_og_description"><strong><?php esc_html_e( 'OG Description', 'seovela' ); ?></strong></label>
+                        <textarea
+                            id="seovela_og_description"
+                            name="seovela_og_description"
+                            rows="3"
+                            class="widefat"
+                            placeholder="<?php echo esc_attr( $meta_description ); ?>"
+                        ><?php echo esc_textarea( $og_description ); ?></textarea>
+                        <p class="description"><?php esc_html_e( 'Leave empty to use the meta description.', 'seovela' ); ?></p>
+                    </div>
+
+                    <div class="seovela-field">
+                        <label for="seovela_og_image"><strong><?php esc_html_e( 'OG Image URL', 'seovela' ); ?></strong></label>
+                        <div style="display:flex;gap:8px;">
+                            <input
+                                type="url"
+                                id="seovela_og_image"
+                                name="seovela_og_image"
+                                value="<?php echo esc_attr( $og_image ); ?>"
+                                class="widefat"
+                                placeholder="<?php esc_attr_e( 'https://example.com/image.jpg', 'seovela' ); ?>"
+                            />
+                            <button type="button" class="button seovela-upload-og-image">
+                                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15l4-4 3 3 4-5 3 3"/><rect x="2" y="2" width="16" height="16" rx="2"/></svg>
+                                <?php esc_html_e( 'Upload', 'seovela' ); ?>
+                            </button>
+                        </div>
+                        <p class="description"><?php esc_html_e( 'Recommended: 1200x630 pixels.', 'seovela' ); ?></p>
+                    </div>
+                </div>
+
+                <!-- Twitter Panel -->
+                <div class="seovela-social-panel" data-social-panel="twitter">
+
+                    <div class="seovela-field">
+                        <label for="seovela_twitter_card"><strong><?php esc_html_e( 'Card Type', 'seovela' ); ?></strong></label>
+                        <select id="seovela_twitter_card" name="seovela_twitter_card" class="widefat">
+                            <option value="summary_large_image" <?php selected( $twitter_card, 'summary_large_image' ); ?>><?php esc_html_e( 'Summary with Large Image', 'seovela' ); ?></option>
+                            <option value="summary" <?php selected( $twitter_card, 'summary' ); ?>><?php esc_html_e( 'Summary', 'seovela' ); ?></option>
+                        </select>
+                    </div>
+
+                    <div class="seovela-field">
+                        <label for="seovela_twitter_title"><strong><?php esc_html_e( 'Twitter Title', 'seovela' ); ?></strong></label>
+                        <input
+                            type="text"
+                            id="seovela_twitter_title"
+                            name="seovela_twitter_title"
+                            value="<?php echo esc_attr( $twitter_title ); ?>"
+                            class="widefat"
+                            placeholder="<?php echo esc_attr( $meta_title ); ?>"
+                        />
+                        <p class="description"><?php esc_html_e( 'Leave empty to use the OG title or meta title.', 'seovela' ); ?></p>
+                    </div>
+
+                    <div class="seovela-field">
+                        <label for="seovela_twitter_description"><strong><?php esc_html_e( 'Twitter Description', 'seovela' ); ?></strong></label>
+                        <textarea
+                            id="seovela_twitter_description"
+                            name="seovela_twitter_description"
+                            rows="3"
+                            class="widefat"
+                            placeholder="<?php echo esc_attr( $meta_description ); ?>"
+                        ><?php echo esc_textarea( $twitter_description ); ?></textarea>
+                        <p class="description"><?php esc_html_e( 'Leave empty to use the OG description or meta description.', 'seovela' ); ?></p>
+                    </div>
+                </div>
+            </div>
+
         </div>
+
+        <script>
+        (function(){
+            /* Tab switching */
+            document.querySelectorAll('.seovela-tab-btn').forEach(function(btn){
+                btn.addEventListener('click', function(){
+                    var tab = this.getAttribute('data-tab');
+                    this.closest('.seovela-metabox').querySelectorAll('.seovela-tab-btn').forEach(function(b){b.classList.remove('active');});
+                    this.classList.add('active');
+                    this.closest('.seovela-metabox').querySelectorAll('.seovela-tab-panel').forEach(function(p){
+                        p.classList.toggle('active', p.getAttribute('data-panel') === tab);
+                    });
+                });
+            });
+
+            /* Social sub-tab switching */
+            document.querySelectorAll('.seovela-social-tab').forEach(function(btn){
+                btn.addEventListener('click', function(){
+                    var social = this.getAttribute('data-social');
+                    this.closest('.seovela-social-subtabs').querySelectorAll('.seovela-social-tab').forEach(function(b){b.classList.remove('active');});
+                    this.classList.add('active');
+                    this.closest('.seovela-tab-panel').querySelectorAll('.seovela-social-panel').forEach(function(p){
+                        p.classList.toggle('active', p.getAttribute('data-social-panel') === social);
+                    });
+                });
+            });
+
+            /* Robot chip toggle visual */
+            document.querySelectorAll('.seovela-robot-chip input[type="checkbox"]').forEach(function(cb){
+                cb.addEventListener('change', function(){
+                    this.closest('.seovela-robot-chip').classList.toggle('checked', this.checked);
+                });
+            });
+
+        })();
+        </script>
         <?php
     }
 
@@ -1291,6 +1580,50 @@ class Seovela_Metabox {
             update_post_meta( $post_id, '_seovela_nofollow', true );
         } else {
             delete_post_meta( $post_id, '_seovela_nofollow' );
+        }
+
+        // Save advanced robots meta
+        $bool_fields = array( 'seovela_noarchive', 'seovela_nosnippet', 'seovela_noimageindex' );
+        foreach ( $bool_fields as $field ) {
+            if ( isset( $_POST[ $field ] ) ) {
+                update_post_meta( $post_id, '_' . $field, true );
+            } else {
+                delete_post_meta( $post_id, '_' . $field );
+            }
+        }
+
+        // Save canonical URL
+        if ( isset( $_POST['seovela_canonical_url'] ) ) {
+            $canonical = esc_url_raw( wp_unslash( $_POST['seovela_canonical_url'] ) );
+            if ( ! empty( $canonical ) ) {
+                update_post_meta( $post_id, '_seovela_canonical_url', $canonical );
+            } else {
+                delete_post_meta( $post_id, '_seovela_canonical_url' );
+            }
+        }
+
+        // Save Social / OpenGraph fields
+        $text_fields = array(
+            'seovela_og_title',
+            'seovela_og_description',
+            'seovela_og_image',
+            'seovela_twitter_title',
+            'seovela_twitter_description',
+        );
+        foreach ( $text_fields as $field ) {
+            if ( isset( $_POST[ $field ] ) ) {
+                $val = sanitize_text_field( wp_unslash( $_POST[ $field ] ) );
+                if ( ! empty( $val ) ) {
+                    update_post_meta( $post_id, '_' . $field, $val );
+                } else {
+                    delete_post_meta( $post_id, '_' . $field );
+                }
+            }
+        }
+
+        // Save Twitter card type
+        if ( isset( $_POST['seovela_twitter_card'] ) ) {
+            update_post_meta( $post_id, '_seovela_twitter_card', sanitize_text_field( wp_unslash( $_POST['seovela_twitter_card'] ) ) );
         }
 
         // Save schema settings
