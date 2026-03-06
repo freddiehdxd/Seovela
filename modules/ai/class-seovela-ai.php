@@ -271,7 +271,7 @@ Requirements:
      */
     private function stream_openai( $prompt ) {
         $api_key = Seovela_Helpers::decrypt( get_option( 'seovela_openai_api_key', '' ) );
-        $model   = get_option( 'seovela_openai_model', 'gpt-4o-mini' );
+        $model   = get_option( 'seovela_openai_model', 'gpt-5-mini' );
 
         if ( empty( $api_key ) ) {
             echo "data: " . wp_json_encode( array( 'error' => 'OpenAI API key not configured' ) ) . "\n\n";
@@ -350,7 +350,7 @@ Requirements:
      */
     private function stream_gemini( $prompt ) {
         $api_key = Seovela_Helpers::decrypt( get_option( 'seovela_gemini_api_key', '' ) );
-        $model   = get_option( 'seovela_gemini_model', 'gemini-2.5-flash' );
+        $model   = get_option( 'seovela_gemini_model', 'gemini-3-flash-preview' );
 
         if ( empty( $api_key ) ) {
             echo "data: " . wp_json_encode( array( 'error' => 'Gemini API key not configured' ) ) . "\n\n";
@@ -719,7 +719,7 @@ Requirements:
                 'Content-Type'  => 'application/json',
             ),
             'body' => wp_json_encode( array(
-                'model' => 'gpt-4o-mini',
+                'model' => 'gpt-5-nano',
                 'messages' => array(
                     array(
                         'role' => 'user',
@@ -752,7 +752,7 @@ Requirements:
      * @return bool|WP_Error
      */
     private function test_gemini_connection( $api_key ) {
-        $model = 'gemini-1.5-flash';
+        $model = 'gemini-3.1-flash-lite-preview';
         $url = $this->gemini_endpoint . $model . ':generateContent?key=' . $api_key;
 
         $response = wp_remote_post( $url, array(
@@ -804,7 +804,7 @@ Requirements:
                 'Content-Type'      => 'application/json',
             ),
             'body' => wp_json_encode( array(
-                'model'      => 'claude-sonnet-4-20250514',
+                'model'      => 'claude-sonnet-4-6',
                 'max_tokens' => 10,
                 'messages'   => array(
                     array(
@@ -837,7 +837,7 @@ Requirements:
      */
     private function stream_claude( $prompt ) {
         $api_key = Seovela_Helpers::decrypt( get_option( 'seovela_claude_api_key', '' ) );
-        $model   = get_option( 'seovela_claude_model', 'claude-sonnet-4-20250514' );
+        $model   = get_option( 'seovela_claude_model', 'claude-sonnet-4-6' );
 
         if ( empty( $api_key ) ) {
             echo "data: " . wp_json_encode( array( 'error' => 'Claude API key not configured' ) ) . "\n\n";
@@ -917,7 +917,7 @@ Requirements:
      */
     private function generate_with_claude( $content, $type, $focus_keyword ) {
         $api_key = Seovela_Helpers::decrypt( get_option( 'seovela_claude_api_key', '' ) );
-        $model = get_option( 'seovela_claude_model', 'claude-sonnet-4-20250514' );
+        $model = get_option( 'seovela_claude_model', 'claude-sonnet-4-6' );
         $temperature = floatval( get_option( 'seovela_ai_temperature', 0.7 ) );
 
         if ( empty( $api_key ) ) {
@@ -1025,7 +1025,7 @@ Requirements:
      */
     private function generate_with_openai( $content, $type, $focus_keyword ) {
         $api_key = Seovela_Helpers::decrypt( get_option( 'seovela_openai_api_key', '' ) );
-        $model = get_option( 'seovela_openai_model', 'gpt-4o-mini' );
+        $model = get_option( 'seovela_openai_model', 'gpt-5-mini' );
         $temperature = floatval( get_option( 'seovela_ai_temperature', 0.7 ) );
 
         if ( empty( $api_key ) ) {
@@ -1086,7 +1086,7 @@ Requirements:
      */
     private function generate_with_gemini( $content, $type, $focus_keyword ) {
         $api_key = Seovela_Helpers::decrypt( get_option( 'seovela_gemini_api_key', '' ) );
-        $model = get_option( 'seovela_gemini_model', 'gemini-2.5-flash' );
+        $model = get_option( 'seovela_gemini_model', 'gemini-3-flash-preview' );
         $temperature = floatval( get_option( 'seovela_ai_temperature', 0.7 ) );
 
         if ( empty( $api_key ) ) {
@@ -1371,7 +1371,7 @@ Requirements:
     private function dispatch_ai_request( $provider, $system_prompt, $user_content, $max_tokens, $temperature ) {
         if ( $provider === 'openai' ) {
             $api_key = Seovela_Helpers::decrypt( get_option( 'seovela_openai_api_key', '' ) );
-            $model   = get_option( 'seovela_openai_model', 'gpt-4o-mini' );
+            $model   = get_option( 'seovela_openai_model', 'gpt-5-mini' );
 
             if ( empty( $api_key ) ) {
                 return new WP_Error( 'no_api_key', __( 'OpenAI API key is not configured.', 'seovela' ) );
@@ -1395,7 +1395,7 @@ Requirements:
             ) );
         } elseif ( $provider === 'claude' ) {
             $api_key = Seovela_Helpers::decrypt( get_option( 'seovela_claude_api_key', '' ) );
-            $model   = get_option( 'seovela_claude_model', 'claude-sonnet-4-20250514' );
+            $model   = get_option( 'seovela_claude_model', 'claude-sonnet-4-6' );
 
             if ( empty( $api_key ) ) {
                 return new WP_Error( 'no_api_key', __( 'Claude API key is not configured.', 'seovela' ) );
@@ -1421,7 +1421,7 @@ Requirements:
         } else {
             // Gemini
             $api_key = Seovela_Helpers::decrypt( get_option( 'seovela_gemini_api_key', '' ) );
-            $model   = get_option( 'seovela_gemini_model', 'gemini-2.5-flash' );
+            $model   = get_option( 'seovela_gemini_model', 'gemini-3-flash-preview' );
 
             if ( empty( $api_key ) ) {
                 return new WP_Error( 'no_api_key', __( 'Gemini API key is not configured.', 'seovela' ) );
@@ -1585,27 +1585,25 @@ Each array should contain 2-5 specific, actionable string suggestions. Return ON
         // Pricing per 1M tokens: array( input_cost, output_cost ).
         $pricing = array(
             'openai' => array(
+                'gpt-5.2'       => array( 1.75, 14.00 ),
+                'gpt-5-mini'    => array( 0.25, 2.00 ),
+                'gpt-5-nano'    => array( 0.05, 0.40 ),
                 'gpt-4.1'       => array( 2.00, 8.00 ),
                 'gpt-4.1-mini'  => array( 0.40, 1.60 ),
                 'gpt-4.1-nano'  => array( 0.10, 0.40 ),
-                'o4-mini'       => array( 1.10, 4.40 ),
-                'o3'            => array( 2.00, 8.00 ),
-                'o3-mini'       => array( 1.10, 4.40 ),
                 'gpt-4o'        => array( 2.50, 10.00 ),
                 'gpt-4o-mini'   => array( 0.15, 0.60 ),
             ),
             'claude' => array(
-                'claude-opus-4-20250514'    => array( 15.00, 75.00 ),
-                'claude-sonnet-4-20250514'  => array( 3.00, 15.00 ),
-                'claude-haiku-4-5-20251001' => array( 0.80, 4.00 ),
+                'claude-opus-4-6'           => array( 5.00, 25.00 ),
+                'claude-sonnet-4-6'         => array( 3.00, 15.00 ),
+                'claude-haiku-4-5-20251001' => array( 1.00, 5.00 ),
             ),
             'gemini' => array(
-                'gemini-2.5-pro'        => array( 1.25, 10.00 ),
-                'gemini-2.5-flash'      => array( 0.15, 0.60 ),
-                'gemini-2.0-flash'      => array( 0.10, 0.40 ),
-                'gemini-2.0-flash-lite' => array( 0.075, 0.30 ),
-                'gemini-1.5-pro'        => array( 1.25, 5.00 ),
-                'gemini-1.5-flash'      => array( 0.075, 0.30 ),
+                'gemini-3.1-pro-preview'        => array( 2.00, 12.00 ),
+                'gemini-3-flash-preview'        => array( 0.50, 3.00 ),
+                'gemini-3.1-flash-lite-preview' => array( 0.25, 1.50 ),
+                'text-embedding-004'            => array( 0.00, 0.00 ),
             ),
         );
 
@@ -1613,11 +1611,11 @@ Each array should contain 2-5 specific, actionable string suggestions. Return ON
 
         // Determine the active model.
         if ( $provider === 'openai' ) {
-            $model = get_option( 'seovela_openai_model', 'gpt-4o-mini' );
+            $model = get_option( 'seovela_openai_model', 'gpt-5-mini' );
         } elseif ( $provider === 'claude' ) {
-            $model = get_option( 'seovela_claude_model', 'claude-sonnet-4-20250514' );
+            $model = get_option( 'seovela_claude_model', 'claude-sonnet-4-6' );
         } else {
-            $model = get_option( 'seovela_gemini_model', 'gemini-2.5-flash' );
+            $model = get_option( 'seovela_gemini_model', 'gemini-3-flash-preview' );
         }
 
         // Look up pricing for the provider/model.
@@ -1627,9 +1625,9 @@ Each array should contain 2-5 specific, actionable string suggestions. Return ON
         } else {
             // Fallback to default rates per provider.
             $defaults = array(
-                'openai' => array( 0.40, 1.60 ),
+                'openai' => array( 0.25, 2.00 ),
                 'claude' => array( 3.00, 15.00 ),
-                'gemini' => array( 0.15, 0.60 ),
+                'gemini' => array( 0.50, 3.00 ),
             );
             $input_rate  = isset( $defaults[ $provider ] ) ? $defaults[ $provider ][0] : 0.15;
             $output_rate = isset( $defaults[ $provider ] ) ? $defaults[ $provider ][1] : 0.60;
@@ -1659,48 +1657,48 @@ Each array should contain 2-5 specific, actionable string suggestions. Return ON
     public function get_available_models( $provider = 'openai' ) {
         if ( $provider === 'claude' ) {
             return array(
-                'claude-opus-4-20250514' => array(
-                    'name' => 'Claude Opus 4',
-                    'description' => __( 'Most capable - best quality', 'seovela' ),
+                'claude-opus-4-6' => array(
+                    'name' => 'Claude Opus 4.6',
+                    'description' => __( 'Most intelligent - complex reasoning', 'seovela' ),
                 ),
-                'claude-sonnet-4-20250514' => array(
-                    'name' => 'Claude Sonnet 4',
-                    'description' => __( 'Fast and capable', 'seovela' ),
+                'claude-sonnet-4-6' => array(
+                    'name' => 'Claude Sonnet 4.6',
+                    'description' => __( 'Balanced intelligence and speed', 'seovela' ),
                 ),
                 'claude-haiku-4-5-20251001' => array(
                     'name' => 'Claude Haiku 4.5',
-                    'description' => __( 'Fast and cost-effective', 'seovela' ),
+                    'description' => __( 'Fastest and cheapest', 'seovela' ),
                 ),
             );
         } elseif ( $provider === 'openai' ) {
             return array(
+                'gpt-5.2' => array(
+                    'name' => 'GPT-5.2',
+                    'description' => __( 'Flagship - most capable', 'seovela' ),
+                ),
+                'gpt-5-mini' => array(
+                    'name' => 'GPT-5 Mini',
+                    'description' => __( 'Fast and smart', 'seovela' ),
+                ),
+                'gpt-5-nano' => array(
+                    'name' => 'GPT-5 Nano',
+                    'description' => __( 'Ultra fast and cheap', 'seovela' ),
+                ),
                 'gpt-4.1' => array(
                     'name' => 'GPT-4.1',
-                    'description' => __( 'Flagship - best quality', 'seovela' ),
+                    'description' => __( 'Previous flagship', 'seovela' ),
                 ),
                 'gpt-4.1-mini' => array(
                     'name' => 'GPT-4.1 Mini',
-                    'description' => __( 'Fast and smart', 'seovela' ),
+                    'description' => __( 'Balanced', 'seovela' ),
                 ),
                 'gpt-4.1-nano' => array(
                     'name' => 'GPT-4.1 Nano',
-                    'description' => __( 'Ultra fast and cheap', 'seovela' ),
-                ),
-                'o4-mini' => array(
-                    'name' => 'o4-mini',
-                    'description' => __( 'Reasoning - cost-effective', 'seovela' ),
-                ),
-                'o3' => array(
-                    'name' => 'o3',
-                    'description' => __( 'Advanced reasoning', 'seovela' ),
-                ),
-                'o3-mini' => array(
-                    'name' => 'o3-mini',
-                    'description' => __( 'Reasoning - budget', 'seovela' ),
+                    'description' => __( 'Budget', 'seovela' ),
                 ),
                 'gpt-4o' => array(
                     'name' => 'GPT-4o',
-                    'description' => __( 'Multimodal', 'seovela' ),
+                    'description' => __( 'Legacy multimodal', 'seovela' ),
                 ),
                 'gpt-4o-mini' => array(
                     'name' => 'GPT-4o Mini',
@@ -1709,29 +1707,21 @@ Each array should contain 2-5 specific, actionable string suggestions. Return ON
             );
         } else {
             return array(
-                'gemini-2.5-pro' => array(
-                    'name' => 'Gemini 2.5 Pro',
-                    'description' => __( 'Most capable - thinking', 'seovela' ),
+                'gemini-3.1-pro-preview' => array(
+                    'name' => 'Gemini 3.1 Pro',
+                    'description' => __( 'Flagship - deep reasoning', 'seovela' ),
                 ),
-                'gemini-2.5-flash' => array(
-                    'name' => 'Gemini 2.5 Flash',
-                    'description' => __( 'Fast and smart', 'seovela' ),
+                'gemini-3-flash-preview' => array(
+                    'name' => 'Gemini 3 Flash',
+                    'description' => __( 'Balanced - fast and smart', 'seovela' ),
                 ),
-                'gemini-2.0-flash' => array(
-                    'name' => 'Gemini 2.0 Flash',
-                    'description' => __( 'Balanced', 'seovela' ),
+                'gemini-3.1-flash-lite-preview' => array(
+                    'name' => 'Gemini 3.1 Flash Lite',
+                    'description' => __( 'Ultra fast and cheap', 'seovela' ),
                 ),
-                'gemini-2.0-flash-lite' => array(
-                    'name' => 'Gemini 2.0 Flash Lite',
-                    'description' => __( 'Budget', 'seovela' ),
-                ),
-                'gemini-1.5-pro' => array(
-                    'name' => 'Gemini 1.5 Pro',
-                    'description' => __( 'Legacy pro', 'seovela' ),
-                ),
-                'gemini-1.5-flash' => array(
-                    'name' => 'Gemini 1.5 Flash',
-                    'description' => __( 'Legacy fast', 'seovela' ),
+                'text-embedding-004' => array(
+                    'name' => 'Text Embedding 004',
+                    'description' => __( 'Semantic search - free', 'seovela' ),
                 ),
             );
     }

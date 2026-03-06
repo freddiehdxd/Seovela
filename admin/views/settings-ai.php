@@ -25,7 +25,7 @@ if ( isset( $_POST['seovela_save_ai_settings'] ) && wp_verify_nonce( $_POST['seo
     if ( ! empty( $openai_key_input ) && strpos( $openai_key_input, '****' ) === false ) {
         update_option( 'seovela_openai_api_key', Seovela_Helpers::encrypt( $openai_key_input ) );
     }
-    $openai_model = isset( $_POST['seovela_openai_model'] ) ? sanitize_text_field( $_POST['seovela_openai_model'] ) : 'gpt-4o-mini';
+    $openai_model = isset( $_POST['seovela_openai_model'] ) ? sanitize_text_field( $_POST['seovela_openai_model'] ) : 'gpt-5-mini';
     update_option( 'seovela_openai_model', $openai_model );
     
     // Save Gemini settings (encrypt API key)
@@ -33,7 +33,7 @@ if ( isset( $_POST['seovela_save_ai_settings'] ) && wp_verify_nonce( $_POST['seo
     if ( ! empty( $gemini_key_input ) && strpos( $gemini_key_input, '****' ) === false ) {
         update_option( 'seovela_gemini_api_key', Seovela_Helpers::encrypt( $gemini_key_input ) );
     }
-    $gemini_model = isset( $_POST['seovela_gemini_model'] ) ? sanitize_text_field( $_POST['seovela_gemini_model'] ) : 'gemini-2.5-flash';
+    $gemini_model = isset( $_POST['seovela_gemini_model'] ) ? sanitize_text_field( $_POST['seovela_gemini_model'] ) : 'gemini-3-flash-preview';
     update_option( 'seovela_gemini_model', $gemini_model );
     
     // Save Claude settings (encrypt API key)
@@ -41,7 +41,7 @@ if ( isset( $_POST['seovela_save_ai_settings'] ) && wp_verify_nonce( $_POST['seo
     if ( ! empty( $claude_key_input ) && strpos( $claude_key_input, '****' ) === false ) {
         update_option( 'seovela_claude_api_key', Seovela_Helpers::encrypt( $claude_key_input ) );
     }
-    $claude_model = isset( $_POST['seovela_claude_model'] ) ? sanitize_text_field( $_POST['seovela_claude_model'] ) : 'claude-sonnet-4-20250514';
+    $claude_model = isset( $_POST['seovela_claude_model'] ) ? sanitize_text_field( $_POST['seovela_claude_model'] ) : 'claude-sonnet-4-6';
     update_option( 'seovela_claude_model', $claude_model );
     
     // Save AI generation settings
@@ -57,13 +57,13 @@ if ( isset( $_POST['seovela_save_ai_settings'] ) && wp_verify_nonce( $_POST['seo
 $ai_provider = get_option( 'seovela_ai_provider', 'openai' );
 $openai_key_raw = get_option( 'seovela_openai_api_key', '' );
 $openai_key_masked = Seovela_Helpers::mask_api_key( $openai_key_raw );
-$openai_model = get_option( 'seovela_openai_model', 'gpt-4o-mini' );
+$openai_model = get_option( 'seovela_openai_model', 'gpt-5-mini' );
 $gemini_key_raw = get_option( 'seovela_gemini_api_key', '' );
 $gemini_key_masked = Seovela_Helpers::mask_api_key( $gemini_key_raw );
-$gemini_model = get_option( 'seovela_gemini_model', 'gemini-2.5-flash' );
+$gemini_model = get_option( 'seovela_gemini_model', 'gemini-3-flash-preview' );
 $claude_key_raw = get_option( 'seovela_claude_api_key', '' );
 $claude_key_masked = Seovela_Helpers::mask_api_key( $claude_key_raw );
-$claude_model = get_option( 'seovela_claude_model', 'claude-sonnet-4-20250514' );
+$claude_model = get_option( 'seovela_claude_model', 'claude-sonnet-4-6' );
 $ai_temperature = get_option( 'seovela_ai_temperature', 0.7 );
 $ai_post_types = get_option( 'seovela_ai_post_types', array( 'post', 'page' ) );
 
@@ -155,7 +155,7 @@ $claude_configured = ! empty( $claude_key_raw );
                                 </span>
                             <?php endif; ?>
                         </div>
-                        <p class="seovela-provider-desc"><?php esc_html_e( 'Powered by GPT-4o and GPT-4o-mini models. Best for creative and nuanced content.', 'seovela' ); ?></p>
+                        <p class="seovela-provider-desc"><?php esc_html_e( 'Powered by GPT-5 and GPT-4.1 models. Best for creative and nuanced SEO content.', 'seovela' ); ?></p>
                     </label>
                     
                     <!-- Gemini Card -->
@@ -186,7 +186,7 @@ $claude_configured = ! empty( $claude_key_raw );
                                 </span>
                             <?php endif; ?>
                         </div>
-                        <p class="seovela-provider-desc"><?php esc_html_e( 'Google\'s latest AI model. Fast, efficient, and great for SEO optimization.', 'seovela' ); ?></p>
+                        <p class="seovela-provider-desc"><?php esc_html_e( 'Google\'s Gemini 3 series. Fast, efficient, and great for SEO optimization at scale.', 'seovela' ); ?></p>
                     </label>
                     
                     <!-- Claude Card -->
@@ -208,7 +208,7 @@ $claude_configured = ! empty( $claude_key_raw );
                                 </span>
                             <?php endif; ?>
                         </div>
-                        <p class="seovela-provider-desc"><?php esc_html_e( 'Anthropic\'s Claude models. Excellent at nuanced writing and following complex instructions.', 'seovela' ); ?></p>
+                        <p class="seovela-provider-desc"><?php esc_html_e( 'Anthropic\'s Claude 4.6 models. Excellent at nuanced writing and following complex instructions.', 'seovela' ); ?></p>
                     </label>
                 </div>
             </div>
@@ -265,31 +265,31 @@ $claude_configured = ! empty( $claude_key_raw );
                         </th>
                         <td>
                             <select id="seovela_openai_model" name="seovela_openai_model" class="regular-text">
-                                <optgroup label="<?php esc_attr_e( 'GPT-4.1 Series (Latest)', 'seovela' ); ?>">
+                                <optgroup label="<?php esc_attr_e( 'GPT-5 Series (Latest)', 'seovela' ); ?>">
+                                    <option value="gpt-5.2" <?php selected( $openai_model, 'gpt-5.2' ); ?>>
+                                        GPT-5.2 (<?php esc_html_e( 'Flagship - Most Capable', 'seovela' ); ?>)
+                                    </option>
+                                    <option value="gpt-5-mini" <?php selected( $openai_model, 'gpt-5-mini' ); ?>>
+                                        GPT-5 Mini (<?php esc_html_e( 'Fast & Smart', 'seovela' ); ?>)
+                                    </option>
+                                    <option value="gpt-5-nano" <?php selected( $openai_model, 'gpt-5-nano' ); ?>>
+                                        GPT-5 Nano (<?php esc_html_e( 'Ultra Fast & Cheap', 'seovela' ); ?>)
+                                    </option>
+                                </optgroup>
+                                <optgroup label="<?php esc_attr_e( 'GPT-4.1 Series', 'seovela' ); ?>">
                                     <option value="gpt-4.1" <?php selected( $openai_model, 'gpt-4.1' ); ?>>
-                                        GPT-4.1 (<?php esc_html_e( 'Flagship - Best Quality', 'seovela' ); ?>)
+                                        GPT-4.1 (<?php esc_html_e( 'Previous Flagship', 'seovela' ); ?>)
                                     </option>
                                     <option value="gpt-4.1-mini" <?php selected( $openai_model, 'gpt-4.1-mini' ); ?>>
-                                        GPT-4.1 Mini (<?php esc_html_e( 'Fast & Smart', 'seovela' ); ?>)
+                                        GPT-4.1 Mini (<?php esc_html_e( 'Balanced', 'seovela' ); ?>)
                                     </option>
                                     <option value="gpt-4.1-nano" <?php selected( $openai_model, 'gpt-4.1-nano' ); ?>>
-                                        GPT-4.1 Nano (<?php esc_html_e( 'Ultra Fast & Cheap', 'seovela' ); ?>)
+                                        GPT-4.1 Nano (<?php esc_html_e( 'Budget', 'seovela' ); ?>)
                                     </option>
                                 </optgroup>
-                                <optgroup label="<?php esc_attr_e( 'Reasoning Models', 'seovela' ); ?>">
-                                    <option value="o4-mini" <?php selected( $openai_model, 'o4-mini' ); ?>>
-                                        o4-mini (<?php esc_html_e( 'Reasoning - Cost-Effective', 'seovela' ); ?>)
-                                    </option>
-                                    <option value="o3" <?php selected( $openai_model, 'o3' ); ?>>
-                                        o3 (<?php esc_html_e( 'Advanced Reasoning', 'seovela' ); ?>)
-                                    </option>
-                                    <option value="o3-mini" <?php selected( $openai_model, 'o3-mini' ); ?>>
-                                        o3-mini (<?php esc_html_e( 'Reasoning - Budget', 'seovela' ); ?>)
-                                    </option>
-                                </optgroup>
-                                <optgroup label="<?php esc_attr_e( 'GPT-4o Series', 'seovela' ); ?>">
+                                <optgroup label="<?php esc_attr_e( 'GPT-4o Series (Legacy)', 'seovela' ); ?>">
                                     <option value="gpt-4o" <?php selected( $openai_model, 'gpt-4o' ); ?>>
-                                        GPT-4o (<?php esc_html_e( 'Multimodal', 'seovela' ); ?>)
+                                        GPT-4o (<?php esc_html_e( 'Legacy Multimodal', 'seovela' ); ?>)
                                     </option>
                                     <option value="gpt-4o-mini" <?php selected( $openai_model, 'gpt-4o-mini' ); ?>>
                                         GPT-4o Mini (<?php esc_html_e( 'Legacy Fast', 'seovela' ); ?>)
@@ -297,7 +297,7 @@ $claude_configured = ! empty( $claude_key_raw );
                                 </optgroup>
                             </select>
                             <p class="description">
-                                <?php esc_html_e( 'GPT-4.1 Mini is recommended for the best balance of speed, quality, and cost.', 'seovela' ); ?>
+                                <?php esc_html_e( 'GPT-5 Mini is recommended for the best balance of speed, quality, and cost.', 'seovela' ); ?>
                             </p>
                         </td>
                     </tr>
@@ -363,33 +363,25 @@ $claude_configured = ! empty( $claude_key_raw );
                         </th>
                         <td>
                             <select id="seovela_gemini_model" name="seovela_gemini_model" class="regular-text">
-                                <optgroup label="<?php esc_attr_e( 'Gemini 2.5 Series (Latest)', 'seovela' ); ?>">
-                                    <option value="gemini-2.5-pro" <?php selected( $gemini_model, 'gemini-2.5-pro' ); ?>>
-                                        Gemini 2.5 Pro (<?php esc_html_e( 'Most Capable - Thinking', 'seovela' ); ?>)
+                                <optgroup label="<?php esc_attr_e( 'Gemini 3 Series (Latest)', 'seovela' ); ?>">
+                                    <option value="gemini-3.1-pro-preview" <?php selected( $gemini_model, 'gemini-3.1-pro-preview' ); ?>>
+                                        Gemini 3.1 Pro (<?php esc_html_e( 'Flagship - Deep Reasoning', 'seovela' ); ?>)
                                     </option>
-                                    <option value="gemini-2.5-flash" <?php selected( $gemini_model, 'gemini-2.5-flash' ); ?>>
-                                        Gemini 2.5 Flash (<?php esc_html_e( 'Fast & Smart', 'seovela' ); ?>)
+                                    <option value="gemini-3-flash-preview" <?php selected( $gemini_model, 'gemini-3-flash-preview' ); ?>>
+                                        Gemini 3 Flash (<?php esc_html_e( 'Balanced - Fast & Smart', 'seovela' ); ?>)
                                     </option>
-                                </optgroup>
-                                <optgroup label="<?php esc_attr_e( 'Gemini 2.0 Series', 'seovela' ); ?>">
-                                    <option value="gemini-2.0-flash" <?php selected( $gemini_model, 'gemini-2.0-flash' ); ?>>
-                                        Gemini 2.0 Flash (<?php esc_html_e( 'Balanced', 'seovela' ); ?>)
-                                    </option>
-                                    <option value="gemini-2.0-flash-lite" <?php selected( $gemini_model, 'gemini-2.0-flash-lite' ); ?>>
-                                        Gemini 2.0 Flash Lite (<?php esc_html_e( 'Budget', 'seovela' ); ?>)
+                                    <option value="gemini-3.1-flash-lite-preview" <?php selected( $gemini_model, 'gemini-3.1-flash-lite-preview' ); ?>>
+                                        Gemini 3.1 Flash Lite (<?php esc_html_e( 'Ultra Fast & Cheap', 'seovela' ); ?>)
                                     </option>
                                 </optgroup>
-                                <optgroup label="<?php esc_attr_e( 'Gemini 1.5 Series', 'seovela' ); ?>">
-                                    <option value="gemini-1.5-pro" <?php selected( $gemini_model, 'gemini-1.5-pro' ); ?>>
-                                        Gemini 1.5 Pro (<?php esc_html_e( 'Legacy Pro', 'seovela' ); ?>)
-                                    </option>
-                                    <option value="gemini-1.5-flash" <?php selected( $gemini_model, 'gemini-1.5-flash' ); ?>>
-                                        Gemini 1.5 Flash (<?php esc_html_e( 'Legacy Fast', 'seovela' ); ?>)
+                                <optgroup label="<?php esc_attr_e( 'Embeddings', 'seovela' ); ?>">
+                                    <option value="text-embedding-004" <?php selected( $gemini_model, 'text-embedding-004' ); ?>>
+                                        Text Embedding 004 (<?php esc_html_e( 'Semantic Search - Free', 'seovela' ); ?>)
                                     </option>
                                 </optgroup>
                             </select>
                             <p class="description">
-                                <?php esc_html_e( 'Gemini 2.5 Flash is recommended for the best balance of speed and quality.', 'seovela' ); ?>
+                                <?php esc_html_e( 'Gemini 3 Flash is recommended for the best balance of speed, intelligence, and cost.', 'seovela' ); ?>
                             </p>
                         </td>
                     </tr>
@@ -448,22 +440,22 @@ $claude_configured = ! empty( $claude_key_raw );
                         </th>
                         <td>
                             <select id="seovela_claude_model" name="seovela_claude_model" class="regular-text">
-                                <optgroup label="<?php esc_attr_e( 'Claude 4 Series (Latest)', 'seovela' ); ?>">
-                                    <option value="claude-opus-4-20250514" <?php selected( $claude_model, 'claude-opus-4-20250514' ); ?>>
-                                        Claude Opus 4 (<?php esc_html_e( 'Most Capable - Best Quality', 'seovela' ); ?>)
+                                <optgroup label="<?php esc_attr_e( 'Claude 4.6 Series (Latest)', 'seovela' ); ?>">
+                                    <option value="claude-opus-4-6" <?php selected( $claude_model, 'claude-opus-4-6' ); ?>>
+                                        Claude Opus 4.6 (<?php esc_html_e( 'Most Intelligent - Complex Reasoning', 'seovela' ); ?>)
                                     </option>
-                                    <option value="claude-sonnet-4-20250514" <?php selected( $claude_model, 'claude-sonnet-4-20250514' ); ?>>
-                                        Claude Sonnet 4 (<?php esc_html_e( 'Fast & Capable', 'seovela' ); ?>)
+                                    <option value="claude-sonnet-4-6" <?php selected( $claude_model, 'claude-sonnet-4-6' ); ?>>
+                                        Claude Sonnet 4.6 (<?php esc_html_e( 'Balanced - Fast & Smart', 'seovela' ); ?>)
                                     </option>
                                 </optgroup>
                                 <optgroup label="<?php esc_attr_e( 'Claude Haiku', 'seovela' ); ?>">
                                     <option value="claude-haiku-4-5-20251001" <?php selected( $claude_model, 'claude-haiku-4-5-20251001' ); ?>>
-                                        Claude Haiku 4.5 (<?php esc_html_e( 'Fast & Cost-Effective', 'seovela' ); ?>)
+                                        Claude Haiku 4.5 (<?php esc_html_e( 'Fastest & Cheapest', 'seovela' ); ?>)
                                     </option>
                                 </optgroup>
                             </select>
                             <p class="description">
-                                <?php esc_html_e( 'Claude Sonnet 4 is recommended for the best balance of quality, speed, and cost for SEO tasks.', 'seovela' ); ?>
+                                <?php esc_html_e( 'Claude Sonnet 4.6 is recommended for the best balance of quality, speed, and cost for SEO tasks.', 'seovela' ); ?>
                             </p>
                         </td>
                     </tr>
@@ -583,32 +575,31 @@ $claude_configured = ! empty( $claude_key_raw );
                 <div class="seovela-pricing-item">
                     <h4><?php esc_html_e( 'OpenAI', 'seovela' ); ?></h4>
                     <ul>
+                        <li><strong>GPT-5.2:</strong> $1.75 / 1M input, $14.00 / 1M output</li>
+                        <li><strong>GPT-5 Mini:</strong> $0.25 / 1M input, $2.00 / 1M output</li>
+                        <li><strong>GPT-5 Nano:</strong> $0.05 / 1M input, $0.40 / 1M output</li>
                         <li><strong>GPT-4.1:</strong> $2.00 / 1M input, $8.00 / 1M output</li>
                         <li><strong>GPT-4.1 Mini:</strong> $0.40 / 1M input, $1.60 / 1M output</li>
                         <li><strong>GPT-4.1 Nano:</strong> $0.10 / 1M input, $0.40 / 1M output</li>
-                        <li><strong>o4-mini:</strong> $1.10 / 1M input, $4.40 / 1M output</li>
-                        <li><strong>o3:</strong> $2.00 / 1M input, $8.00 / 1M output</li>
-                        <li><strong>GPT-4o:</strong> $2.50 / 1M input, $10.00 / 1M output</li>
                     </ul>
-                    <p class="description"><?php esc_html_e( '~100 meta generations = ~$0.01-0.10 with GPT-4.1 Mini', 'seovela' ); ?></p>
+                    <p class="description"><?php esc_html_e( '~100 meta generations = ~$0.01-0.05 with GPT-5 Mini', 'seovela' ); ?></p>
                 </div>
                 <div class="seovela-pricing-item">
                     <h4><?php esc_html_e( 'Google Gemini', 'seovela' ); ?></h4>
                     <ul>
-                        <li><strong>Gemini 2.5 Pro:</strong> $1.25 / 1M input, $10.00 / 1M output</li>
-                        <li><strong>Gemini 2.5 Flash:</strong> $0.15 / 1M input, $0.60 / 1M output</li>
-                        <li><strong>Gemini 2.0 Flash:</strong> $0.10 / 1M input, $0.40 / 1M output</li>
-                        <li><strong>Gemini 2.0 Flash Lite:</strong> $0.075 / 1M input, $0.30 / 1M output</li>
-                        <li><strong>Free tier:</strong> 15 requests/minute</li>
+                        <li><strong>Gemini 3.1 Pro:</strong> $2.00 / 1M input, $12.00 / 1M output</li>
+                        <li><strong>Gemini 3 Flash:</strong> $0.50 / 1M input, $3.00 / 1M output</li>
+                        <li><strong>Gemini 3.1 Flash Lite:</strong> $0.25 / 1M input, $1.50 / 1M output</li>
+                        <li><strong>Text Embedding 004:</strong> Free (within limits)</li>
                     </ul>
-                    <p class="description"><?php esc_html_e( 'Very cost-effective for SEO tasks. Free tier available.', 'seovela' ); ?></p>
+                    <p class="description"><?php esc_html_e( 'Excellent for bulk SEO tasks. Embedding model free for semantic linking.', 'seovela' ); ?></p>
                 </div>
                 <div class="seovela-pricing-item">
                     <h4><?php esc_html_e( 'Anthropic Claude', 'seovela' ); ?></h4>
                     <ul>
-                        <li><strong>Claude Opus 4:</strong> $15.00 / 1M input, $75.00 / 1M output</li>
-                        <li><strong>Claude Sonnet 4:</strong> $3.00 / 1M input, $15.00 / 1M output</li>
-                        <li><strong>Claude Haiku 4.5:</strong> $0.80 / 1M input, $4.00 / 1M output</li>
+                        <li><strong>Claude Opus 4.6:</strong> $5.00 / 1M input, $25.00 / 1M output</li>
+                        <li><strong>Claude Sonnet 4.6:</strong> $3.00 / 1M input, $15.00 / 1M output</li>
+                        <li><strong>Claude Haiku 4.5:</strong> $1.00 / 1M input, $5.00 / 1M output</li>
                     </ul>
                     <p class="description"><?php esc_html_e( 'Excellent for nuanced, instruction-following SEO content', 'seovela' ); ?></p>
                 </div>
