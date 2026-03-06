@@ -726,7 +726,7 @@ Requirements:
                         'content' => 'Hi',
                     ),
                 ),
-                'max_tokens' => 5,
+                'max_completion_tokens' => 5,
             ) ),
         ) );
 
@@ -1052,7 +1052,7 @@ Requirements:
                         'content' => 'Content to optimize: ' . substr( $content, 0, 3000 ),
                     ),
                 ),
-                'max_tokens' => $type === 'title' ? 100 : 200,
+                'max_completion_tokens' => $type === 'title' ? 100 : 200,
                 'temperature' => $temperature,
                 ) ),
         ) );
@@ -1384,13 +1384,13 @@ Requirements:
                     'Content-Type'  => 'application/json',
                 ),
                 'body' => wp_json_encode( array(
-                    'model'       => $model,
-                    'messages'    => array(
+                    'model'                 => $model,
+                    'messages'              => array(
                         array( 'role' => 'system', 'content' => $system_prompt ),
                         array( 'role' => 'user', 'content' => $user_content ),
                     ),
-                    'max_tokens'  => $max_tokens,
-                    'temperature' => $temperature,
+                    'max_completion_tokens' => $max_tokens,
+                    'temperature'           => $temperature,
                 ) ),
             ) );
         } elseif ( $provider === 'claude' ) {
