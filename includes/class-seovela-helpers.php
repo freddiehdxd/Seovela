@@ -128,4 +128,146 @@ class Seovela_Helpers {
     public static function get_settings_url() {
         return admin_url( 'admin.php?page=seovela-settings' );
     }
+
+    /**
+     * Encrypt a value for secure storage
+     *
+     * Uses AES-256-CBC with a key derived from WordPress AUTH_KEY and AUTH_SALT.
+     * Falls back to base64 encoding if OpenSSL is not available.
+     *
+     * @param string $value The plaintext value to encrypt.
+     * @return string The encrypted value (base64-encoded with IV prepended), or the original value on failure.
+     */
+    public static function encrypt( $value ) {
+        if ( empty( $value ) ) {
+            return '';
+        }
+
+        // Don't double-encrypt
+        if ( self::is_encrypted( $value ) ) {
+            return $value;
+        }
+
+        if ( ! function_exists( 'openssl_encrypt' ) ) {
+            // Fallback: base64 encode with a marker
+            return 'enc:b64:' . base64_encode( $value );
+        }
+
+        $key    = self::get_encryption_key();
+        $method = 'aes-256-cbc';
+        $iv_len = openssl_cipher_iv_length( $method );
+        $iv     = openssl_random_pseudo_bytes( $iv_len );
+
+        $encrypted = openssl_encrypt( $value, $method, $key, OPENSSL_RAW_DATA, $iv );
+
+        if ( false === $encrypted ) {
+            return $value; // Return original on failure
+        }
+
+        // Prepend IV and base64 encode, with a marker prefix
+        return 'enc:aes:' . base64_encode( $iv . $encrypted );
+    }
+
+    /**
+     * Decrypt a value that was encrypted with self::encrypt()
+     *
+     * @param string $value The encrypted value.
+     * @return string The decrypted plaintext value, or the original value if not encrypted.
+     */
+    public static function decrypt( $value ) {
+        if ( empty( $value ) ) {
+            return '';
+        }
+
+        if ( ! self::is_encrypted( $value ) ) {
+            return $value; // Not encrypted, return as-is (backward compatibility)
+        }
+
+        // Handle base64 fallback
+        if ( strpos( $value, 'enc:b64:' ) === 0 ) {
+            $decoded = base64_decode( substr( $value, 8 ) );
+            return false !== $decoded ? $decoded : '';
+        }
+
+        // Handle AES encryption
+        if ( strpos( $value, 'enc:aes:' ) === 0 ) {
+            if ( ! function_exists( 'openssl_decrypt' ) ) {
+                return ''; // Cannot decrypt without OpenSSL
+            }
+
+            $key    = self::get_encryption_key();
+            $method = 'aes-256-cbc';
+            $iv_len = openssl_cipher_iv_length( $method );
+            $raw    = base64_decode( substr( $value, 8 ) );
+
+            if ( false === $raw || strlen( $raw ) < $iv_len ) {
+                return '';
+            }
+
+            $iv        = substr( $raw, 0, $iv_len );
+            $encrypted = substr( $raw, $iv_len );
+
+            $decrypted = openssl_decrypt( $encrypted, $method, $key, OPENSSL_RAW_DATA, $iv );
+
+            return false !== $decrypted ? $decrypted : '';
+        }
+
+        return $value;
+    }
+
+    /**
+     * Check if a value is encrypted
+     *
+     * @param string $value The value to check.
+     * @return bool
+     */
+    public static function is_encrypted( $value ) {
+        return strpos( $value, 'enc:aes:' ) === 0 || strpos( $value, 'enc:b64:' ) === 0;
+    }
+
+    /**
+     * Mask an API key for display (show first 4 and last 4 characters)
+     *
+     * @param string $key The API key (plaintext or encrypted).
+     * @return string The masked key (e.g., "sk-a...z1B2").
+     */
+    public static function mask_api_key( $key ) {
+        // Decrypt first if encrypted
+        $plain = self::decrypt( $key );
+
+        if ( empty( $plain ) ) {
+            return '';
+        }
+
+        $len = strlen( $plain );
+
+        if ( $len <= 8 ) {
+            return str_repeat( '*', $len );
+        }
+
+        return substr( $plain, 0, 4 ) . str_repeat( '*', $len - 8 ) . substr( $plain, -4 );
+    }
+
+    /**
+     * Get the encryption key derived from WordPress salts
+     *
+     * @return string A 32-byte key for AES-256.
+     */
+    private static function get_encryption_key() {
+        $salt = '';
+
+        if ( defined( 'AUTH_KEY' ) ) {
+            $salt .= AUTH_KEY;
+        }
+        if ( defined( 'AUTH_SALT' ) ) {
+            $salt .= AUTH_SALT;
+        }
+
+        // Fallback if constants aren't defined
+        if ( empty( $salt ) ) {
+            $salt = 'seovela-default-encryption-key-' . md5( ABSPATH );
+        }
+
+        return hash( 'sha256', $salt, true ); // 32 bytes for AES-256
+    }
 }

@@ -20,22 +20,28 @@ if ( isset( $_POST['seovela_save_ai_settings'] ) && wp_verify_nonce( $_POST['seo
     }
     update_option( 'seovela_ai_provider', $ai_provider );
     
-    // Save OpenAI settings
-    $openai_key = isset( $_POST['seovela_openai_api_key'] ) ? sanitize_text_field( $_POST['seovela_openai_api_key'] ) : '';
+    // Save OpenAI settings (encrypt API key, skip if placeholder mask submitted)
+    $openai_key_input = isset( $_POST['seovela_openai_api_key'] ) ? sanitize_text_field( $_POST['seovela_openai_api_key'] ) : '';
+    if ( ! empty( $openai_key_input ) && strpos( $openai_key_input, '****' ) === false ) {
+        update_option( 'seovela_openai_api_key', Seovela_Helpers::encrypt( $openai_key_input ) );
+    }
     $openai_model = isset( $_POST['seovela_openai_model'] ) ? sanitize_text_field( $_POST['seovela_openai_model'] ) : 'gpt-4o-mini';
-    update_option( 'seovela_openai_api_key', $openai_key );
     update_option( 'seovela_openai_model', $openai_model );
     
-    // Save Gemini settings
-    $gemini_key = isset( $_POST['seovela_gemini_api_key'] ) ? sanitize_text_field( $_POST['seovela_gemini_api_key'] ) : '';
-    $gemini_model = isset( $_POST['seovela_gemini_model'] ) ? sanitize_text_field( $_POST['seovela_gemini_model'] ) : 'gemini-1.5-flash';
-    update_option( 'seovela_gemini_api_key', $gemini_key );
+    // Save Gemini settings (encrypt API key)
+    $gemini_key_input = isset( $_POST['seovela_gemini_api_key'] ) ? sanitize_text_field( $_POST['seovela_gemini_api_key'] ) : '';
+    if ( ! empty( $gemini_key_input ) && strpos( $gemini_key_input, '****' ) === false ) {
+        update_option( 'seovela_gemini_api_key', Seovela_Helpers::encrypt( $gemini_key_input ) );
+    }
+    $gemini_model = isset( $_POST['seovela_gemini_model'] ) ? sanitize_text_field( $_POST['seovela_gemini_model'] ) : 'gemini-2.5-flash';
     update_option( 'seovela_gemini_model', $gemini_model );
     
-    // Save Claude settings
-    $claude_key = isset( $_POST['seovela_claude_api_key'] ) ? sanitize_text_field( $_POST['seovela_claude_api_key'] ) : '';
+    // Save Claude settings (encrypt API key)
+    $claude_key_input = isset( $_POST['seovela_claude_api_key'] ) ? sanitize_text_field( $_POST['seovela_claude_api_key'] ) : '';
+    if ( ! empty( $claude_key_input ) && strpos( $claude_key_input, '****' ) === false ) {
+        update_option( 'seovela_claude_api_key', Seovela_Helpers::encrypt( $claude_key_input ) );
+    }
     $claude_model = isset( $_POST['seovela_claude_model'] ) ? sanitize_text_field( $_POST['seovela_claude_model'] ) : 'claude-sonnet-4-20250514';
-    update_option( 'seovela_claude_api_key', $claude_key );
     update_option( 'seovela_claude_model', $claude_model );
     
     // Save AI generation settings
@@ -49,11 +55,14 @@ if ( isset( $_POST['seovela_save_ai_settings'] ) && wp_verify_nonce( $_POST['seo
 
 // Get current values
 $ai_provider = get_option( 'seovela_ai_provider', 'openai' );
-$openai_key = get_option( 'seovela_openai_api_key', '' );
+$openai_key_raw = get_option( 'seovela_openai_api_key', '' );
+$openai_key_masked = Seovela_Helpers::mask_api_key( $openai_key_raw );
 $openai_model = get_option( 'seovela_openai_model', 'gpt-4o-mini' );
-$gemini_key = get_option( 'seovela_gemini_api_key', '' );
-$gemini_model = get_option( 'seovela_gemini_model', 'gemini-1.5-flash' );
-$claude_key = get_option( 'seovela_claude_api_key', '' );
+$gemini_key_raw = get_option( 'seovela_gemini_api_key', '' );
+$gemini_key_masked = Seovela_Helpers::mask_api_key( $gemini_key_raw );
+$gemini_model = get_option( 'seovela_gemini_model', 'gemini-2.5-flash' );
+$claude_key_raw = get_option( 'seovela_claude_api_key', '' );
+$claude_key_masked = Seovela_Helpers::mask_api_key( $claude_key_raw );
 $claude_model = get_option( 'seovela_claude_model', 'claude-sonnet-4-20250514' );
 $ai_temperature = get_option( 'seovela_ai_temperature', 0.7 );
 $ai_post_types = get_option( 'seovela_ai_post_types', array( 'post', 'page' ) );
@@ -62,10 +71,10 @@ $ai_post_types = get_option( 'seovela_ai_post_types', array( 'post', 'page' ) );
 $post_types = get_post_types( array( 'public' => true ), 'objects' );
 unset( $post_types['attachment'] );
 
-// Check if API keys are configured
-$openai_configured = ! empty( $openai_key );
-$gemini_configured = ! empty( $gemini_key );
-$claude_configured = ! empty( $claude_key );
+// Check if API keys are configured (check raw value, not masked)
+$openai_configured = ! empty( $openai_key_raw );
+$gemini_configured = ! empty( $gemini_key_raw );
+$claude_configured = ! empty( $claude_key_raw );
 ?>
 
 <div class="seovela-premium-page">
@@ -224,17 +233,21 @@ $claude_configured = ! empty( $claude_key );
                                     type="password" 
                                     id="seovela_openai_api_key" 
                                     name="seovela_openai_api_key" 
-                                    value="<?php echo esc_attr( $openai_key ); ?>" 
+                                    value="" 
                                     class="regular-text"
-                                    placeholder="sk-..."
+                                    placeholder="<?php echo $openai_configured ? esc_attr( $openai_key_masked ) : 'sk-...'; ?>"
+                                    autocomplete="off"
                                 />
-                                <button type="button" class="button seovela-toggle-key" data-target="seovela_openai_api_key">
-                                    <span class="dashicons dashicons-visibility"></span>
-                                </button>
                                 <button type="button" class="button seovela-test-key" data-provider="openai">
                                     <?php esc_html_e( 'Test Connection', 'seovela' ); ?>
                                 </button>
                             </div>
+                                <?php if ( $openai_configured ) : ?>
+                                <p class="description" style="color: #10b981; font-weight: 500;">
+                                    <span class="dashicons dashicons-lock" style="font-size: 14px; width: 14px; height: 14px; vertical-align: text-bottom;"></span>
+                                    <?php esc_html_e( 'API key is saved and encrypted. Enter a new key to replace it.', 'seovela' ); ?>
+                                </p>
+                                <?php endif; ?>
                                 <p class="description">
                                 <?php 
                                 printf( 
@@ -252,27 +265,39 @@ $claude_configured = ! empty( $claude_key );
                         </th>
                         <td>
                             <select id="seovela_openai_model" name="seovela_openai_model" class="regular-text">
-                                <optgroup label="<?php esc_attr_e( 'GPT-4o Series (Recommended)', 'seovela' ); ?>">
+                                <optgroup label="<?php esc_attr_e( 'GPT-4.1 Series (Latest)', 'seovela' ); ?>">
+                                    <option value="gpt-4.1" <?php selected( $openai_model, 'gpt-4.1' ); ?>>
+                                        GPT-4.1 (<?php esc_html_e( 'Flagship - Best Quality', 'seovela' ); ?>)
+                                    </option>
+                                    <option value="gpt-4.1-mini" <?php selected( $openai_model, 'gpt-4.1-mini' ); ?>>
+                                        GPT-4.1 Mini (<?php esc_html_e( 'Fast & Smart', 'seovela' ); ?>)
+                                    </option>
+                                    <option value="gpt-4.1-nano" <?php selected( $openai_model, 'gpt-4.1-nano' ); ?>>
+                                        GPT-4.1 Nano (<?php esc_html_e( 'Ultra Fast & Cheap', 'seovela' ); ?>)
+                                    </option>
+                                </optgroup>
+                                <optgroup label="<?php esc_attr_e( 'Reasoning Models', 'seovela' ); ?>">
+                                    <option value="o4-mini" <?php selected( $openai_model, 'o4-mini' ); ?>>
+                                        o4-mini (<?php esc_html_e( 'Reasoning - Cost-Effective', 'seovela' ); ?>)
+                                    </option>
+                                    <option value="o3" <?php selected( $openai_model, 'o3' ); ?>>
+                                        o3 (<?php esc_html_e( 'Advanced Reasoning', 'seovela' ); ?>)
+                                    </option>
+                                    <option value="o3-mini" <?php selected( $openai_model, 'o3-mini' ); ?>>
+                                        o3-mini (<?php esc_html_e( 'Reasoning - Budget', 'seovela' ); ?>)
+                                    </option>
+                                </optgroup>
+                                <optgroup label="<?php esc_attr_e( 'GPT-4o Series', 'seovela' ); ?>">
                                     <option value="gpt-4o" <?php selected( $openai_model, 'gpt-4o' ); ?>>
-                                        GPT-4o (<?php esc_html_e( 'Most Capable', 'seovela' ); ?>)
+                                        GPT-4o (<?php esc_html_e( 'Multimodal', 'seovela' ); ?>)
                                     </option>
                                     <option value="gpt-4o-mini" <?php selected( $openai_model, 'gpt-4o-mini' ); ?>>
-                                        GPT-4o-mini (<?php esc_html_e( 'Fast & Cost-Effective', 'seovela' ); ?>)
-                                    </option>
-                                </optgroup>
-                                <optgroup label="<?php esc_attr_e( 'GPT-4 Turbo', 'seovela' ); ?>">
-                                    <option value="gpt-4-turbo" <?php selected( $openai_model, 'gpt-4-turbo' ); ?>>
-                                        GPT-4 Turbo
-                                    </option>
-                                </optgroup>
-                                <optgroup label="<?php esc_attr_e( 'GPT-3.5', 'seovela' ); ?>">
-                                    <option value="gpt-3.5-turbo" <?php selected( $openai_model, 'gpt-3.5-turbo' ); ?>>
-                                        GPT-3.5 Turbo (<?php esc_html_e( 'Budget Option', 'seovela' ); ?>)
+                                        GPT-4o Mini (<?php esc_html_e( 'Legacy Fast', 'seovela' ); ?>)
                                     </option>
                                 </optgroup>
                             </select>
                             <p class="description">
-                                <?php esc_html_e( 'GPT-4o-mini offers the best balance of speed, quality, and cost.', 'seovela' ); ?>
+                                <?php esc_html_e( 'GPT-4.1 Mini is recommended for the best balance of speed, quality, and cost.', 'seovela' ); ?>
                             </p>
                         </td>
                     </tr>
@@ -306,17 +331,21 @@ $claude_configured = ! empty( $claude_key );
                                     type="password" 
                                     id="seovela_gemini_api_key" 
                                     name="seovela_gemini_api_key" 
-                                    value="<?php echo esc_attr( $gemini_key ); ?>" 
+                                    value="" 
                                     class="regular-text"
-                                    placeholder="AIza..."
+                                    placeholder="<?php echo $gemini_configured ? esc_attr( $gemini_key_masked ) : 'AIza...'; ?>"
+                                    autocomplete="off"
                                 />
-                                <button type="button" class="button seovela-toggle-key" data-target="seovela_gemini_api_key">
-                                    <span class="dashicons dashicons-visibility"></span>
-                                </button>
                                 <button type="button" class="button seovela-test-key" data-provider="gemini">
                                     <?php esc_html_e( 'Test Connection', 'seovela' ); ?>
                                 </button>
                             </div>
+                            <?php if ( $gemini_configured ) : ?>
+                            <p class="description" style="color: #10b981; font-weight: 500;">
+                                <span class="dashicons dashicons-lock" style="font-size: 14px; width: 14px; height: 14px; vertical-align: text-bottom;"></span>
+                                <?php esc_html_e( 'API key is saved and encrypted. Enter a new key to replace it.', 'seovela' ); ?>
+                            </p>
+                            <?php endif; ?>
                             <p class="description">
                                 <?php 
                                 printf( 
@@ -334,25 +363,33 @@ $claude_configured = ! empty( $claude_key );
                         </th>
                         <td>
                             <select id="seovela_gemini_model" name="seovela_gemini_model" class="regular-text">
-                                <optgroup label="<?php esc_attr_e( 'Gemini 1.5 Series', 'seovela' ); ?>">
-                                    <option value="gemini-1.5-pro" <?php selected( $gemini_model, 'gemini-1.5-pro' ); ?>>
-                                        Gemini 1.5 Pro (<?php esc_html_e( 'Most Capable', 'seovela' ); ?>)
+                                <optgroup label="<?php esc_attr_e( 'Gemini 2.5 Series (Latest)', 'seovela' ); ?>">
+                                    <option value="gemini-2.5-pro" <?php selected( $gemini_model, 'gemini-2.5-pro' ); ?>>
+                                        Gemini 2.5 Pro (<?php esc_html_e( 'Most Capable - Thinking', 'seovela' ); ?>)
                                     </option>
-                                    <option value="gemini-1.5-flash" <?php selected( $gemini_model, 'gemini-1.5-flash' ); ?>>
-                                        Gemini 1.5 Flash (<?php esc_html_e( 'Fast & Efficient', 'seovela' ); ?>)
-                                    </option>
-                                    <option value="gemini-1.5-flash-8b" <?php selected( $gemini_model, 'gemini-1.5-flash-8b' ); ?>>
-                                        Gemini 1.5 Flash-8B (<?php esc_html_e( 'Ultra Fast', 'seovela' ); ?>)
+                                    <option value="gemini-2.5-flash" <?php selected( $gemini_model, 'gemini-2.5-flash' ); ?>>
+                                        Gemini 2.5 Flash (<?php esc_html_e( 'Fast & Smart', 'seovela' ); ?>)
                                     </option>
                                 </optgroup>
-                                <optgroup label="<?php esc_attr_e( 'Gemini 2.0', 'seovela' ); ?>">
-                                    <option value="gemini-2.0-flash-exp" <?php selected( $gemini_model, 'gemini-2.0-flash-exp' ); ?>>
-                                        Gemini 2.0 Flash (<?php esc_html_e( 'Experimental', 'seovela' ); ?>)
+                                <optgroup label="<?php esc_attr_e( 'Gemini 2.0 Series', 'seovela' ); ?>">
+                                    <option value="gemini-2.0-flash" <?php selected( $gemini_model, 'gemini-2.0-flash' ); ?>>
+                                        Gemini 2.0 Flash (<?php esc_html_e( 'Balanced', 'seovela' ); ?>)
+                                    </option>
+                                    <option value="gemini-2.0-flash-lite" <?php selected( $gemini_model, 'gemini-2.0-flash-lite' ); ?>>
+                                        Gemini 2.0 Flash Lite (<?php esc_html_e( 'Budget', 'seovela' ); ?>)
+                                    </option>
+                                </optgroup>
+                                <optgroup label="<?php esc_attr_e( 'Gemini 1.5 Series', 'seovela' ); ?>">
+                                    <option value="gemini-1.5-pro" <?php selected( $gemini_model, 'gemini-1.5-pro' ); ?>>
+                                        Gemini 1.5 Pro (<?php esc_html_e( 'Legacy Pro', 'seovela' ); ?>)
+                                    </option>
+                                    <option value="gemini-1.5-flash" <?php selected( $gemini_model, 'gemini-1.5-flash' ); ?>>
+                                        Gemini 1.5 Flash (<?php esc_html_e( 'Legacy Fast', 'seovela' ); ?>)
                                     </option>
                                 </optgroup>
                             </select>
                             <p class="description">
-                                <?php esc_html_e( 'Gemini 1.5 Flash offers great speed and quality for SEO tasks.', 'seovela' ); ?>
+                                <?php esc_html_e( 'Gemini 2.5 Flash is recommended for the best balance of speed and quality.', 'seovela' ); ?>
                             </p>
                         </td>
                     </tr>
@@ -379,17 +416,21 @@ $claude_configured = ! empty( $claude_key );
                                     type="password" 
                                     id="seovela_claude_api_key" 
                                     name="seovela_claude_api_key" 
-                                    value="<?php echo esc_attr( $claude_key ); ?>" 
+                                    value="" 
                                     class="regular-text"
-                                    placeholder="sk-ant-..."
+                                    placeholder="<?php echo $claude_configured ? esc_attr( $claude_key_masked ) : 'sk-ant-...'; ?>"
+                                    autocomplete="off"
                                 />
-                                <button type="button" class="button seovela-toggle-key" data-target="seovela_claude_api_key">
-                                    <span class="dashicons dashicons-visibility"></span>
-                                </button>
                                 <button type="button" class="button seovela-test-key" data-provider="claude">
                                     <?php esc_html_e( 'Test Connection', 'seovela' ); ?>
                                 </button>
                             </div>
+                            <?php if ( $claude_configured ) : ?>
+                            <p class="description" style="color: #10b981; font-weight: 500;">
+                                <span class="dashicons dashicons-lock" style="font-size: 14px; width: 14px; height: 14px; vertical-align: text-bottom;"></span>
+                                <?php esc_html_e( 'API key is saved and encrypted. Enter a new key to replace it.', 'seovela' ); ?>
+                            </p>
+                            <?php endif; ?>
                             <p class="description">
                                 <?php 
                                 printf( 
@@ -407,7 +448,10 @@ $claude_configured = ! empty( $claude_key );
                         </th>
                         <td>
                             <select id="seovela_claude_model" name="seovela_claude_model" class="regular-text">
-                                <optgroup label="<?php esc_attr_e( 'Claude (Recommended)', 'seovela' ); ?>">
+                                <optgroup label="<?php esc_attr_e( 'Claude 4 Series (Latest)', 'seovela' ); ?>">
+                                    <option value="claude-opus-4-20250514" <?php selected( $claude_model, 'claude-opus-4-20250514' ); ?>>
+                                        Claude Opus 4 (<?php esc_html_e( 'Most Capable - Best Quality', 'seovela' ); ?>)
+                                    </option>
                                     <option value="claude-sonnet-4-20250514" <?php selected( $claude_model, 'claude-sonnet-4-20250514' ); ?>>
                                         Claude Sonnet 4 (<?php esc_html_e( 'Fast & Capable', 'seovela' ); ?>)
                                     </option>
@@ -419,7 +463,7 @@ $claude_configured = ! empty( $claude_key );
                                 </optgroup>
                             </select>
                             <p class="description">
-                                <?php esc_html_e( 'Claude Sonnet 4 offers the best balance of quality and speed for SEO tasks.', 'seovela' ); ?>
+                                <?php esc_html_e( 'Claude Sonnet 4 is recommended for the best balance of quality, speed, and cost for SEO tasks.', 'seovela' ); ?>
                             </p>
                         </td>
                     </tr>
@@ -539,26 +583,32 @@ $claude_configured = ! empty( $claude_key );
                 <div class="seovela-pricing-item">
                     <h4><?php esc_html_e( 'OpenAI', 'seovela' ); ?></h4>
                     <ul>
-                        <li><strong>GPT-4o:</strong> $5.00 / 1M input tokens</li>
-                        <li><strong>GPT-4o-mini:</strong> $0.15 / 1M input tokens</li>
-                        <li><strong>GPT-3.5:</strong> $0.50 / 1M input tokens</li>
+                        <li><strong>GPT-4.1:</strong> $2.00 / 1M input, $8.00 / 1M output</li>
+                        <li><strong>GPT-4.1 Mini:</strong> $0.40 / 1M input, $1.60 / 1M output</li>
+                        <li><strong>GPT-4.1 Nano:</strong> $0.10 / 1M input, $0.40 / 1M output</li>
+                        <li><strong>o4-mini:</strong> $1.10 / 1M input, $4.40 / 1M output</li>
+                        <li><strong>o3:</strong> $2.00 / 1M input, $8.00 / 1M output</li>
+                        <li><strong>GPT-4o:</strong> $2.50 / 1M input, $10.00 / 1M output</li>
                     </ul>
-                    <p class="description"><?php esc_html_e( '~100 meta generations = ~$0.01-0.10', 'seovela' ); ?></p>
+                    <p class="description"><?php esc_html_e( '~100 meta generations = ~$0.01-0.10 with GPT-4.1 Mini', 'seovela' ); ?></p>
                 </div>
                 <div class="seovela-pricing-item">
                     <h4><?php esc_html_e( 'Google Gemini', 'seovela' ); ?></h4>
                     <ul>
-                        <li><strong>Gemini 1.5 Pro:</strong> $1.25 / 1M input tokens</li>
-                        <li><strong>Gemini 1.5 Flash:</strong> $0.075 / 1M input tokens</li>
+                        <li><strong>Gemini 2.5 Pro:</strong> $1.25 / 1M input, $10.00 / 1M output</li>
+                        <li><strong>Gemini 2.5 Flash:</strong> $0.15 / 1M input, $0.60 / 1M output</li>
+                        <li><strong>Gemini 2.0 Flash:</strong> $0.10 / 1M input, $0.40 / 1M output</li>
+                        <li><strong>Gemini 2.0 Flash Lite:</strong> $0.075 / 1M input, $0.30 / 1M output</li>
                         <li><strong>Free tier:</strong> 15 requests/minute</li>
                     </ul>
-                    <p class="description"><?php esc_html_e( 'Very cost-effective for SEO tasks', 'seovela' ); ?></p>
+                    <p class="description"><?php esc_html_e( 'Very cost-effective for SEO tasks. Free tier available.', 'seovela' ); ?></p>
                 </div>
                 <div class="seovela-pricing-item">
                     <h4><?php esc_html_e( 'Anthropic Claude', 'seovela' ); ?></h4>
                     <ul>
-                        <li><strong>Claude Sonnet 4:</strong> $3.00 / 1M input tokens</li>
-                        <li><strong>Claude Haiku 4.5:</strong> $0.80 / 1M input tokens</li>
+                        <li><strong>Claude Opus 4:</strong> $15.00 / 1M input, $75.00 / 1M output</li>
+                        <li><strong>Claude Sonnet 4:</strong> $3.00 / 1M input, $15.00 / 1M output</li>
+                        <li><strong>Claude Haiku 4.5:</strong> $0.80 / 1M input, $4.00 / 1M output</li>
                     </ul>
                     <p class="description"><?php esc_html_e( 'Excellent for nuanced, instruction-following SEO content', 'seovela' ); ?></p>
                 </div>
@@ -684,12 +734,6 @@ $claude_configured = ! empty( $claude_key );
 .seovela-api-key-field input {
     flex: 1;
     min-width: 200px;
-}
-
-.seovela-toggle-key .dashicons {
-    width: 20px;
-    height: 20px;
-    font-size: 20px;
 }
 
 .seovela-test-key {
@@ -865,21 +909,6 @@ jQuery(document).ready(function($) {
         // Toggle config panels
         $('#openai-config, #gemini-config, #claude-config').slideUp(200);
         $('#' + provider + '-config').slideDown(200);
-    });
-    
-    // Toggle API key visibility
-    $('.seovela-toggle-key').on('click', function() {
-        var targetId = $(this).data('target');
-        var $input = $('#' + targetId);
-        var $icon = $(this).find('.dashicons');
-        
-        if ($input.attr('type') === 'password') {
-            $input.attr('type', 'text');
-            $icon.removeClass('dashicons-visibility').addClass('dashicons-hidden');
-        } else {
-            $input.attr('type', 'password');
-            $icon.removeClass('dashicons-hidden').addClass('dashicons-visibility');
-        }
     });
     
     // Test API connection
