@@ -1,0 +1,156 @@
+# Copyright (C) 2024 Seovela
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Seovela 1.0.0\n"
+"Report-Msgid-Bugs-To: https://seovela.com/support/\n"
+"POT-Creation-Date: 2024-01-01 00:00:00+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2024-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: en\n"
+
+#: seovela.php
+msgid "Seovela"
+msgstr ""
+
+msgid "Lightweight, modular SEO plugin with FREE and PRO features."
+msgstr ""
+
+#: includes/class-seovela-license.php
+msgid "License key is required."
+msgstr ""
+
+msgid "Could not connect to license server."
+msgstr ""
+
+msgid "Invalid response from license server."
+msgstr ""
+
+msgid "License activated successfully!"
+msgstr ""
+
+msgid "License is invalid or expired."
+msgstr ""
+
+#: includes/class-seovela-conflict-detector.php
+msgid "Seovela: SEO Plugin Conflict Detected"
+msgstr ""
+
+msgid "You have other SEO plugins active: %s. Having multiple SEO plugins active may cause conflicts and duplicate meta tags. We recommend keeping only one main SEO plugin active."
+msgstr ""
+
+#: admin/class-seovela-admin.php
+msgid "Dashboard"
+msgstr ""
+
+msgid "SEO Settings"
+msgstr ""
+
+msgid "Modules"
+msgstr ""
+
+msgid "Pro Features"
+msgstr ""
+
+msgid "License"
+msgstr ""
+
+#: admin/views/dashboard.php
+msgid "Seovela Dashboard"
+msgstr ""
+
+msgid "License Status"
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "Free Version"
+msgstr ""
+
+msgid "SEO Overview"
+msgstr ""
+
+msgid "Total Posts/Pages"
+msgstr ""
+
+msgid "With Meta Title"
+msgstr ""
+
+msgid "With Meta Description"
+msgstr ""
+
+#: admin/views/settings-meta.php
+msgid "Meta Tags"
+msgstr ""
+
+msgid "Sitemap"
+msgstr ""
+
+msgid "Schema"
+msgstr ""
+
+msgid "Indexing"
+msgstr ""
+
+#: admin/class-seovela-metabox.php
+msgid "Seovela SEO"
+msgstr ""
+
+msgid "Meta Title"
+msgstr ""
+
+msgid "Meta Description"
+msgstr ""
+
+msgid "characters"
+msgstr ""
+
+msgid "Optimize with AI"
+msgstr ""
+
+msgid "Google Preview"
+msgstr ""
+
+msgid "Indexing Settings"
+msgstr ""
+
+msgid "Noindex (hide from search engines)"
+msgstr ""
+
+msgid "Nofollow (don't follow links)"
+msgstr ""
+
+#: modules/meta/class-seovela-meta.php
+msgid "Missing meta title"
+msgstr ""
+
+msgid "Meta title is too short"
+msgstr ""
+
+msgid "Meta title is too long"
+msgstr ""
+
+msgid "Meta title looks good"
+msgstr ""
+
+msgid "Missing meta description"
+msgstr ""
+
+msgid "Meta description is too short"
+msgstr ""
+
+msgid "Meta description is too long"
+msgstr ""
+
+msgid "Meta description looks good"
+msgstr ""
+
+#: includes/class-seovela-helpers.php
+msgid "N/A"
+msgstr ""
+

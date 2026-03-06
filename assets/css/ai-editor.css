@@ -1,0 +1,604 @@
+/**
+ * Seovela AI Editor Styles - Classic Editor
+ *
+ * @package Seovela
+ */
+
+/* Floating Action Button */
+.seovela-ai-fab {
+    position: fixed !important;
+    bottom: 30px !important;
+    right: 30px !important;
+    left: auto !important;
+    top: auto !important;
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+    z-index: 99999;
+    transition: all 0.3s ease;
+}
+
+.seovela-ai-fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(99, 102, 241, 0.5);
+}
+
+.seovela-ai-fab .dashicons {
+    color: #ffffff;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+}
+
+.seovela-ai-fab.active {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+}
+
+/* AI Panel */
+.seovela-ai-panel {
+    position: fixed !important;
+    bottom: 100px !important;
+    right: 30px !important;
+    left: auto !important;
+    top: auto !important;
+    width: 380px;
+    max-height: 80vh;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.2);
+    z-index: 99998;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.seovela-ai-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: #ffffff;
+}
+
+.seovela-ai-panel-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff !important;
+}
+
+.seovela-ai-panel-header .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: #ffffff !important;
+}
+
+.seovela-ai-panel-close {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 24px;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    padding: 0;
+    line-height: 1;
+}
+
+.seovela-ai-panel-close:hover {
+    opacity: 1;
+}
+
+/* Panel Body */
+.seovela-ai-panel-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Tabs */
+.seovela-ai-panel-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 12px;
+}
+
+.seovela-ai-panel-tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: #f1f5f9;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.seovela-ai-panel-tab:hover {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.seovela-ai-panel-tab.active {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #ffffff;
+}
+
+.seovela-ai-panel-tab .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* Tab Content */
+.seovela-ai-panel-content {
+    display: none;
+}
+
+.seovela-ai-panel-content.active {
+    display: block;
+}
+
+.seovela-ai-panel-content > .description {
+    margin: 0 0 16px 0;
+    color: #64748b;
+    font-size: 13px;
+}
+
+/* Action Buttons */
+.seovela-ai-panel-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.seovela-ai-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px !important;
+    background: #ffffff !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    height: auto !important;
+}
+
+.seovela-ai-btn:hover {
+    background: #f8fafc !important;
+    border-color: #6366f1 !important;
+    color: #6366f1 !important;
+    transform: translateY(-1px);
+}
+
+.seovela-ai-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.seovela-ai-btn .dashicons {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+}
+
+/* Form Fields */
+.seovela-ai-panel-field {
+    margin-bottom: 14px;
+}
+
+.seovela-ai-panel-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.seovela-ai-panel-field input,
+.seovela-ai-panel-field select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.seovela-ai-panel-field input:focus,
+.seovela-ai-panel-field select:focus {
+    border-color: #6366f1;
+    outline: none;
+}
+
+.seovela-ai-panel-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* Generate Button */
+.seovela-ai-generate {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px !important;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    height: auto !important;
+}
+
+.seovela-ai-generate:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    transform: translateY(-1px);
+}
+
+.seovela-ai-generate .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/* Output Preview */
+.seovela-ai-panel-output {
+    margin-top: 20px;
+    border: 2px solid #10b981;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.seovela-ai-panel-output-header {
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-bottom: 1px solid #bbf7d0;
+}
+
+.seovela-ai-panel-output-header strong {
+    color: #166534;
+    font-size: 13px;
+}
+
+.seovela-ai-panel-output-content {
+    padding: 16px;
+    max-height: 200px;
+    overflow-y: auto;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #1e293b;
+    background: #ffffff;
+}
+
+.seovela-ai-panel-output-content h2,
+.seovela-ai-panel-output-content h3 {
+    font-size: 16px;
+    margin: 16px 0 8px;
+}
+
+.seovela-ai-panel-output-content p {
+    margin: 0 0 12px;
+}
+
+.seovela-ai-panel-output-actions {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+.seovela-ai-panel-output-actions .button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    height: auto !important;
+}
+
+.seovela-ai-insert-content {
+    background: #10b981 !important;
+    border-color: #10b981 !important;
+    color: #ffffff !important;
+}
+
+.seovela-ai-insert-content:hover {
+    background: #059669 !important;
+}
+
+.seovela-ai-replace-content {
+    background: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+    color: #ffffff !important;
+}
+
+.seovela-ai-replace-content:hover {
+    background: #2563eb !important;
+}
+
+.seovela-ai-discard-content {
+    background: #64748b !important;
+    border-color: #64748b !important;
+    color: #ffffff !important;
+}
+
+.seovela-ai-discard-content:hover {
+    background: #475569 !important;
+}
+
+/* Loading State */
+.seovela-ai-panel-loading {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.seovela-ai-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e2e8f0;
+    border-top-color: #6366f1;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    animation: seovela-spin 0.8s linear infinite;
+}
+
+@keyframes seovela-spin {
+    to { transform: rotate(360deg); }
+}
+
+.seovela-ai-panel-loading p {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Pro Teaser Floating Button */
+.seovela-ai-fab-teaser {
+    position: relative;
+    overflow: visible !important;
+}
+
+.seovela-ai-fab-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #ffffff;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+    z-index: 1;
+    line-height: 1;
+}
+
+/* Pro Tag in Header */
+.seovela-ai-pro-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: 8px;
+}
+
+/* Pro Teaser Panel Body */
+.seovela-ai-teaser-body {
+    text-align: center;
+    padding: 30px 20px;
+}
+
+.seovela-ai-teaser-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.seovela-ai-teaser-icon .dashicons {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    color: #6366f1;
+}
+
+.seovela-ai-teaser-body h4 {
+    margin: 0 0 12px 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.seovela-ai-teaser-body > p {
+    margin: 0 0 20px 0;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Pro Teaser Features List */
+.seovela-ai-teaser-features {
+    list-style: none;
+    margin: 0 0 24px 0;
+    padding: 0;
+    text-align: left;
+}
+
+.seovela-ai-teaser-features li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    font-size: 13px;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.seovela-ai-teaser-features li:last-child {
+    border-bottom: none;
+}
+
+.seovela-ai-teaser-features .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #10b981;
+}
+
+/* Upgrade Button */
+.seovela-ai-upgrade-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px 24px !important;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none !important;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+}
+
+.seovela-ai-upgrade-btn:hover {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+    color: #ffffff !important;
+}
+
+.seovela-ai-upgrade-btn .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/* Configure AI Panel */
+.seovela-ai-configure-body {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.seovela-ai-configure-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.15) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.seovela-ai-configure-icon .dashicons {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    color: #f59e0b;
+}
+
+.seovela-ai-configure-body h4 {
+    margin: 0 0 12px 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.seovela-ai-configure-body > p {
+    margin: 0 0 24px 0;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.seovela-ai-configure-body .button {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px !important;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    height: auto !important;
+}
+
+.seovela-ai-configure-body .button:hover {
+    background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important;
+}
+
+.seovela-ai-configure-body .button .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .seovela-ai-panel {
+        left: 10px;
+        right: 10px;
+        width: auto;
+        bottom: 80px;
+    }
+
+    .seovela-ai-fab {
+        right: 15px;
+        bottom: 15px;
+    }
+}
+

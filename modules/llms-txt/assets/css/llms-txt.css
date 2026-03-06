@@ -1,0 +1,831 @@
+/**
+ * LLMS Txt Settings Page Styles
+ * Modern Light Theme Design
+ * 
+ * @package Seovela
+ */
+
+/* CSS Variables */
+:root {
+    --llms-primary: #6366f1;
+    --llms-primary-hover: #4f46e5;
+    --llms-background: #f8fafc;
+    --llms-surface: #ffffff;
+    --llms-border: #e2e8f0;
+    --llms-border-hover: #cbd5e1;
+    --llms-text-primary: #0f172a;
+    --llms-text-secondary: #64748b;
+    --llms-text-tertiary: #94a3b8;
+    --llms-success: #10b981;
+    --llms-warning: #f59e0b;
+    --llms-error: #ef4444;
+    --llms-accent-purple: #8b5cf6;
+}
+
+/* Reset & Base */
+.seovela-llms-txt-page {
+    margin: 0 0 0 -20px;
+    background: var(--llms-background);
+    min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.seovela-llms-txt-page * {
+    box-sizing: border-box;
+}
+
+/* =============================================
+   HEADER - Top Bar
+   ============================================= */
+.seovela-llms-header {
+    background: var(--llms-surface);
+    border-bottom: 1px solid var(--llms-border);
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.seovela-llms-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.seovela-llms-header-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--llms-accent-purple);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.seovela-llms-header-icon svg {
+    width: 24px;
+    height: 24px;
+    color: #fff;
+}
+
+.seovela-llms-header-text h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--llms-text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 1.3;
+}
+
+.seovela-llms-header-text p {
+    font-size: 13px;
+    color: var(--llms-text-tertiary);
+    margin: 2px 0 0;
+}
+
+.seovela-llms-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--llms-primary);
+    color: #fff;
+}
+
+/* =============================================
+   MAIN LAYOUT - Grid
+   ============================================= */
+.seovela-llms-container {
+    max-width: 1400px;
+    margin: 0;
+    padding: 32px 24px;
+}
+
+.seovela-llms-grid {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 24px;
+}
+
+/* =============================================
+   SIDEBAR
+   ============================================= */
+.seovela-llms-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Card Base Style */
+.seovela-llms-card {
+    background: var(--llms-surface);
+    border: 1px solid var(--llms-border);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.seovela-llms-card:hover {
+    border-color: var(--llms-border-hover);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Sidebar Section Header */
+.seovela-llms-sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    border-bottom: 1px solid var(--llms-border);
+}
+
+.seovela-llms-sidebar-header svg {
+    width: 16px;
+    height: 16px;
+    color: var(--llms-primary);
+}
+
+.seovela-llms-sidebar-header h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--llms-text-secondary);
+    margin: 0;
+}
+
+/* Stats Cards Grid */
+.seovela-llms-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+}
+
+.seovela-llms-stat-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: var(--llms-surface);
+    border: 1px solid var(--llms-border);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.seovela-llms-stat-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+}
+
+.seovela-llms-stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.seovela-llms-stat-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.seovela-llms-stat-icon.purple {
+    background: #f3e8ff;
+}
+
+.seovela-llms-stat-icon.purple svg {
+    color: #9333ea;
+}
+
+.seovela-llms-stat-icon.green {
+    background: #dcfce7;
+}
+
+.seovela-llms-stat-icon.green svg {
+    color: #16a34a;
+}
+
+.seovela-llms-stat-icon.amber {
+    background: #fef3c7;
+}
+
+.seovela-llms-stat-icon.amber svg {
+    color: #d97706;
+}
+
+.seovela-llms-stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.seovela-llms-stat-number {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--llms-text-primary);
+    line-height: 1.2;
+}
+
+.seovela-llms-stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--llms-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Public URL Section */
+.seovela-llms-url-section {
+    padding: 16px;
+}
+
+.seovela-llms-url-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--llms-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.seovela-llms-url-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    background: #f8fafc;
+    border: 1px solid var(--llms-border);
+    border-radius: 8px;
+}
+
+.seovela-llms-url-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 13px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    color: var(--llms-text-primary);
+    min-width: 0;
+}
+
+.seovela-llms-url-box button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--llms-text-secondary);
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.seovela-llms-url-box button:hover {
+    color: var(--llms-primary);
+}
+
+.seovela-llms-url-box button svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Info Box */
+.seovela-llms-info-box {
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.seovela-llms-info-content {
+    display: flex;
+    gap: 10px;
+}
+
+.seovela-llms-info-content svg {
+    width: 20px;
+    height: 20px;
+    color: #d97706;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.seovela-llms-info-content h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #92400e;
+    margin: 0 0 4px;
+}
+
+.seovela-llms-info-content p {
+    font-size: 12px;
+    color: #92400e;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* =============================================
+   MAIN CONTENT AREA
+   ============================================= */
+.seovela-llms-main {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Section Cards */
+.seovela-llms-section {
+    background: var(--llms-surface);
+    border: 1px solid var(--llms-border);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.seovela-llms-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.seovela-llms-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.seovela-llms-section-title svg {
+    width: 20px;
+    height: 20px;
+    color: var(--llms-primary);
+}
+
+.seovela-llms-section-title h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--llms-text-primary);
+    margin: 0;
+}
+
+.seovela-llms-section-description {
+    font-size: 14px;
+    color: var(--llms-text-secondary);
+    line-height: 1.5;
+    margin: 0 0 24px;
+}
+
+/* Toggle All Button */
+.seovela-llms-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--llms-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.seovela-llms-toggle-btn:hover {
+    background: #f1f5f9;
+    color: var(--llms-primary);
+}
+
+.seovela-llms-toggle-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* =============================================
+   CHECKBOX CARDS
+   ============================================= */
+.seovela-llms-checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.seovela-llms-checkbox-grid.three-col {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.seovela-llms-checkbox-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    background: #fafbfc;
+    border: 1px solid var(--llms-border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.seovela-llms-checkbox-card:hover {
+    border-color: var(--llms-border-hover);
+    background: #f8fafc;
+    transform: translateY(-1px);
+}
+
+.seovela-llms-checkbox-card.checked {
+    border-color: var(--llms-border-hover);
+    background: #f8fafc;
+}
+
+.seovela-llms-checkbox-card input[type="checkbox"] {
+    margin: 2px 0 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    border: 2px solid var(--llms-border);
+    cursor: pointer;
+}
+
+.seovela-llms-checkbox-content {
+    flex: 1;
+}
+
+.seovela-llms-checkbox-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--llms-text-primary);
+    margin-bottom: 2px;
+}
+
+.seovela-llms-checkbox-meta {
+    display: block;
+    font-size: 13px;
+    color: var(--llms-text-tertiary);
+}
+
+/* =============================================
+   TWO COLUMN BOTTOM GRID
+   ============================================= */
+.seovela-llms-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+/* Content Limit Section */
+.seovela-llms-slider-display {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.seovela-llms-slider-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--llms-primary);
+}
+
+.seovela-llms-slider-unit {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--llms-text-secondary);
+}
+
+/* Range Slider */
+.seovela-llms-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--llms-border);
+    outline: none;
+    margin-bottom: 16px;
+}
+
+.seovela-llms-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--llms-surface);
+    border: 3px solid var(--llms-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.seovela-llms-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+}
+
+.seovela-llms-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--llms-surface);
+    border: 3px solid var(--llms-primary);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+/* Size Recommendations */
+.seovela-llms-recommendations {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.seovela-llms-rec-item {
+    text-align: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.seovela-llms-rec-item.small {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.seovela-llms-rec-item.small span {
+    color: #16a34a;
+}
+
+.seovela-llms-rec-item.medium {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.seovela-llms-rec-item.medium span {
+    color: #d97706;
+}
+
+.seovela-llms-rec-item.large {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.seovela-llms-rec-item.large span {
+    color: #dc2626;
+}
+
+.seovela-llms-rec-label {
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 2px;
+}
+
+.seovela-llms-rec-range {
+    display: block;
+}
+
+/* Custom Content Textarea */
+.seovela-llms-textarea {
+    width: 100%;
+    height: 128px;
+    padding: 12px 16px;
+    border: 2px solid var(--llms-border);
+    border-radius: 8px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--llms-text-primary);
+    background: #fafbfc;
+    resize: none;
+    transition: all 0.2s ease;
+}
+
+.seovela-llms-textarea:focus {
+    outline: none;
+    border-color: var(--llms-primary);
+    background: var(--llms-surface);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.seovela-llms-textarea-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 12px;
+    font-size: 12px;
+    color: var(--llms-text-secondary);
+}
+
+.seovela-llms-textarea-hint svg {
+    width: 16px;
+    height: 16px;
+    color: #f59e0b;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+/* =============================================
+   FOOTER
+   ============================================= */
+.seovela-llms-footer {
+    border-top: 1px solid var(--llms-border);
+    background: var(--llms-surface);
+    margin-top: 48px;
+}
+
+.seovela-llms-footer-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Buttons */
+.seovela-llms-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.seovela-llms-btn svg {
+    width: 16px;
+    height: 16px;
+}
+
+.seovela-llms-btn-primary {
+    background: var(--llms-primary);
+    color: #fff;
+    padding: 10px 32px;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+}
+
+.seovela-llms-btn-primary:hover {
+    background: var(--llms-primary-hover);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+    color: #fff;
+}
+
+.seovela-llms-btn-secondary {
+    background: var(--llms-surface);
+    color: var(--llms-text-secondary);
+    border: 2px solid var(--llms-border);
+}
+
+.seovela-llms-btn-secondary:hover {
+    border-color: var(--llms-border-hover);
+    color: var(--llms-text-primary);
+}
+
+.seovela-llms-btn-loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.seovela-llms-btn-loading::after {
+    content: '';
+    width: 14px;
+    height: 14px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: llms-spin 0.6s linear infinite;
+    margin-left: 6px;
+}
+
+@keyframes llms-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Copy button success state */
+.seovela-llms-url-box button.copied {
+    color: var(--llms-success);
+}
+
+/* =============================================
+   RESPONSIVE DESIGN
+   ============================================= */
+@media (max-width: 1200px) {
+    .seovela-llms-grid {
+        grid-template-columns: 280px 1fr;
+    }
+}
+
+@media (max-width: 1024px) {
+    .seovela-llms-checkbox-grid.three-col {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .seovela-llms-two-col {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 900px) {
+    .seovela-llms-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .seovela-llms-sidebar {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .seovela-llms-info-box {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .seovela-llms-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 16px 20px;
+    }
+    
+    .seovela-llms-container {
+        padding: 20px 16px;
+    }
+    
+    .seovela-llms-sidebar {
+        grid-template-columns: 1fr;
+    }
+    
+    .seovela-llms-info-box {
+        grid-column: span 1;
+    }
+    
+    .seovela-llms-checkbox-grid,
+    .seovela-llms-checkbox-grid.three-col {
+        grid-template-columns: 1fr;
+    }
+    
+    .seovela-llms-recommendations {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .seovela-llms-footer-inner {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .seovela-llms-btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .seovela-llms-btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .seovela-llms-header-text h1 {
+        font-size: 18px;
+    }
+    
+    .seovela-llms-section {
+        padding: 16px;
+    }
+    
+    .seovela-llms-stat-card {
+        padding: 12px;
+    }
+    
+    .seovela-llms-stat-number {
+        font-size: 20px;
+    }
+}
+
+/* WordPress Admin Bar Offset */
+@media screen and (max-width: 782px) {
+    .admin-bar .seovela-llms-txt-page {
+        margin-top: 0;
+    }
+}
