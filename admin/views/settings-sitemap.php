@@ -36,23 +36,23 @@ if ( isset( $_POST['seovela_regenerate_sitemap'] ) && wp_verify_nonce( sanitize_
             </div>
             <div class="seovela-page-header-tabs">
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=meta' ) ); ?>" class="seovela-header-tab">
-                    <span class="dashicons dashicons-edit-page"></span>
+                    <?php Seovela_Icons::render( 'meta', 16 ); ?>
                     <?php esc_html_e( 'Titles & Meta', 'seovela' ); ?>
                 </a>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=sitemap' ) ); ?>" class="seovela-header-tab active">
-                    <span class="dashicons dashicons-networking"></span>
+                    <?php Seovela_Icons::render( 'sitemap', 16 ); ?>
                     <?php esc_html_e( 'Sitemap', 'seovela' ); ?>
                 </a>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=schema' ) ); ?>" class="seovela-header-tab">
-                    <span class="dashicons dashicons-code-standards"></span>
+                    <?php Seovela_Icons::render( 'schema', 16 ); ?>
                     <?php esc_html_e( 'Schema', 'seovela' ); ?>
                 </a>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=indexing' ) ); ?>" class="seovela-header-tab">
-                    <span class="dashicons dashicons-search"></span>
+                    <?php Seovela_Icons::render( 'indexing', 16 ); ?>
                     <?php esc_html_e( 'Indexing', 'seovela' ); ?>
                 </a>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=ai' ) ); ?>" class="seovela-header-tab">
-                    <span class="dashicons dashicons-superhero-alt"></span>
+                    <?php Seovela_Icons::render( 'ai', 16 ); ?>
                     <?php esc_html_e( 'AI Optimization', 'seovela' ); ?>
                 </a>
             </div>

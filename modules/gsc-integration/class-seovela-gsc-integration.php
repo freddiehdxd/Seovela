@@ -47,13 +47,11 @@ class Seovela_Gsc_Integration {
 	private $central_callback_url = 'https://seovela.com/oauth/callback/';
 
 	/**
-	 * Google OAuth2 Client ID (public - safe to expose)
-	 * This is your single OAuth app that all users authenticate through
-	 * 
-	 * IMPORTANT: Replace with your actual Client ID from Google Cloud Console
-	 * Get it from: APIs & Services → Credentials → Your OAuth 2.0 Client ID
+	 * Google OAuth2 Client ID (public identifier - safe to expose).
+	 * OAuth authentication is handled through seovela.com as a proxy (see readme.txt "External services").
+	 * Override via the 'seovela_gsc_client_id' filter or SEOVELA_GSC_CLIENT_ID constant.
 	 */
-	private $client_id = '284765469874-jdl69571667d2pfh5882vl8einujdam4.apps.googleusercontent.com';
+	private $client_id = '';
 
 	/**
 	 * OAuth2 scopes
@@ -92,6 +90,13 @@ class Seovela_Gsc_Integration {
 	public function __construct() {
 		global $wpdb;
 		$this->table_name = $wpdb->prefix . 'seovela_gsc_data';
+
+		// Set OAuth client ID (overridable via constant or filter).
+		$default_client_id = '284765469874-jdl69571667d2pfh5882vl8einujdam4.apps.googleusercontent.com';
+		if ( defined( 'SEOVELA_GSC_CLIENT_ID' ) ) {
+			$default_client_id = SEOVELA_GSC_CLIENT_ID;
+		}
+		$this->client_id = apply_filters( 'seovela_gsc_client_id', $default_client_id );
 
 		// Admin hooks
 		add_action( 'admin_menu', array( $this, 'add_menu_page' ), 20 );
@@ -207,12 +212,12 @@ class Seovela_Gsc_Integration {
 			return;
 		}
 
-		// Chart.js for graphs (bundled locally — download chart.umd.min.js v4.4.1 to assets/js/chart.min.js)
+		// Chart.js for graphs (bundled locally — download chart.umd.min.js v4.5.1 to assets/js/chart.min.js)
 		wp_enqueue_script(
 			'chartjs',
 			plugins_url( 'assets/js/chart.min.js', dirname( dirname( __FILE__ ) ) ),
 			array(),
-			'4.4.1',
+			'4.5.1',
 			true
 		);
 
@@ -286,11 +291,18 @@ class Seovela_Gsc_Integration {
 	}
 
 	/**
-	 * Handle OAuth2 callback from central server
-	 * Central server exchanges code for tokens and sends them here
+	 * Handle OAuth2 callback from central server.
+	 *
+	 * Security model: This callback cannot use WordPress nonces because the request
+	 * originates from the external OAuth server redirect (not a form submission).
+	 * Instead, security is enforced via:
+	 * 1. A per-user transient nonce embedded in the OAuth state and verified below.
+	 * 2. A cryptographically signed token bundle verified by verify_token_bundle().
+	 * 3. A 5-minute token age check to prevent replay attacks.
+	 * No user-supplied values from $_GET are echoed back to the page.
 	 */
 	public function handle_oauth_callback() {
-		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- OAuth callback uses its own nonce via transient + signed token bundle.
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended -- OAuth callback from external server; security via transient nonce + signed token bundle (see docblock).
 		if ( ! isset( $_GET['page'] ) || sanitize_text_field( wp_unslash( $_GET['page'] ) ) !== 'seovela-gsc' ) {
 			return;
 		}
@@ -298,25 +310,27 @@ class Seovela_Gsc_Integration {
 		if ( ! isset( $_GET['gsc_oauth_callback'] ) ) {
 			return;
 		}
-		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
 		$user_id = get_current_user_id();
 
-		// Handle errors from central server
+		// Handle errors from central server.
+		// Use a generic error message rather than echoing user-supplied query parameter.
 		if ( isset( $_GET['gsc_error'] ) ) {
-			$error = sanitize_text_field( wp_unslash( $_GET['gsc_error'] ) );
-			add_settings_error( 'seovela_gsc', 'oauth_error', $error, 'error' );
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
+			add_settings_error( 'seovela_gsc', 'oauth_error', __( 'OAuth authentication failed. Please try connecting again.', 'seovela' ), 'error' );
 			return;
 		}
 
 		// Check for token bundle from central server
 		if ( ! isset( $_GET['gsc_tokens'] ) || empty( $_GET['gsc_tokens'] ) ) {
+			// phpcs:enable WordPress.Security.NonceVerification.Recommended
 			add_settings_error( 'seovela_gsc', 'oauth_error', __( 'No tokens received. Please try again.', 'seovela' ), 'error' );
 			return;
 		}
 
-		// Decode and verify the signed token bundle
+		// Decode and verify the signed token bundle (cryptographic signature check).
 		$signed_bundle = sanitize_text_field( wp_unslash( $_GET['gsc_tokens'] ) );
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 		$tokens = $this->verify_token_bundle( $signed_bundle );
 
 		if ( is_wp_error( $tokens ) ) {
@@ -324,7 +338,7 @@ class Seovela_Gsc_Integration {
 			return;
 		}
 
-		// Verify nonce
+		// Verify transient nonce (set when user initiated the OAuth flow).
 		$stored_nonce = get_transient( 'seovela_gsc_oauth_nonce_' . $user_id );
 		if ( ! $stored_nonce || ! isset( $tokens['nonce'] ) || $tokens['nonce'] !== $stored_nonce ) {
 			add_settings_error( 'seovela_gsc', 'oauth_error', __( 'Security validation failed. Please try again.', 'seovela' ), 'error' );
@@ -488,11 +502,13 @@ class Seovela_Gsc_Integration {
 			return new WP_Error( 'no_token', __( 'Not connected. Please connect your Google account.', 'seovela' ) );
 		}
 
-		// Token expires in less than 5 minutes, refresh it
-		if ( $expires && time() > ( intval( $expires ) - 300 ) ) {
+		// Token expires in less than 5 minutes or expiry unknown — refresh it
+		if ( ! $expires || time() > ( intval( $expires ) - 300 ) ) {
 			$new_token = $this->refresh_access_token( $user_id );
 			if ( is_wp_error( $new_token ) ) {
-				return $new_token;
+				// If refresh fails but we still have a token, try using it anyway
+				// (the 401 retry in api_request will handle truly expired tokens)
+				return $access_token;
 			}
 			return $new_token;
 		}
@@ -553,10 +569,10 @@ class Seovela_Gsc_Integration {
 		$code = wp_remote_retrieve_response_code( $response );
 
 		if ( $code >= 400 ) {
-			$error_msg = isset( $response_body['error']['message'] ) 
-				? $response_body['error']['message'] 
+			$error_msg = isset( $response_body['error']['message'] )
+				? $response_body['error']['message']
 				: __( 'API request failed', 'seovela' );
-			
+
 			// If unauthorized, try refreshing token once
 			if ( $code === 401 ) {
 				$new_token = $this->refresh_access_token( $user_id );
@@ -888,6 +904,8 @@ class Seovela_Gsc_Integration {
 			return array();
 		}
 
+		$cache_meta_key = 'seovela_gsc_chart_cache_' . $days;
+
 		$end_date = gmdate( 'Y-m-d', strtotime( '-2 days' ) );
 		$start_date = gmdate( 'Y-m-d', strtotime( "-{$days} days" ) );
 
@@ -902,7 +920,9 @@ class Seovela_Gsc_Integration {
 		);
 
 		if ( is_wp_error( $response ) || ! isset( $response['rows'] ) ) {
-			return array();
+			// API call failed — return cached chart data if available
+			$cached = get_user_meta( $user_id, $cache_meta_key, true );
+			return is_array( $cached ) ? $cached : array();
 		}
 
 		$labels = array();
@@ -915,11 +935,16 @@ class Seovela_Gsc_Integration {
 			$impressions[] = isset( $row['impressions'] ) ? intval( $row['impressions'] ) : 0;
 		}
 
-		return array(
+		$chart_data = array(
 			'labels'      => $labels,
 			'clicks'      => $clicks,
 			'impressions' => $impressions,
 		);
+
+		// Cache in user meta so chart still shows when token refresh fails
+		update_user_meta( $user_id, $cache_meta_key, $chart_data );
+
+		return $chart_data;
 	}
 
 	/**
@@ -1035,7 +1060,11 @@ class Seovela_Gsc_Integration {
 		// Fetch page data
 		$page_data = $this->get_search_analytics( $property, $start_date, $end_date, array( 'page' ), 1000, $user_id );
 
-		if ( ! is_wp_error( $page_data ) && isset( $page_data['rows'] ) ) {
+		if ( is_wp_error( $page_data ) ) {
+			return $page_data;
+		}
+
+		if ( isset( $page_data['rows'] ) ) {
 			foreach ( $page_data['rows'] as $row ) {
 				$page_url = $row['keys'][0];
 				$clicks = isset( $row['clicks'] ) ? intval( $row['clicks'] ) : 0;
@@ -1124,6 +1153,24 @@ class Seovela_Gsc_Integration {
 		}
 
 		update_user_meta( $user_id, 'seovela_gsc_last_sync', current_time( 'mysql' ) );
+
+		// Pre-cache chart data while the token is still valid
+		$chart_response = $this->get_search_analytics( $property, $start_date, $end_date, array( 'date' ), $days, $user_id );
+		if ( ! is_wp_error( $chart_response ) && isset( $chart_response['rows'] ) ) {
+			$labels = array();
+			$clicks = array();
+			$impressions = array();
+			foreach ( $chart_response['rows'] as $row ) {
+				$labels[]      = $row['keys'][0];
+				$clicks[]      = isset( $row['clicks'] ) ? intval( $row['clicks'] ) : 0;
+				$impressions[] = isset( $row['impressions'] ) ? intval( $row['impressions'] ) : 0;
+			}
+			update_user_meta( $user_id, 'seovela_gsc_chart_cache_' . $days, array(
+				'labels'      => $labels,
+				'clicks'      => $clicks,
+				'impressions' => $impressions,
+			) );
+		}
 
 		return $rows_processed;
 	}
@@ -1227,13 +1274,14 @@ class Seovela_Gsc_Integration {
 		$queries_table = $wpdb->prefix . 'seovela_gsc_queries';
 		$valid_order = in_array( $order_by, array( 'clicks', 'impressions', 'ctr', 'position' ), true ) ? $order_by : 'clicks';
 		$order_dir = $order_by === 'position' ? 'ASC' : 'DESC';
-		
+
+		// $valid_order is from a strict allowlist above; $order_dir is a literal ASC/DESC.
+		// Using %i identifier placeholder for table name and column name (WP 6.2+).
 		return $wpdb->get_results( $wpdb->prepare(
-			"SELECT * FROM $queries_table
-			WHERE user_id = %d
-			ORDER BY {$valid_order} {$order_dir}
-			LIMIT %d",
+			"SELECT * FROM %i WHERE user_id = %d ORDER BY %i " . $order_dir . " LIMIT %d",
+			$queries_table,
 			$user_id,
+			$valid_order,
 			$limit
 		) );
 	}

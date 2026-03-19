@@ -27,51 +27,58 @@ class Seovela_Optimizer {
     /**
      * Get SEO stats for dashboard
      *
+     * Uses direct SQL COUNT queries instead of loading every post object,
+     * and caches the result for 5 minutes to keep the dashboard fast.
+     *
      * @return array
      */
     public function get_stats() {
-        $stats = array(
-            'posts_with_meta_title'       => 0,
-            'posts_without_meta_title'    => 0,
-            'posts_with_meta_description' => 0,
-            'posts_without_meta_description' => 0,
-            'total_posts'                 => 0,
+        $cached = get_transient( 'seovela_dashboard_stats' );
+        if ( false !== $cached ) {
+            return $cached;
+        }
+
+        global $wpdb;
+
+        // Total published posts + pages in a single query
+        $total = (int) $wpdb->get_var(
+            "SELECT COUNT(*) FROM {$wpdb->posts}
+             WHERE post_type IN ('post','page') AND post_status = 'publish'"
         );
 
-        // Get all published posts
-        $posts = get_posts( array(
-            'post_type'      => array( 'post', 'page' ),
-            'posts_per_page' => -1,
-            'post_status'    => 'publish',
+        // Posts with non-empty meta title
+        $with_title = (int) $wpdb->get_var( $wpdb->prepare(
+            "SELECT COUNT(DISTINCT p.ID) FROM {$wpdb->posts} p
+             INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
+             WHERE p.post_type IN ('post','page')
+               AND p.post_status = 'publish'
+               AND pm.meta_key = %s
+               AND pm.meta_value != ''",
+            '_seovela_meta_title'
         ) );
 
-        $stats['total_posts'] = count( $posts );
+        // Posts with non-empty meta description
+        $with_desc = (int) $wpdb->get_var( $wpdb->prepare(
+            "SELECT COUNT(DISTINCT p.ID) FROM {$wpdb->posts} p
+             INNER JOIN {$wpdb->postmeta} pm ON p.ID = pm.post_id
+             WHERE p.post_type IN ('post','page')
+               AND p.post_status = 'publish'
+               AND pm.meta_key = %s
+               AND pm.meta_value != ''",
+            '_seovela_meta_description'
+        ) );
 
-        foreach ( $posts as $post ) {
-            $meta_title = get_post_meta( $post->ID, '_seovela_meta_title', true );
-            $meta_description = get_post_meta( $post->ID, '_seovela_meta_description', true );
+        $stats = array(
+            'total_posts'                    => $total,
+            'posts_with_meta_title'          => $with_title,
+            'posts_without_meta_title'       => max( 0, $total - $with_title ),
+            'posts_with_meta_description'    => $with_desc,
+            'posts_without_meta_description' => max( 0, $total - $with_desc ),
+            'meta_title_percentage'          => $total > 0 ? round( ( $with_title / $total ) * 100, 1 ) : 0,
+            'meta_description_percentage'    => $total > 0 ? round( ( $with_desc / $total ) * 100, 1 ) : 0,
+        );
 
-            if ( ! empty( $meta_title ) ) {
-                $stats['posts_with_meta_title']++;
-            } else {
-                $stats['posts_without_meta_title']++;
-            }
-
-            if ( ! empty( $meta_description ) ) {
-                $stats['posts_with_meta_description']++;
-            } else {
-                $stats['posts_without_meta_description']++;
-            }
-        }
-
-        // Calculate percentages
-        if ( $stats['total_posts'] > 0 ) {
-            $stats['meta_title_percentage'] = round( ( $stats['posts_with_meta_title'] / $stats['total_posts'] ) * 100, 1 );
-            $stats['meta_description_percentage'] = round( ( $stats['posts_with_meta_description'] / $stats['total_posts'] ) * 100, 1 );
-        } else {
-            $stats['meta_title_percentage'] = 0;
-            $stats['meta_description_percentage'] = 0;
-        }
+        set_transient( 'seovela_dashboard_stats', $stats, 5 * MINUTE_IN_SECONDS );
 
         return $stats;
     }

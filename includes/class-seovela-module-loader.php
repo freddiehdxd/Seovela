@@ -33,19 +33,32 @@ class Seovela_Module_Loader {
 
     /**
      * Load all enabled modules
+     *
+     * Modules that have no frontend output are only loaded in admin context
+     * to reduce memory usage and file includes on visitor page loads.
      */
     private function load_modules() {
+        // Modules with frontend hooks (always load when enabled)
         $this->load_module( 'meta', 'seovela_meta_enabled' );
         $this->load_module( 'sitemap', 'seovela_sitemap_enabled' );
         $this->load_module( 'schema', 'seovela_schema_enabled' );
         $this->load_module( 'llms-txt', 'seovela_llms_txt_enabled' );
-        $this->load_module( 'optimizer', 'seovela_optimizer_enabled' );
-        $this->load_module( 'redirects', 'seovela_redirects_enabled' );
-        $this->load_module( '404-monitor', 'seovela_404_monitor_enabled' );
-        $this->load_module( 'internal-links', 'seovela_internal_links_enabled' );
-        $this->load_module( 'image-seo', 'seovela_image_seo_enabled' );
-        $this->load_module( 'gsc-integration', 'seovela_gsc_integration_enabled' );
-        $this->load_module( 'ai', 'seovela_ai_enabled' );
+
+        // Redirects + 404 are loaded separately in class-seovela-core.php
+        // (they're registered here for status tracking only in admin)
+        if ( is_admin() ) {
+            $this->load_module( 'redirects', 'seovela_redirects_enabled' );
+            $this->load_module( '404-monitor', 'seovela_404_monitor_enabled' );
+        }
+
+        // Admin-only modules (no frontend hooks, only dashboards/settings)
+        if ( is_admin() ) {
+            $this->load_module( 'optimizer', 'seovela_optimizer_enabled' );
+            $this->load_module( 'internal-links', 'seovela_internal_links_enabled' );
+            $this->load_module( 'image-seo', 'seovela_image_seo_enabled' );
+            $this->load_module( 'gsc-integration', 'seovela_gsc_integration_enabled' );
+            $this->load_module( 'ai', 'seovela_ai_enabled' );
+        }
     }
 
     /**

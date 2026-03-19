@@ -1,438 +1,722 @@
 /**
- * Seovela Admin Styles - Modern Design
+ * Seovela Admin Styles v3 - Premium SaaS Design
+ *
+ * Shared design system matching the dashboard redesign.
+ * Clean, confident, data-forward. All pages share the same tokens.
  *
  * @package Seovela
  */
 
-/* Global Wrapper */
-.wrap.seovela-dashboard,
-.wrap.seovela-settings,
-.wrap.seovela-modules,
-.wrap.seovela-pro-features,
-.wrap.seovela-license {
-    background: #f8f9fa;
-    margin: 0 -20px 0 -10px;
-    padding: 20px 40px 40px 20px;
-    min-height: calc(100vh - 32px);
+/* ============================================
+   Design Tokens (shared with dashboard.css)
+   ============================================ */
+:root {
+    --sv-brand: #6366f1;
+    --sv-brand-hover: #4f46e5;
+    --sv-brand-light: #eef2ff;
+    --sv-brand-100: #e0e7ff;
+    --sv-bg: #f8fafc;
+    --sv-surface: #ffffff;
+    --sv-text-primary: #0f172a;
+    --sv-text-secondary: #475569;
+    --sv-text-tertiary: #94a3b8;
+    --sv-border: #e2e8f0;
+    --sv-border-light: #f1f5f9;
+    --sv-green: #10b981;
+    --sv-green-light: #ecfdf5;
+    --sv-amber: #f59e0b;
+    --sv-amber-light: #fffbeb;
+    --sv-red: #ef4444;
+    --sv-red-light: #fef2f2;
+    --sv-shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+    --sv-shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --sv-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.04);
+    --sv-radius-sm: 6px;
+    --sv-radius-md: 8px;
+    --sv-radius-lg: 12px;
+    --sv-radius-xl: 16px;
+    --sv-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
-.wrap.seovela-dashboard h1,
-.wrap.seovela-settings h1,
-.wrap.seovela-modules h1,
-.wrap.seovela-pro-features h1,
-.wrap.seovela-license h1 {
-    font-size: 32px;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 30px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.wrap.seovela-dashboard h1:before {
-    content: "📊";
-    font-size: 36px;
-}
-
-/* Dashboard Layout */
-.seovela-dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 24px;
-    margin-top: 30px;
-}
-
-/* Card Styling */
-.seovela-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 28px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-    transition: all 0.3s ease;
-}
-
-.seovela-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
-}
-
-.seovela-card h2 {
-    margin: 0 0 20px 0;
-    font-size: 20px;
-    font-weight: 700;
-    color: #1e293b;
-    border-bottom: 2px solid #f1f5f9;
-    padding-bottom: 14px;
-}
-
-/* License Status */
-.seovela-license-status {
-    text-align: center;
-    padding: 20px 0;
-}
-
-.seovela-status-badge {
+/* ============================================
+   SVG Icon Base System (Global)
+   ============================================ */
+.seovela-icon {
     display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 15px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.seovela-status-active {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: #ffffff;
-}
-
-.seovela-status-inactive {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    color: #ffffff;
-}
-
-.seovela-status-coming {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    color: #ffffff;
-}
-
-.seovela-license-status p {
-    margin: 10px 0;
-    color: #64748b;
-}
-
-.seovela-license-status .button {
-    margin: 10px 5px 0;
-}
-
-/* Stats */
-.seovela-stats {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-}
-
-.seovela-stat-item {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border-radius: 10px;
-    padding: 20px;
-    border-left: 4px solid #3b82f6;
-    transition: all 0.3s ease;
-}
-
-.seovela-stat-item:hover {
-    transform: translateX(4px);
-    border-left-color: #2563eb;
-}
-
-.seovela-stat-label {
-    font-size: 14px;
-    color: #64748b;
-    margin-bottom: 8px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.seovela-stat-value {
-    font-size: 32px;
-    font-weight: 700;
-    color: #1e293b;
+    vertical-align: middle;
+    flex-shrink: 0;
     line-height: 1;
 }
 
-.seovela-stat-percent {
-    font-size: 16px;
-    color: #64748b;
-    font-weight: 600;
-    margin-left: 8px;
+/* Admin menu icon */
+#adminmenu .toplevel_page_seovela .wp-menu-image img {
+    opacity: 0.85 !important;
+    padding: 6px 0 !important;
+    transition: opacity 0.2s ease, filter 0.2s ease;
 }
 
-/* Quick Links */
-.seovela-quick-links {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+#adminmenu .toplevel_page_seovela:hover .wp-menu-image img {
+    opacity: 1 !important;
+    filter: brightness(1.3);
 }
 
-.seovela-quick-links li {
-    margin-bottom: 14px;
-    padding-left: 0;
+#adminmenu .toplevel_page_seovela.wp-has-current-submenu .wp-menu-image img,
+#adminmenu .toplevel_page_seovela.current .wp-menu-image img {
+    opacity: 1 !important;
+    filter: brightness(1.5) drop-shadow(0 0 4px rgba(99, 102, 241, 0.5));
 }
 
-.seovela-quick-links li:before {
-    content: '→';
-    color: #3b82f6;
-    font-weight: 700;
-    margin-right: 10px;
-    font-size: 18px;
+/* ============================================
+   Premium Page Layout (.seovela-premium-page)
+   Used by: Settings, Schema, Sitemap, Indexing,
+   AI, Tools, Import/Export
+   ============================================ */
+.seovela-premium-page {
+    margin: -20px -20px 0 -2px;
+    background: var(--sv-bg);
+    padding-bottom: 40px;
+    font-family: var(--sv-font);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-.seovela-quick-links a {
-    color: #1e293b;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.2s ease;
+/* ── Page Header ─────────────────────────────── */
+.seovela-page-header {
+    position: relative;
+    overflow: hidden;
+    background: var(--sv-surface);
+    border-bottom: 1px solid var(--sv-border);
 }
 
-.seovela-quick-links a:hover {
-    color: #3b82f6;
-    padding-left: 5px;
+/* Kill the dark gradient background */
+.seovela-page-header-bg {
+    display: none;
 }
 
-/* Modules List */
-.seovela-modules-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+.seovela-page-header-content {
+    position: relative;
+    z-index: 10;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px 32px 0;
 }
 
-.seovela-modules-list li {
-    padding: 12px 0;
-    border-bottom: 1px solid #f1f5f9;
+.seovela-page-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 20px;
+}
+
+/* Breadcrumb */
+.seovela-page-breadcrumb {
     display: flex;
     align-items: center;
-    gap: 10px;
-    color: #1e293b;
+    gap: 6px;
+    font-size: 12px;
     font-weight: 500;
+    margin-bottom: 8px;
 }
 
-.seovela-modules-list li:last-child {
-    border-bottom: none;
+.seovela-page-breadcrumb a {
+    color: var(--sv-text-tertiary);
+    text-decoration: none;
+    transition: color 0.2s;
 }
 
-.seovela-modules-list .dashicons {
-    color: #10b981;
-    font-size: 20px;
+.seovela-page-breadcrumb a:hover {
+    color: var(--sv-brand);
 }
 
-/* Settings Tabs */
-.nav-tab-wrapper {
-    margin-bottom: 30px;
-    border-bottom: 2px solid #e2e8f0;
-    background: transparent;
+.seovela-page-breadcrumb .sep {
+    color: var(--sv-text-tertiary);
+    opacity: 0.5;
 }
 
-.nav-tab {
-    background: transparent;
-    border: none;
-    border-bottom: 3px solid transparent;
-    color: #64748b;
-    font-weight: 600;
-    padding: 12px 24px;
-    margin: 0 8px 0 0;
-    transition: all 0.3s ease;
+.seovela-page-breadcrumb .current {
+    color: var(--sv-text-secondary);
 }
 
-.nav-tab:hover {
-    background: transparent;
-    color: #3b82f6;
-    border-bottom-color: #3b82f6;
-}
-
-.nav-tab-active,
-.nav-tab-active:hover {
-    background: transparent;
-    color: #3b82f6;
-    border-bottom-color: #3b82f6;
-}
-
-.seovela-settings-content {
-    margin-top: 30px;
-}
-
-/* Settings Layout with Sidebar */
-.seovela-settings-layout {
-    display: flex;
-    gap: 30px;
-    margin-top: 30px;
-    align-items: flex-start;
-}
-
-.seovela-settings-sidebar {
-    width: 200px;
-    flex-shrink: 0;
-    background: #ffffff;
-    border: none;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    border-radius: 12px;
+/* Header Text */
+.seovela-page-header-text h1 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--sv-text-primary);
+    margin: 0 0 6px;
     padding: 0;
-    position: sticky;
-    top: 32px;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
 }
 
-.seovela-settings-menu {
-    list-style: none;
+.seovela-page-header-text h1::before {
+    display: none;
+}
+
+.seovela-page-header-text p {
+    font-size: 13px;
+    color: var(--sv-text-tertiary);
     margin: 0;
-    padding: 8px 0;
+    max-width: 500px;
+    line-height: 1.5;
 }
 
-.seovela-menu-header {
-    font-size: 11px;
+/* Header Stats */
+.seovela-page-header-stats {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.seovela-header-stat {
+    text-align: center;
+}
+
+.seovela-header-stat-number {
+    font-size: 28px;
     font-weight: 800;
-    color: #94a3b8;
+    color: var(--sv-text-primary);
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.seovela-header-stat-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--sv-text-tertiary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    padding: 16px 20px 8px;
-    margin-top: 12px;
+    margin-top: 4px;
 }
 
-.seovela-menu-header:first-child {
-    margin-top: 0;
+.seovela-header-stat-divider {
+    width: 1px;
+    height: 32px;
+    background: var(--sv-border);
 }
 
-.seovela-settings-menu li:not(.seovela-menu-header) {
-    margin: 2px 8px;
+/* ── Header Tabs ─────────────────────────────── */
+.seovela-page-header-tabs {
+    display: flex;
+    gap: 0;
+    border-top: 1px solid var(--sv-border-light);
+    margin: 0 -32px;
+    padding: 0 32px;
 }
 
-.seovela-settings-menu li:not(.seovela-menu-header) a {
+.seovela-header-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sv-text-tertiary);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.seovela-header-tab:hover {
+    color: var(--sv-text-secondary);
+    border-bottom-color: var(--sv-border);
+}
+
+.seovela-header-tab.active {
+    color: var(--sv-brand);
+    border-bottom-color: var(--sv-brand);
+    font-weight: 600;
+}
+
+.seovela-header-tab .seovela-icon {
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.seovela-header-tab:hover .seovela-icon,
+.seovela-header-tab.active .seovela-icon {
+    opacity: 1;
+}
+
+.seovela-header-tab .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* ── Page Body ─────────────────────────────── */
+.seovela-page-body {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 24px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ── Premium Card ─────────────────────────────── */
+.seovela-premium-card {
+    background: var(--sv-surface);
+    border: 1px solid var(--sv-border);
+    border-radius: var(--sv-radius-lg);
+    box-shadow: var(--sv-shadow-xs);
+    overflow: hidden;
+}
+
+.seovela-premium-card-header {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 20px;
-    color: #475569;
-    text-decoration: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s ease;
+    gap: 16px;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--sv-border-light);
 }
 
-.seovela-settings-menu li:not(.seovela-menu-header) a:hover {
-    background: #f1f5f9;
-    color: #1e293b;
+.seovela-premium-card-header .card-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--sv-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 }
 
-.seovela-settings-menu li:not(.seovela-menu-header).active a {
-    background: #eff6ff;
-    color: #2563eb;
-    font-weight: 600;
-    box-shadow: none;
-}
-
-.seovela-settings-menu li:not(.seovela-menu-header) a .dashicons {
+.seovela-premium-card-header .card-icon .dashicons {
     font-size: 18px;
     width: 18px;
     height: 18px;
+    color: #fff;
 }
 
-.seovela-settings-menu li:not(.seovela-menu-header).active a .dashicons {
-    color: #2563eb;
-}
-
-.seovela-settings-content-area {
-    flex: 1;
-    background: #ffffff;
-    border: none;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    border-radius: 12px;
-    padding: 40px;
-    min-height: 600px;
-}
-
-.seovela-settings-section {
-    margin-bottom: 40px;
-    padding-bottom: 40px;
-    border-bottom: 2px solid #f1f5f9;
-}
-
-.seovela-settings-section:last-of-type {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-}
-
-.seovela-settings-section h2 {
-    font-size: 24px;
+.seovela-premium-card-header h2 {
+    font-size: 15px;
     font-weight: 700;
-    color: #1e293b;
-    margin: 0 0 24px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #e2e8f0;
+    color: var(--sv-text-primary);
+    margin: 0;
+    padding: 0;
+    border: none;
+    letter-spacing: -0.01em;
 }
 
-.seovela-settings-section > p.description {
-    color: #64748b;
+.seovela-premium-card-header p {
+    font-size: 12px;
+    color: var(--sv-text-tertiary);
+    margin: 2px 0 0;
+    line-height: 1.4;
+}
+
+.seovela-premium-card-body {
+    padding: 24px;
+}
+
+.seovela-premium-card .submit {
+    padding: 16px 24px;
+    border-top: 1px solid var(--sv-border-light);
+    margin: 0;
+}
+
+.seovela-premium-card .submit .button-primary {
+    background: var(--sv-brand);
+    border-color: var(--sv-brand);
+    border-radius: var(--sv-radius-md);
+    padding: 6px 20px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.seovela-premium-card .submit .button-primary:hover {
+    background: var(--sv-brand-hover);
+    border-color: var(--sv-brand-hover);
+}
+
+/* ── Info Boxes ─────────────────────────────── */
+.seovela-premium-info {
+    display: flex;
+    gap: 14px;
+    padding: 16px 20px;
+    border-radius: var(--sv-radius-md);
+    border: 1px solid var(--sv-border);
+    background: var(--sv-surface);
+}
+
+.seovela-premium-info .info-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    line-height: 1.4;
+}
+
+.seovela-premium-info .info-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.seovela-premium-info .info-content h3 {
     font-size: 14px;
-    margin: -10px 0 20px;
+    font-weight: 600;
+    color: var(--sv-text-primary);
+    margin: 0 0 4px;
+}
+
+.seovela-premium-info .info-content p,
+.seovela-premium-info .info-content li {
+    font-size: 13px;
+    color: var(--sv-text-secondary);
+    margin: 0;
     line-height: 1.6;
 }
 
-/* Coming Soon Message */
-.seovela-coming-soon {
-    text-align: center;
-    padding: 60px 40px;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border-radius: 12px;
-    color: #64748b;
+.seovela-premium-info .info-content ol,
+.seovela-premium-info .info-content ul {
+    margin: 8px 0 0;
+    padding-left: 18px;
+}
+
+.seovela-premium-info .info-content li {
+    margin-bottom: 4px;
+}
+
+.seovela-premium-info .info-content a {
+    color: var(--sv-brand);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.seovela-premium-info .info-content a:hover {
+    text-decoration: underline;
+}
+
+/* Info box color variants via left border */
+.seovela-premium-info.info-blue {
+    border-left: 3px solid var(--sv-brand);
+    background: var(--sv-brand-light);
+}
+
+.seovela-premium-info.info-green {
+    border-left: 3px solid var(--sv-green);
+    background: var(--sv-green-light);
+}
+
+.seovela-premium-info.info-amber {
+    border-left: 3px solid var(--sv-amber);
+    background: var(--sv-amber-light);
+}
+
+.seovela-premium-info.info-red {
+    border-left: 3px solid var(--sv-red);
+    background: var(--sv-red-light);
+}
+
+/* ── Schema Grid ─────────────────────────────── */
+.seovela-schema-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+.seovela-schema-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border-radius: var(--sv-radius-md);
+    border: 1px solid var(--sv-border-light);
+    transition: all 0.2s;
+}
+
+.seovela-schema-item:hover {
+    border-color: var(--sv-border);
+    background: var(--sv-bg);
+}
+
+.seovela-schema-item .schema-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--sv-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, var(--sv-brand), var(--sv-brand-hover));
+}
+
+.seovela-schema-item .schema-icon .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #fff;
+}
+
+.seovela-schema-item .schema-info h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sv-text-primary);
+    margin: 0 0 2px;
+}
+
+.seovela-schema-item .schema-info p {
+    font-size: 11px;
+    color: var(--sv-text-tertiary);
+    margin: 0;
+    line-height: 1.3;
+}
+
+/* ── Form Table Styles ─────────────────────────────── */
+.seovela-premium-card .form-table th {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sv-text-primary);
+    padding: 16px 12px 16px 0;
+    width: 200px;
+}
+
+.seovela-premium-card .form-table td {
+    padding: 16px 0;
+}
+
+.seovela-premium-card .form-table tr {
+    border-bottom: 1px solid var(--sv-border-light);
+}
+
+.seovela-premium-card .form-table tr:last-child {
+    border-bottom: none;
+}
+
+/* Text inputs */
+.seovela-premium-card input[type="text"],
+.seovela-premium-card input[type="url"],
+.seovela-premium-card input[type="email"],
+.seovela-premium-card input[type="number"],
+.seovela-premium-card input[type="password"],
+.seovela-premium-card textarea,
+.seovela-premium-card select {
+    border: 1px solid var(--sv-border);
+    border-radius: var(--sv-radius-sm);
+    padding: 8px 12px;
+    font-size: 13px;
+    font-family: var(--sv-font);
+    color: var(--sv-text-primary);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    max-width: 500px;
+}
+
+.seovela-premium-card input[type="text"]:focus,
+.seovela-premium-card input[type="url"]:focus,
+.seovela-premium-card input[type="email"]:focus,
+.seovela-premium-card input[type="number"]:focus,
+.seovela-premium-card input[type="password"]:focus,
+.seovela-premium-card textarea:focus,
+.seovela-premium-card select:focus {
+    border-color: var(--sv-brand);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    outline: none;
+}
+
+.seovela-premium-card .description {
+    font-size: 12px;
+    color: var(--sv-text-tertiary);
+    margin-top: 6px;
+    line-height: 1.5;
+}
+
+/* Toggle Switch (Modern) */
+.seovela-toggle-modern {
+    position: relative;
+    display: inline-flex;
+    cursor: pointer;
+}
+
+.seovela-toggle-modern input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.seovela-toggle-slider-modern {
+    width: 36px;
+    height: 20px;
+    background: var(--sv-border);
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.seovela-toggle-slider-modern::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.seovela-toggle-modern input:checked + .seovela-toggle-slider-modern {
+    background: var(--sv-green);
+}
+
+.seovela-toggle-modern input:checked + .seovela-toggle-slider-modern::after {
+    transform: translateX(16px);
+}
+
+.seovela-toggle-modern input:focus + .seovela-toggle-slider-modern {
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.seovela-toggle-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.seovela-toggle-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sv-text-primary);
+    line-height: 20px;
+}
+
+/* ── Tools Page Cards ─────────────────────────────── */
+.seovela-tools-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.seovela-tool-card {
+    background: var(--sv-surface);
+    border: 1px solid var(--sv-border);
+    border-radius: var(--sv-radius-lg);
+    overflow: hidden;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.seovela-tool-card:hover {
+    box-shadow: var(--sv-shadow-md);
+    transform: translateY(-2px);
+}
+
+.seovela-tool-card-body {
+    padding: 24px;
+    flex: 1;
+}
+
+.seovela-tool-card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--sv-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 14px;
+}
+
+.seovela-tool-card-icon .dashicons {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: #fff;
+}
+
+.seovela-tool-card-body h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--sv-text-primary);
+    margin: 0 0 6px;
+}
+
+.seovela-tool-card-body p {
+    font-size: 13px;
+    color: var(--sv-text-tertiary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.seovela-tool-card-footer {
+    padding: 14px 24px;
+    border-top: 1px solid var(--sv-border-light);
+}
+
+.seovela-tool-card-footer .button {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sv-brand);
+    text-decoration: none;
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.seovela-tool-card-footer .button:hover {
+    color: var(--sv-brand-hover);
+}
+
+.seovela-tool-card-footer .button .dashicons {
     font-size: 16px;
+    width: 16px;
+    height: 16px;
 }
 
-.seovela-coming-soon .dashicons {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-    color: #94a3b8;
-    margin-bottom: 16px;
-}
-
-/* Media Upload Box (Rank Math Style) */
+/* ── Media Upload Box ─────────────────────────────── */
 .seovela-media-upload-box {
     max-width: 400px;
 }
 
 .seovela-media-placeholder {
-    border: 2px dashed #cbd5e1;
-    border-radius: 12px;
-    padding: 32px;
+    border: 2px dashed var(--sv-border);
+    border-radius: var(--sv-radius-lg);
+    padding: 24px;
     text-align: center;
-    background: #f8fafc;
-    transition: all 0.2s ease;
+    background: var(--sv-bg);
+    transition: all 0.2s;
 }
 
 .seovela-media-placeholder:hover {
-    border-color: #94a3b8;
-    background: #f1f5f9;
+    border-color: var(--sv-text-tertiary);
 }
 
 .seovela-media-placeholder .dashicons {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-    color: #cbd5e1;
-    margin-bottom: 12px;
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    color: var(--sv-border);
+    margin-bottom: 8px;
 }
 
 .seovela-media-placeholder p {
-    color: #64748b;
-    margin: 0 0 16px 0;
-    font-size: 14px;
+    color: var(--sv-text-tertiary);
+    font-size: 13px;
+    margin: 0 0 12px;
 }
 
 .seovela-media-placeholder-small {
-    padding: 24px;
+    padding: 16px;
 }
 
 .seovela-media-placeholder-small .dashicons {
-    font-size: 32px;
-    width: 32px;
-    height: 32px;
-    margin-bottom: 8px;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
 }
 
 .seovela-media-preview {
     position: relative;
-    border-radius: 12px;
+    border-radius: var(--sv-radius-lg);
     overflow: hidden;
-    background: #f8fafc;
-    border: 2px solid #e2e8f0;
+    background: var(--sv-bg);
+    border: 1px solid var(--sv-border);
 }
 
 .seovela-media-preview img {
@@ -442,21 +726,19 @@
 }
 
 .seovela-media-preview-small {
-    max-width: 150px;
+    max-width: 200px;
 }
 
 .seovela-media-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(15, 23, 42, 0.7);
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 6px;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s;
 }
 
 .seovela-media-preview:hover .seovela-media-overlay {
@@ -464,459 +746,262 @@
 }
 
 .seovela-media-overlay .button {
-    background: #ffffff;
-    color: #1e293b;
-    border: none;
-    font-weight: 600;
-    padding: 8px 16px;
-    border-radius: 6px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background: var(--sv-surface) !important;
+    border-radius: var(--sv-radius-sm) !important;
+    font-size: 12px !important;
+    padding: 4px 10px !important;
 }
 
-.seovela-media-overlay .button .dashicons {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-}
-
-.seovela-media-overlay .button:hover {
-    background: #f8fafc;
-    transform: translateY(-1px);
-}
-
-/* Form Tables */
-.seovela-card .form-table th {
-    padding: 20px 10px 20px 0;
-    font-weight: 600;
-    color: #1e293b;
-}
-
-.seovela-card .form-table td {
-    padding: 20px 10px;
-}
-
-/* Info Boxes */
-.seovela-info-box {
-    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-    border-left: 4px solid #3b82f6;
-    padding: 20px;
-    margin: 20px 0;
-    border-radius: 8px;
-}
-
-.seovela-info-box h3 {
-    margin-top: 0;
-    font-size: 16px;
-    font-weight: 700;
-    color: #1e40af;
-}
-
-.seovela-info-box ul,
-.seovela-info-box ol {
-    margin: 12px 0 0 24px;
-    color: #475569;
-}
-
-/* Pro Box */
-.seovela-pro-box {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    color: #ffffff;
-    padding: 28px;
-    border-radius: 12px;
-    margin: 24px 0;
-    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
-}
-
-.seovela-pro-box h3 {
-    margin-top: 0;
-    color: #ffffff;
-    font-size: 20px;
-    font-weight: 700;
-}
-
-.seovela-pro-box p {
-    opacity: 0.95;
-    line-height: 1.6;
-}
-
-.seovela-pro-box ul {
-    margin: 18px 0;
-    padding-left: 24px;
-}
-
-.seovela-pro-box ul li {
-    margin: 8px 0;
-    opacity: 0.95;
-}
-
-.seovela-pro-box .button {
-    background: #ffffff;
-    color: #6366f1;
-    border: none;
-    font-weight: 700;
-    padding: 12px 28px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transition: all 0.3s ease;
-}
-
-.seovela-pro-box .button:hover {
-    background: #f8fafc;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-}
-
-/* Modules Grid */
-.seovela-modules-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 24px;
-    margin: 30px 0;
-}
-
-.seovela-module-card {
-    position: relative;
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
-    padding: 24px;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-}
-
-.seovela-module-card:hover {
-    border-color: #3b82f6;
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1);
-}
-
-.seovela-module-locked {
-    opacity: 0.7;
-    background: #f8fafc;
-}
-
-.seovela-module-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px;
-}
-
-.seovela-module-header h3 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 700;
-    color: #1e293b;
-}
-
-.seovela-pro-badge {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 12px;
-    border-radius: 12px;
-    margin-left: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.seovela-module-description {
-    color: #64748b;
-    font-size: 14px;
-    line-height: 1.6;
-    margin: 14px 0;
-}
-
-.seovela-module-locked-overlay {
+.seovela-media-preview-actions {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    bottom: 8px;
+    right: 8px;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(248, 250, 252, 0.95);
-    border-radius: 12px;
-    backdrop-filter: blur(4px);
+    gap: 4px;
 }
 
-/* Modern Modules Grid (Rank Math Style) */
-.seovela-modules-description {
-    color: #64748b;
-    font-size: 16px;
-    margin: 20px 0 30px;
-    line-height: 1.6;
+.seovela-media-preview-actions .button {
+    border-radius: var(--sv-radius-sm);
+    padding: 4px 10px;
+    font-size: 12px;
 }
 
-.seovela-modules-grid-modern {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-    margin: 30px 0 40px;
+/* ── Settings Layout with Sidebar ─────────────── */
+.seovela-settings-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
 }
 
-.seovela-module-card-modern {
-    position: relative;
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
+.seovela-settings-sidebar {
+    width: 200px;
+    flex-shrink: 0;
+    background: var(--sv-surface);
+    border: 1px solid var(--sv-border);
+    border-radius: var(--sv-radius-lg);
+    box-shadow: var(--sv-shadow-xs);
     padding: 0;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
+    position: sticky;
+    top: 46px;
 }
 
-.seovela-module-card-modern:hover {
-    border-color: #3b82f6;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
+.seovela-settings-menu {
+    list-style: none;
+    margin: 0;
+    padding: 6px 0;
 }
 
-.seovela-module-card-modern.seovela-module-active {
-    border-color: #10b981;
-    background: #f0fdf4;
-}
-
-.seovela-module-card-modern.seovela-module-locked {
-    opacity: 0.7;
-    background: #fafafa;
-}
-
-.seovela-module-card-modern.seovela-module-locked:hover {
-    transform: none;
-}
-
-/* Module Icon */
-.seovela-module-icon-wrapper {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 24px auto 0;
-    transition: all 0.3s ease;
-}
-
-.seovela-module-card-modern:hover .seovela-module-icon-wrapper {
-    transform: scale(1.1);
-}
-
-.seovela-module-icon {
-    font-size: 32px;
-    line-height: 1;
-}
-
-/* Module Content */
-.seovela-module-content {
-    padding: 20px 24px;
-    text-align: center;
-    flex-grow: 1;
-}
-
-.seovela-module-title {
-    margin: 0 0 10px;
-    font-size: 17px;
+.seovela-menu-header {
+    font-size: 10px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--sv-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 14px 16px 6px;
+    margin-top: 4px;
+}
+
+.seovela-menu-header:first-child {
+    margin-top: 0;
+    padding-top: 10px;
+}
+
+.seovela-settings-menu li:not(.seovela-menu-header) {
+    margin: 1px 6px;
+}
+
+.seovela-settings-menu li:not(.seovela-menu-header) a {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 8px;
+    padding: 8px 12px;
+    color: var(--sv-text-secondary);
+    text-decoration: none;
+    border-radius: var(--sv-radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+
+.seovela-settings-menu li:not(.seovela-menu-header) a:hover {
+    background: var(--sv-bg);
+    color: var(--sv-text-primary);
+}
+
+.seovela-settings-menu li:not(.seovela-menu-header).active a {
+    background: var(--sv-brand-light);
+    color: var(--sv-brand);
+    font-weight: 600;
+}
+
+.seovela-settings-menu li:not(.seovela-menu-header) a .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    opacity: 0.7;
+}
+
+.seovela-settings-menu li:not(.seovela-menu-header).active a .dashicons {
+    color: var(--sv-brand);
+    opacity: 1;
+}
+
+/* Settings Content Area */
+.seovela-settings-content-area {
+    flex: 1;
+    min-width: 0;
+    background: var(--sv-surface);
+    border: 1px solid var(--sv-border);
+    border-radius: var(--sv-radius-lg);
+    box-shadow: var(--sv-shadow-xs);
+    padding: 28px;
+}
+
+.seovela-settings-content-area .form-table th {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sv-text-primary);
+    padding: 14px 12px 14px 0;
+    width: 180px;
+}
+
+.seovela-settings-content-area .form-table td {
+    padding: 14px 0;
+}
+
+.seovela-settings-content-area .form-table tr {
+    border-bottom: 1px solid var(--sv-border-light);
+}
+
+.seovela-settings-content-area .form-table tr:last-child {
+    border-bottom: none;
+}
+
+.seovela-settings-content-area input[type="text"],
+.seovela-settings-content-area input[type="url"],
+.seovela-settings-content-area input[type="number"],
+.seovela-settings-content-area input[type="password"],
+.seovela-settings-content-area textarea,
+.seovela-settings-content-area select {
+    border: 1px solid var(--sv-border);
+    border-radius: var(--sv-radius-sm);
+    padding: 8px 12px;
+    font-size: 13px;
+    font-family: var(--sv-font);
+    color: var(--sv-text-primary);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    max-width: 500px;
+}
+
+.seovela-settings-content-area input:focus,
+.seovela-settings-content-area textarea:focus,
+.seovela-settings-content-area select:focus {
+    border-color: var(--sv-brand);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    outline: none;
+}
+
+.seovela-settings-content-area .description {
+    font-size: 12px;
+    color: var(--sv-text-tertiary);
+    margin-top: 6px;
+    line-height: 1.5;
+}
+
+.seovela-settings-content-area .submit {
+    padding-top: 16px;
+    border-top: 1px solid var(--sv-border-light);
+    margin-top: 16px;
+}
+
+.seovela-settings-content-area .button-primary {
+    background: var(--sv-brand);
+    border-color: var(--sv-brand);
+    border-radius: var(--sv-radius-md);
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.seovela-settings-content-area .button-primary:hover {
+    background: var(--sv-brand-hover);
+    border-color: var(--sv-brand-hover);
+}
+
+/* ── Robots Checkbox Group ─────────────────── */
+.seovela-robots-checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
     gap: 8px;
 }
 
-.seovela-pro-badge-small {
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    color: #ffffff;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+.seovela-robots-checkbox {
+    cursor: pointer;
 }
 
-.seovela-module-description-text {
-    color: #64748b;
-    font-size: 14px;
-    line-height: 1.6;
-    margin: 0;
-}
-
-/* Module Footer */
-.seovela-module-footer {
-    padding: 16px 24px;
-    border-top: 1px solid #f1f5f9;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #fafbfc;
-}
-
-.seovela-module-card-modern.seovela-module-active .seovela-module-footer {
-    background: #ecfdf5;
-    border-top-color: #d1fae5;
-}
-
-/* Modern Toggle Switch */
-.seovela-toggle-modern {
-    position: relative;
-    display: inline-block;
-    width: 44px;
-    height: 24px;
-    vertical-align: middle;
-}
-
-.seovela-toggle-modern input {
+.seovela-robots-checkbox input {
+    position: absolute;
     opacity: 0;
     width: 0;
     height: 0;
 }
 
-.seovela-toggle-slider-modern {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #cbd5e1;
-    transition: .3s;
-    border-radius: 24px;
-}
-
-.seovela-toggle-slider-modern:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: .3s;
-    border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.seovela-toggle-modern input:checked + .seovela-toggle-slider-modern {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-}
-
-.seovela-toggle-modern input:focus + .seovela-toggle-slider-modern {
-    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
-}
-
-.seovela-toggle-modern input:checked + .seovela-toggle-slider-modern:before {
-    transform: translateX(20px);
-}
-
-/* Toggle Group Items */
-.seovela-toggle-item {
-    margin-bottom: 20px;
+.seovela-robots-checkbox-content {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-}
-
-.seovela-toggle-item:last-child {
-    margin-bottom: 0;
-}
-
-.seovela-toggle-label {
-    font-weight: 600;
-    font-size: 14px;
-    color: #1e293b;
-    margin-left: 12px;
-}
-
-.seovela-toggle-item .description {
-    width: 100%;
-    margin: 6px 0 0 56px !important; /* Align with label text */
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--sv-border);
+    border-radius: var(--sv-radius-md);
+    background: var(--sv-surface);
+    transition: all 0.15s ease;
     font-size: 13px;
-    color: #64748b;
 }
 
-/* Form Inputs Modernization */
-.seovela-card input[type="text"],
-.seovela-card input[type="number"],
-.seovela-card input[type="url"],
-.seovela-card input[type="email"],
-.seovela-card input[type="password"],
-.seovela-card textarea,
-.seovela-card select,
-.seovela-settings-content-area input[type="text"],
-.seovela-settings-content-area input[type="number"],
-.seovela-settings-content-area input[type="url"],
-.seovela-settings-content-area input[type="email"],
-.seovela-settings-content-area input[type="password"],
-.seovela-settings-content-area textarea,
-.seovela-settings-content-area select {
-    border: 1px solid #cbd5e1;
-    border-radius: 6px;
-    padding: 8px 12px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    transition: all 0.2s ease;
-    font-size: 14px;
-    color: #334155;
-    background: #ffffff;
-    min-height: 40px;
+.seovela-robots-checkbox-content:hover {
+    border-color: var(--sv-brand);
 }
 
-.seovela-settings-content-area textarea {
-    min-height: auto;
-    line-height: 1.5;
+.seovela-robots-checkbox input:checked + .seovela-robots-checkbox-content {
+    border-color: var(--sv-brand);
+    background: var(--sv-brand-light);
+    color: var(--sv-brand);
 }
 
-.seovela-card input:focus,
-.seovela-card textarea:focus,
-.seovela-card select:focus,
-.seovela-settings-content-area input:focus,
-.seovela-settings-content-area textarea:focus,
-.seovela-settings-content-area select:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    outline: none;
-}
-
-/* Save Bar */
-.seovela-settings-content-area .submit {
-    margin-top: 40px;
-    padding-top: 30px;
-    border-top: 1px solid #e2e8f0;
+.seovela-robots-icon {
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    color: var(--sv-text-tertiary);
 }
 
-.seovela-settings-content-area .button-primary {
-    padding: 12px 32px;
-    font-size: 15px;
-    height: auto;
-    border-radius: 8px;
-    background: #2563eb;
-    border: none;
-    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2), 0 2px 4px -1px rgba(37, 99, 235, 0.1);
-    transition: all 0.2s ease;
+.seovela-robots-checkbox input:checked + .seovela-robots-checkbox-content .seovela-robots-icon {
+    color: var(--sv-brand);
 }
 
-.seovela-settings-content-area .button-primary:hover {
-    background: #1d4ed8;
-    transform: translateY(-1px);
-    box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2), 0 4px 6px -2px rgba(37, 99, 235, 0.1);
+.seovela-robots-icon .dashicons {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
 }
 
-.seovela-settings-content-area .button-primary:active {
-    transform: translateY(0);
+.seovela-robots-label {
+    font-weight: 500;
+    color: var(--sv-text-secondary);
 }
 
-/* Separator Visual Selector */
+.seovela-robots-checkbox input:checked + .seovela-robots-checkbox-content .seovela-robots-label {
+    color: var(--sv-brand);
+    font-weight: 600;
+}
+
+/* ── Separator Selector ─────────────────── */
 .seovela-separator-selector {
     display: flex;
-    gap: 8px;
     flex-wrap: wrap;
+    gap: 6px;
 }
 
 .seovela-separator-option {
@@ -934,604 +1019,312 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    border: 2px solid #cbd5e1;
-    border-radius: 8px;
-    background: #ffffff;
-    font-size: 18px;
-    font-weight: 600;
-    color: #475569;
-    transition: all 0.2s ease;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--sv-border);
+    border-radius: var(--sv-radius-sm);
+    background: var(--sv-surface);
+    font-size: 16px;
+    color: var(--sv-text-secondary);
+    transition: all 0.15s;
 }
 
-.seovela-separator-option:hover .seovela-separator-box {
-    border-color: #94a3b8;
-    background: #f8fafc;
+.seovela-separator-box:hover {
+    border-color: var(--sv-brand);
 }
 
 .seovela-separator-option input:checked + .seovela-separator-box {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    border-color: #2563eb;
-    color: #ffffff;
-    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+    border-color: var(--sv-brand);
+    background: var(--sv-brand-light);
+    color: var(--sv-brand);
+    font-weight: 700;
 }
 
-.seovela-separator-option input:focus + .seovela-separator-box {
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+/* ── Settings Section Styles ─────────────────── */
+.seovela-settings-section {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--sv-border-light);
 }
 
-/* Advanced Meta Row */
-.seovela-advanced-meta-row {
+.seovela-settings-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.seovela-settings-section h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--sv-text-primary);
+    margin: 0 0 16px;
+    padding: 0;
+    border: none;
     display: flex;
     align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
+    gap: 8px;
 }
 
-.seovela-advanced-meta-row .seovela-toggle-modern {
-    flex-shrink: 0;
-}
-
-.seovela-advanced-meta-row .small-text {
-    width: 80px;
-}
-
-.seovela-advanced-meta-row select {
-    min-width: 200px;
-}
-
-.seovela-advanced-meta-row .description {
-    margin: 0 !important;
-    flex: 1 1 100%;
-}
-
-.seovela-advanced-meta-row .seovela-value-label {
-    color: #50575e;
-    font-style: italic;
+.seovela-settings-section > p.description {
+    color: var(--sv-text-tertiary);
     font-size: 13px;
+    margin: -8px 0 16px;
+    line-height: 1.5;
 }
 
-/* Help Tooltips */
-.seovela-help-tip {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    line-height: 18px;
-    text-align: center;
-    background: #cbd5e1;
-    color: #fff;
-    border-radius: 50%;
-    font-size: 12px;
-    font-weight: bold;
-    cursor: help;
-    margin-left: 6px;
-    position: relative;
-    transition: all 0.2s ease;
+/* ── Separator Character Grid ─────────────────── */
+.seovela-separator-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
 }
 
-.seovela-help-tip:hover {
-    background: #3b82f6;
-    transform: scale(1.1);
-}
-
-/* Robots Meta Checkboxes (Rank Math Style) */
-.seovela-robots-checkbox-group {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 12px;
-}
-
-.seovela-robots-checkbox {
+.seovela-separator-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--sv-border);
+    border-radius: var(--sv-radius-sm);
+    background: var(--sv-surface);
     cursor: pointer;
-    display: block;
+    font-size: 16px;
+    color: var(--sv-text-secondary);
+    transition: all 0.2s;
 }
 
-.seovela-robots-checkbox input {
+.seovela-separator-option:hover {
+    border-color: var(--sv-brand);
+    color: var(--sv-brand);
+}
+
+.seovela-separator-option input {
     position: absolute;
     opacity: 0;
     width: 0;
     height: 0;
 }
 
-.seovela-robots-checkbox-content {
+.seovela-separator-option.selected,
+.seovela-separator-option:has(input:checked) {
+    border-color: var(--sv-brand);
+    background: var(--sv-brand-light);
+    color: var(--sv-brand);
+    font-weight: 700;
+}
+
+/* ── Tab/Section Navigation ─────────────────── */
+.seovela-meta-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--sv-border);
+    margin-bottom: 20px;
+}
+
+.seovela-meta-tab {
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sv-text-tertiary);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+
+.seovela-meta-tab:hover {
+    color: var(--sv-text-secondary);
+}
+
+.seovela-meta-tab.active {
+    color: var(--sv-brand);
+    border-bottom-color: var(--sv-brand);
+    font-weight: 600;
+}
+
+/* ── AI Provider Cards ─────────────────── */
+.seovela-provider-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.seovela-provider-card {
+    border: 2px solid var(--sv-border);
+    border-radius: var(--sv-radius-md);
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.seovela-provider-card:hover {
+    border-color: var(--sv-brand);
+}
+
+.seovela-provider-card.selected,
+.seovela-provider-card:has(input:checked) {
+    border-color: var(--sv-brand);
+    background: var(--sv-brand-light);
+}
+
+.seovela-provider-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.seovela-provider-card h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--sv-text-primary);
+    margin: 8px 0 4px;
+}
+
+.seovela-provider-card p {
+    font-size: 12px;
+    color: var(--sv-text-tertiary);
+    margin: 0;
+}
+
+/* ── Success/Error Messages ─────────────────── */
+.seovela-premium-page .notice {
+    margin: 0 32px 0;
+    border-radius: var(--sv-radius-md);
+    border-left-width: 4px;
+    max-width: 1280px;
+}
+
+.seovela-premium-page .notice:first-of-type {
+    margin-top: 16px;
+}
+
+.seovela-premium-page .notice-success {
+    background: var(--sv-green-light);
+    border-color: var(--sv-green);
+}
+
+/* ── Buttons ─────────────────── */
+.seovela-premium-page .button-primary,
+.seovela-premium-page input[type="submit"].button-primary {
+    background: var(--sv-brand);
+    border-color: var(--sv-brand);
+    border-radius: var(--sv-radius-md);
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.seovela-premium-page .button-primary:hover,
+.seovela-premium-page input[type="submit"].button-primary:hover {
+    background: var(--sv-brand-hover);
+    border-color: var(--sv-brand-hover);
+}
+
+.seovela-premium-page .button-secondary,
+.seovela-premium-page .button {
+    border-radius: var(--sv-radius-sm);
+    border-color: var(--sv-border);
+    transition: all 0.2s;
+}
+
+.seovela-premium-page .button-secondary:hover,
+.seovela-premium-page .button:hover {
+    border-color: var(--sv-text-tertiary);
+}
+
+/* ── Import/Export Tab Styles ─────────────────── */
+.seovela-ie-panel {
+    display: none;
+}
+
+.seovela-ie-panel.active {
+    display: block;
+}
+
+/* ── Checkbox Items ─────────────────── */
+.seovela-checkbox-item {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 10px 14px;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    background: #ffffff;
-    transition: all 0.2s ease;
-    min-height: 44px;
-}
-
-.seovela-robots-checkbox:hover .seovela-robots-checkbox-content {
-    border-color: #cbd5e1;
-    background: #f8fafc;
-}
-
-.seovela-robots-checkbox input:checked + .seovela-robots-checkbox-content {
-    border-color: #3b82f6;
-    background: #eff6ff;
-    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
-}
-
-.seovela-robots-checkbox input:focus + .seovela-robots-checkbox-content {
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-}
-
-.seovela-robots-icon {
-    flex-shrink: 0;
-    width: 20px;
-    height: 20px;
-    color: #94a3b8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.seovela-robots-checkbox input:checked + .seovela-robots-checkbox-content .seovela-robots-icon {
-    color: #3b82f6;
-}
-
-.seovela-robots-icon svg {
-    width: 20px;
-    height: 20px;
-}
-
-.seovela-robots-icon .dashicons {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-}
-
-.seovela-robots-label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #1e293b;
-    line-height: 1.3;
-}
-
-/* Radio Cards (Modern) */
-.seovela-radio-group {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-.seovela-radio-option {
-    position: relative;
+    background: var(--sv-bg);
+    border: 1px solid var(--sv-border);
+    border-radius: var(--sv-radius-md);
     cursor: pointer;
-    flex: 1;
-    min-width: 200px;
-}
-
-.seovela-radio-option input {
-    position: absolute;
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.seovela-radio-content {
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 16px;
-    transition: all 0.2s ease;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.seovela-radio-option input:checked + .seovela-radio-content {
-    border-color: #3b82f6;
-    background: #eff6ff;
-    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);
-}
-
-.seovela-radio-option:hover .seovela-radio-content {
-    border-color: #cbd5e1;
-}
-
-.seovela-radio-option input:checked + .seovela-radio-content:before {
-    content: "✓";
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    color: #3b82f6;
-    font-weight: 800;
-}
-
-.seovela-radio-title {
-    display: block;
-    font-weight: 700;
-    color: #1e293b;
-    margin-bottom: 4px;
-    font-size: 15px;
-}
-
-.seovela-radio-option input:checked + .seovela-radio-content .seovela-radio-title {
-    color: #1d4ed8;
-}
-
-.seovela-radio-desc {
+    transition: all 0.2s;
     font-size: 13px;
-    color: #64748b;
-    line-height: 1.4;
+    color: var(--sv-text-primary);
 }
 
-.seovela-radio-option input:focus + .seovela-radio-content {
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+.seovela-checkbox-item:hover {
+    border-color: var(--sv-brand);
 }
 
-/* Unlock Link */
-.seovela-module-unlock-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: #6366f1;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.2s ease;
+.seovela-checkbox-item:has(input:checked) {
+    border-color: var(--sv-brand);
+    background: var(--sv-brand-light);
 }
 
-.seovela-module-unlock-link:hover {
-    color: #4f46e5;
-    gap: 8px;
-}
-
-.seovela-module-unlock-link .dashicons {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-}
-
-/* Locked Badge */
-.seovela-module-locked-badge {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: rgba(99, 102, 241, 0.1);
-    color: #6366f1;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 6px 12px;
-    border-radius: 20px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.seovela-module-locked-badge .dashicons {
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
-}
-
-/* Module Actions */
-.seovela-modules-actions {
-    margin-top: 40px;
-    padding: 30px;
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-.seovela-modules-actions .button-hero {
-    padding: 14px 32px;
-    font-size: 16px;
-    height: auto;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.seovela-modules-actions .dashicons {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-}
-
-/* Toggle Switch */
-.seovela-toggle {
-    position: relative;
-    display: inline-block;
-    width: 56px;
-    height: 28px;
-}
-
-.seovela-toggle input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.seovela-toggle-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #cbd5e1;
-    transition: 0.3s;
-    border-radius: 28px;
-}
-
-.seovela-toggle-slider:before {
-    position: absolute;
-    content: "";
-    height: 22px;
-    width: 22px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: 0.3s;
-    border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.seovela-toggle input:checked + .seovela-toggle-slider {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-}
-
-.seovela-toggle input:checked + .seovela-toggle-slider:before {
-    transform: translateX(28px);
-}
-
-.seovela-toggle input:disabled + .seovela-toggle-slider {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Pro Features */
-.seovela-features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
-    margin: 40px 0;
-}
-
-.seovela-feature-card {
-    background: #ffffff;
-    border: 2px solid #e2e8f0;
-    padding: 28px;
-    border-radius: 12px;
-    text-align: center;
-    transition: all 0.3s ease;
-}
-
-.seovela-feature-card:hover {
-    border-color: #3b82f6;
-    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12);
-    transform: translateY(-4px);
-}
-
-.seovela-feature-locked {
-    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
-}
-
-.seovela-feature-icon {
-    font-size: 56px;
-    margin-bottom: 18px;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
-}
-
-.seovela-feature-card h3 {
-    margin: 14px 0;
-    font-size: 18px;
-    font-weight: 700;
-    color: #1e293b;
-}
-
-.seovela-feature-card p {
-    color: #64748b;
-    font-size: 14px;
-    line-height: 1.7;
-    margin: 0;
-}
-
-.seovela-pro-cta {
-    text-align: center;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px 20px;
-}
-
-.seovela-pro-cta h2 {
-    font-size: 36px;
-    font-weight: 800;
-    color: #1e293b;
-    margin-bottom: 16px;
-}
-
-.seovela-lead {
-    font-size: 20px;
-    color: #64748b;
-    margin-bottom: 40px;
-    font-weight: 500;
-}
-
-.seovela-cta-buttons {
-    margin: 40px 0;
-}
-
-.seovela-cta-buttons .button {
-    margin: 0 10px;
-    padding: 16px 32px;
-    font-size: 16px;
-    font-weight: 700;
-    border-radius: 10px;
-    transition: all 0.3s ease;
-}
-
-.seovela-cta-buttons .button-primary {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    border: none;
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
-}
-
-.seovela-cta-buttons .button-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(59, 130, 246, 0.4);
-}
-
-.seovela-pricing-note {
-    margin-top: 40px;
-    color: #64748b;
-    font-size: 15px;
-}
-
-.seovela-pricing-note p {
-    margin: 8px 0;
-    font-weight: 500;
-}
-
-/* License Page */
-.seovela-license-content {
-    max-width: 800px;
-}
-
-.seovela-license-status-box {
-    text-align: center;
-    padding: 30px;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border-radius: 12px;
-    margin: 20px 0;
-}
-
-.seovela-license-table {
-    width: 100%;
-    margin: 24px 0;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-.seovela-license-table tr {
-    border-bottom: 1px solid #e2e8f0;
-}
-
-.seovela-license-table tr:last-child {
-    border-bottom: none;
-}
-
-.seovela-license-table th {
-    text-align: left;
-    padding: 16px 20px;
-    background: #f8fafc;
-    width: 35%;
-    font-weight: 700;
-    color: #475569;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.seovela-license-table td {
-    padding: 16px 20px;
-    color: #1e293b;
-    font-weight: 600;
-}
-
-.seovela-license-table code {
-    background: #1e293b;
-    color: #10b981;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-family: 'Monaco', 'Courier New', monospace;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.seovela-help-card {
-    background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
-    border: 2px solid #fde047;
-}
-
-.seovela-help-card h2 {
-    color: #92400e;
-    border-bottom-color: #fde047;
-}
-
-.seovela-help-card ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.seovela-help-card ul li {
-    margin: 12px 0;
-}
-
-.seovela-help-card ul li:before {
-    content: '→';
-    color: #f59e0b;
-    font-weight: 700;
-    margin-right: 10px;
-}
-
-.seovela-help-card a {
-    color: #92400e;
-    font-weight: 600;
-}
-
-/* Schema List */
-.seovela-schema-list {
-    list-style: none;
-    margin: 20px 0;
-    padding: 0;
-}
-
-.seovela-schema-list li {
-    padding: 14px 0;
-    border-bottom: 1px solid #f1f5f9;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: #1e293b;
-    font-weight: 500;
-}
-
-.seovela-schema-list li:last-child {
-    border-bottom: none;
-}
-
-.seovela-schema-list .dashicons {
-    color: #10b981;
-    font-size: 22px;
-}
-
-/* Buttons Enhancement */
-.button.button-primary {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    border: none;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
-    font-weight: 600;
-}
-
-.button.button-primary:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-/* Responsive */
-@media (max-width: 1200px) {
-    .seovela-dashboard-grid {
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+/* ── Responsive ─────────────────── */
+@media (max-width: 782px) {
+    .seovela-premium-page {
+        margin: -10px -12px 0 -12px;
     }
-}
 
-@media (max-width: 960px) {
+    .seovela-page-header-content {
+        padding: 16px 16px 0;
+    }
+
+    .seovela-page-header-top {
+        flex-direction: column;
+    }
+
+    .seovela-page-header-tabs {
+        margin: 0 -16px;
+        padding: 0 16px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .seovela-page-body {
+        padding: 16px;
+    }
+
+    .seovela-premium-card-header {
+        padding: 16px;
+    }
+
+    .seovela-premium-card-body {
+        padding: 16px;
+    }
+
+    .seovela-premium-card .form-table th {
+        width: auto;
+        display: block;
+        padding-bottom: 4px;
+    }
+
+    .seovela-premium-card .form-table td {
+        display: block;
+        padding-top: 0;
+    }
+
+    .seovela-schema-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .seovela-tools-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .seovela-provider-grid {
+        grid-template-columns: 1fr;
+    }
+
     .seovela-settings-layout {
         flex-direction: column;
     }
@@ -1544,867 +1337,60 @@
     .seovela-settings-menu {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
-        padding: 12px;
+        padding: 8px;
+        gap: 2px;
     }
 
     .seovela-menu-header {
         width: 100%;
-        padding: 8px 4px 4px;
-        margin-top: 8px;
+        padding: 8px 8px 4px;
     }
 
     .seovela-settings-menu li:not(.seovela-menu-header) {
         margin: 0;
-        flex: 0 0 auto;
     }
 
     .seovela-settings-content-area {
-        padding: 24px;
-    }
-}
-
-@media (max-width: 782px) {
-    .wrap.seovela-dashboard,
-    .wrap.seovela-settings,
-    .wrap.seovela-modules,
-    .wrap.seovela-pro-features,
-    .wrap.seovela-license {
-        margin: 0 -10px;
-        padding: 20px 15px;
+        padding: 16px;
     }
 
-    .seovela-dashboard-grid,
-    .seovela-modules-grid,
-    .seovela-features-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .seovela-cta-buttons .button {
+    .seovela-settings-content-area .form-table th {
+        width: auto;
         display: block;
-        margin: 10px 0;
-        width: 100%;
+        padding-bottom: 4px;
     }
 
-    .wrap.seovela-dashboard h1,
-    .wrap.seovela-settings h1,
-    .wrap.seovela-modules h1,
-    .wrap.seovela-pro-features h1,
-    .wrap.seovela-license h1 {
-        font-size: 24px;
+    .seovela-settings-content-area .form-table td {
+        display: block;
+        padding-top: 0;
     }
 
-    .seovela-settings-content-area {
-        padding: 20px;
-    }
-
-    .seovela-modules-actions {
+    .seovela-robots-checkbox-group {
         flex-direction: column;
     }
+}
 
-    .seovela-modules-actions .button-hero {
-        width: 100%;
-        justify-content: center;
+/* ── Print ─────────────────── */
+@media print {
+    .seovela-page-header-bg {
+        display: none !important;
+    }
+
+    .seovela-premium-card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
     }
 }
 
-/* Pro Active Badge */
-.seovela-pro-active h2 {
-    color: #6366f1;
-}
-
-.seovela-status-badge.seovela-status-active .dashicons {
-    font-size: 20px;
-}
-
-/* SEO Meter Styles */
-.seovela-seo-meter {
-    margin-top: 12px;
-}
-
-.seovela-seo-meter-bar {
-    height: 8px;
-    background: #e2e8f0;
-    border-radius: 4px;
-    overflow: hidden;
-    position: relative;
-}
-
-.seovela-seo-meter-fill {
-    height: 100%;
-    border-radius: 4px;
-    transition: width 0.3s ease, background 0.3s ease;
-    width: 0;
-}
-
-.seovela-seo-meter-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 8px;
-    font-size: 13px;
-}
-
-.seovela-seo-meter-count {
-    color: #64748b;
-    font-weight: 500;
-}
-
-.seovela-seo-meter-status {
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Meter States - Fill colors */
-.seovela-meter-empty {
-    background: #cbd5e1;
-    width: 0 !important;
-}
-
-.seovela-meter-short {
-    background: linear-gradient(90deg, #f59e0b, #fbbf24);
-}
-
-.seovela-meter-good {
-    background: linear-gradient(90deg, #10b981, #34d399);
-}
-
-.seovela-meter-warning {
-    background: linear-gradient(90deg, #f59e0b, #fbbf24);
-}
-
-.seovela-meter-danger {
-    background: linear-gradient(90deg, #ef4444, #f87171);
-}
-
-/* Status badge colors */
-.seovela-status-empty {
-    background: #f1f5f9;
-    color: #94a3b8;
-}
-
-.seovela-status-short {
-    background: #fef3c7;
-    color: #b45309;
-}
-
-.seovela-status-good {
-    background: #d1fae5;
-    color: #047857;
-}
-
-.seovela-status-warning {
-    background: #fef3c7;
-    color: #b45309;
-}
-
-.seovela-status-danger {
-    background: #fee2e2;
-    color: #b91c1c;
-}
-
-/* Input styling when focused */
-.seovela-seo-input:focus + .seovela-seo-meter .seovela-seo-meter-bar {
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
-}
-
-/* ============================================================================
-   UNIFIED PREMIUM PAGE WRAPPER
-   Consistent design language for ALL Seovela admin pages
-   ========================================================================= */
-
-/* Base premium page wrapper */
-.seovela-premium-page {
-    margin: -20px -20px 0 -2px;
-    background: #f8fafc;
-    min-height: calc(100vh - 32px);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-/* Premium Page Header - Dark gradient (matches Module Center) */
-.seovela-page-header {
-    position: relative;
-    padding: 40px 40px 36px;
-    overflow: hidden;
-}
-
-.seovela-page-header-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-    z-index: 0;
-}
-
-.seovela-page-header-bg::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-        radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.1) 0%, transparent 40%);
-    z-index: 1;
-}
-
-.seovela-page-header-bg::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    opacity: 0.5;
-    z-index: 2;
-}
-
-.seovela-page-header-content {
-    position: relative;
-    z-index: 10;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-.seovela-page-header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 40px;
-}
-
-.seovela-page-header-text h1 {
-    font-size: 32px;
-    font-weight: 800;
-    color: #ffffff;
-    margin: 0 0 10px 0;
-    letter-spacing: -0.02em;
-}
-
-.seovela-page-header-text p {
-    font-size: 15px;
-    color: rgba(255, 255, 255, 0.65);
-    margin: 0;
-    max-width: 560px;
-    line-height: 1.6;
-}
-
-/* Breadcrumb in header */
-.seovela-page-breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-    font-size: 13px;
-}
-
-.seovela-page-breadcrumb a {
-    color: rgba(255, 255, 255, 0.5);
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-.seovela-page-breadcrumb a:hover {
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.seovela-page-breadcrumb .sep {
-    color: rgba(255, 255, 255, 0.3);
-    font-size: 11px;
-}
-
-.seovela-page-breadcrumb .current {
-    color: rgba(255, 255, 255, 0.8);
-    font-weight: 600;
-}
-
-/* Header stats badge (like Module Center) */
-.seovela-page-header-stats {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    padding: 18px 28px;
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    flex-shrink: 0;
-}
-
-.seovela-header-stat {
-    text-align: center;
-}
-
-.seovela-header-stat-number {
-    font-size: 36px;
-    font-weight: 800;
-    color: #ffffff;
-    line-height: 1;
-    margin-bottom: 4px;
-}
-
-.seovela-header-stat-label {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.6);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-weight: 600;
-}
-
-.seovela-header-stat-divider {
-    width: 1px;
-    height: 44px;
-    background: rgba(255, 255, 255, 0.15);
-}
-
-/* Header tabs (navigation within page) */
-.seovela-page-header-tabs {
-    display: flex;
-    gap: 4px;
-    margin-top: 28px;
-}
-
-.seovela-header-tab {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    color: rgba(255, 255, 255, 0.6);
-    text-decoration: none;
-    border-radius: 8px 8px 0 0;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.2s ease;
-    border: 1px solid transparent;
-    border-bottom: none;
-}
-
-.seovela-header-tab:hover {
-    color: rgba(255, 255, 255, 0.9);
-    background: rgba(255, 255, 255, 0.08);
-}
-
-.seovela-header-tab.active {
-    color: #1e293b;
-    background: #f8fafc;
-    border-color: rgba(255, 255, 255, 0.1);
-    font-weight: 700;
-}
-
-.seovela-header-tab .dashicons {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-}
-
-.seovela-header-tab .tab-badge {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 700;
-}
-
-.seovela-header-tab.active .tab-badge {
-    background: #3b82f6;
-    color: #ffffff;
-}
-
-/* Premium page body */
-.seovela-page-body {
-    padding: 32px 40px 60px;
-    max-width: 1480px;
-    margin: 0 auto;
-}
-
-/* Premium Card v2 */
-.seovela-premium-card {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    overflow: hidden;
-    margin-bottom: 24px;
-    transition: box-shadow 0.3s ease;
-}
-
-.seovela-premium-card:hover {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-}
-
-.seovela-premium-card-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 24px 28px;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.seovela-premium-card-header .card-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.seovela-premium-card-header .card-icon .dashicons {
-    font-size: 22px;
-    width: 22px;
-    height: 22px;
-}
-
-.seovela-premium-card-header h2 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 700;
-    color: #0f172a;
-    border: none;
-    padding: 0;
-}
-
-.seovela-premium-card-header p {
-    margin: 4px 0 0;
-    font-size: 13px;
-    color: #64748b;
-}
-
-.seovela-premium-card-body {
-    padding: 28px;
-}
-
-/* Premium form table override */
-.seovela-premium-card .form-table {
-    margin: 0;
-}
-
-.seovela-premium-card .form-table th {
-    padding: 18px 16px 18px 0;
-    font-weight: 600;
-    color: #334155;
-    font-size: 14px;
-    vertical-align: top;
-    width: 220px;
-}
-
-.seovela-premium-card .form-table td {
-    padding: 18px 0;
-}
-
-.seovela-premium-card .form-table tr {
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.seovela-premium-card .form-table tr:last-child {
-    border-bottom: none;
-}
-
-.seovela-premium-card .form-table .description {
-    margin-top: 8px;
-    font-size: 13px;
-    color: #64748b;
-    line-height: 1.5;
-}
-
-/* Premium submit button area */
-.seovela-premium-card .submit {
-    margin: 0;
-    padding: 20px 28px;
-    border-top: 1px solid #f1f5f9;
-    background: #fafbfc;
-    display: flex;
-    justify-content: flex-end;
-}
-
-.seovela-premium-card .submit .button-primary {
-    padding: 10px 28px;
-    font-size: 14px;
-    height: auto;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    border: none;
-    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
-    transition: all 0.2s ease;
-    font-weight: 600;
-}
-
-.seovela-premium-card .submit .button-primary:hover {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 12px -2px rgba(37, 99, 235, 0.3);
-}
-
-/* Premium Info Banner */
-.seovela-premium-info {
-    display: flex;
-    gap: 16px;
-    padding: 20px 24px;
-    border-radius: 12px;
-    margin-bottom: 24px;
-}
-
-.seovela-premium-info.info-blue {
-    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-    border: 1px solid #bfdbfe;
-}
-
-.seovela-premium-info.info-amber {
-    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-    border: 1px solid #fde68a;
-}
-
-.seovela-premium-info.info-green {
-    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-    border: 1px solid #bbf7d0;
-}
-
-.seovela-premium-info.info-red {
-    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-    border: 1px solid #fecaca;
-}
-
-.seovela-premium-info .info-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    font-size: 20px;
-}
-
-.seovela-premium-info .info-content h3 {
-    margin: 0 0 6px;
-    font-size: 15px;
-    font-weight: 700;
-    color: #0f172a;
-}
-
-.seovela-premium-info .info-content p {
-    margin: 0;
-    font-size: 14px;
-    color: #475569;
-    line-height: 1.6;
-}
-
-.seovela-premium-info .info-content ul,
-.seovela-premium-info .info-content ol {
-    margin: 8px 0 0 20px;
-    color: #475569;
-    font-size: 14px;
-}
-
-.seovela-premium-info .info-content li {
-    margin-bottom: 4px;
-    line-height: 1.5;
-}
-
-.seovela-premium-info .info-content a {
-    color: #2563eb;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.seovela-premium-info .info-content a:hover {
-    text-decoration: underline;
-}
-
-/* Premium Tools Grid */
-.seovela-tools-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-}
-
-.seovela-tool-card {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 0;
-    overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    flex-direction: column;
-}
-
-.seovela-tool-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.12);
-    border-color: #cbd5e1;
-}
-
-.seovela-tool-card-body {
-    padding: 28px;
-    flex: 1;
-}
-
-.seovela-tool-card-icon {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 18px;
-}
-
-.seovela-tool-card-icon .dashicons {
-    font-size: 24px;
-    width: 24px;
-    height: 24px;
-    color: #ffffff;
-}
-
-.seovela-tool-card-body h3 {
-    margin: 0 0 8px;
-    font-size: 17px;
-    font-weight: 700;
-    color: #0f172a;
-}
-
-.seovela-tool-card-body p {
-    margin: 0;
-    font-size: 14px;
-    color: #64748b;
-    line-height: 1.6;
-}
-
-.seovela-tool-card-footer {
-    padding: 16px 28px;
-    border-top: 1px solid #f1f5f9;
-    background: #fafbfc;
-}
-
-.seovela-tool-card-footer .button {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 600;
-    padding: 8px 18px;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-.seovela-tool-card-footer .button:hover {
-    transform: translateX(2px);
-}
-
-.seovela-tool-card-footer .button .dashicons {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-}
-
-/* Premium Schema List */
-.seovela-schema-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
-    margin: 20px 0;
-}
-
-.seovela-schema-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    padding: 18px;
-    background: #f8fafc;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    transition: all 0.2s ease;
-}
-
-.seovela-schema-item:hover {
-    background: #f0f9ff;
-    border-color: #bfdbfe;
-}
-
-.seovela-schema-item .schema-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.seovela-schema-item .schema-icon .dashicons {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    color: #ffffff;
-}
-
-.seovela-schema-item .schema-info h4 {
-    margin: 0 0 4px;
-    font-size: 14px;
-    font-weight: 700;
-    color: #0f172a;
-}
-
-.seovela-schema-item .schema-info p {
-    margin: 0;
-    font-size: 13px;
-    color: #64748b;
-    line-height: 1.4;
-}
-
-/* Premium Migration Cards */
-.seovela-migration-card {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    overflow: hidden;
-    margin-bottom: 20px;
-    transition: all 0.3s ease;
-}
-
-.seovela-migration-card:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-}
-
-.seovela-migration-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 24px;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.seovela-migration-card-header .migration-brand {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.seovela-migration-card-header .migration-logo {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    font-weight: 800;
-}
-
-.seovela-migration-card-header h3 {
-    margin: 0;
-    font-size: 17px;
-    font-weight: 700;
-    color: #0f172a;
-}
-
-.seovela-migration-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.seovela-migration-status.status-ready {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.seovela-migration-status.status-not-found {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.seovela-migration-card-body {
-    padding: 24px;
-}
-
-.seovela-migration-features {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 10px;
-    margin: 16px 0;
-}
-
-.seovela-migration-feature {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: #475569;
-}
-
-.seovela-migration-feature .dashicons {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-    color: #10b981;
-}
-
-/* Redirects page premium header override */
-.seovela-redirects-premium .seovela-page-header-stats .seovela-header-stat-number {
-    font-size: 32px;
-}
-
-/* Responsive for premium pages */
-@media (max-width: 960px) {
-    .seovela-page-header-top {
-        flex-direction: column;
-    }
-
-    .seovela-page-header-stats {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .seovela-page-header-tabs {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-}
-
-@media (max-width: 782px) {
-    .seovela-page-header {
-        padding: 28px 20px 24px;
-    }
-
-    .seovela-page-header-text h1 {
-        font-size: 24px;
-    }
-
-    .seovela-page-body {
-        padding: 20px;
-    }
-
-    .seovela-tools-cards {
-        grid-template-columns: 1fr;
-    }
-
-    .seovela-schema-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .seovela-header-tab {
-        padding: 8px 14px;
-        font-size: 13px;
-        white-space: nowrap;
-    }
-
-    .seovela-migration-features {
-        grid-template-columns: 1fr;
-    }
+/* ============================================
+   Legacy support for old class names
+   (used in admin.js, modules, etc.)
+   ============================================ */
+.wrap.seovela-dashboard h1::before {
+    content: none;
+}
+
+/* Settings tab navigation (nav-tab wrapper) */
+.seovela-premium-page .nav-tab-wrapper {
+    display: none; /* Hidden when header tabs are used */
 }

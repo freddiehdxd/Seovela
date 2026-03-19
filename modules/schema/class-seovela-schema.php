@@ -99,6 +99,11 @@ class Seovela_Schema {
 
     /**
      * Build and output the unified JSON-LD @graph
+     *
+     * On singular posts the complete JSON-LD output is cached in a transient
+     * keyed by post ID + modified date so it is rebuilt automatically when the
+     * post is updated.  Non-singular pages (archives, home) are lightweight
+     * enough that caching is unnecessary.
      */
     public function output_schema() {
         // Allow short-circuiting the entire schema output
@@ -110,6 +115,14 @@ class Seovela_Schema {
         if ( is_singular() ) {
             global $post;
             if ( get_post_meta( $post->ID, '_seovela_disable_schema', true ) === 'yes' ) {
+                return;
+            }
+
+            // Try cached output first (keyed on post ID + modified date)
+            $cache_key = 'seovela_schema_' . $post->ID . '_' . strtotime( $post->post_modified );
+            $cached    = get_transient( $cache_key );
+            if ( false !== $cached ) {
+                echo $cached; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- pre-encoded JSON-LD
                 return;
             }
         }
@@ -141,40 +154,32 @@ class Seovela_Schema {
             $pieces[] = $breadcrumb;
         }
 
-        /**
-         * Filter the array of graph pieces before they are assembled.
-         *
-         * Each piece is an associative array representing a single schema entity.
-         * You may add, remove, or modify pieces.
-         *
-         * @param array $pieces Graph pieces
-         */
+        /** @see seovela_schema_graph_pieces filter */
         $pieces = apply_filters( 'seovela_schema_graph_pieces', $pieces );
-
-        // Remove any empty/null pieces
         $pieces = array_values( array_filter( $pieces ) );
 
         if ( empty( $pieces ) ) {
             return;
         }
 
-        // Assemble the full graph
         $graph = array(
             '@context' => 'https://schema.org',
             '@graph'   => $pieces,
         );
 
-        /**
-         * Filter the complete JSON-LD graph before encoding.
-         *
-         * @param array $graph Full graph including @context and @graph
-         */
+        /** @see seovela_schema_graph filter */
         $graph = apply_filters( 'seovela_schema_graph', $graph );
 
-        // Output a single JSON-LD script tag
-        echo '<script type="application/ld+json">' . "\n";
-        echo wp_json_encode( $graph );
-        echo "\n" . '</script>' . "\n";
+        $output = '<script type="application/ld+json">' . "\n"
+                . wp_json_encode( $graph )
+                . "\n" . '</script>' . "\n";
+
+        // Cache for singular posts (24 hours, invalidated by modified date in key)
+        if ( is_singular() && isset( $cache_key ) ) {
+            set_transient( $cache_key, $output, DAY_IN_SECONDS );
+        }
+
+        echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- pre-encoded JSON-LD
     }
 
     // ------------------------------------------------------------------

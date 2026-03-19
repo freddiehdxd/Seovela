@@ -96,23 +96,23 @@ $claude_configured = ! empty( $claude_key_raw );
             </div>
             <div class="seovela-page-header-tabs">
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=meta' ) ); ?>" class="seovela-header-tab">
-                    <span class="dashicons dashicons-edit-page"></span>
+                    <?php Seovela_Icons::render( 'meta', 16 ); ?>
                     <?php esc_html_e( 'Titles & Meta', 'seovela' ); ?>
                 </a>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=sitemap' ) ); ?>" class="seovela-header-tab">
-                    <span class="dashicons dashicons-networking"></span>
+                    <?php Seovela_Icons::render( 'sitemap', 16 ); ?>
                     <?php esc_html_e( 'Sitemap', 'seovela' ); ?>
                 </a>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=schema' ) ); ?>" class="seovela-header-tab">
-                    <span class="dashicons dashicons-code-standards"></span>
+                    <?php Seovela_Icons::render( 'schema', 16 ); ?>
                     <?php esc_html_e( 'Schema', 'seovela' ); ?>
                 </a>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=indexing' ) ); ?>" class="seovela-header-tab">
-                    <span class="dashicons dashicons-search"></span>
+                    <?php Seovela_Icons::render( 'indexing', 16 ); ?>
                     <?php esc_html_e( 'Indexing', 'seovela' ); ?>
                 </a>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=ai' ) ); ?>" class="seovela-header-tab active">
-                    <span class="dashicons dashicons-superhero-alt"></span>
+                    <?php Seovela_Icons::render( 'ai', 16 ); ?>
                     <?php esc_html_e( 'AI Optimization', 'seovela' ); ?>
                 </a>
             </div>
@@ -137,7 +137,7 @@ $claude_configured = ! empty( $claude_key_raw );
                 
                 <div class="seovela-provider-cards">
                     <!-- OpenAI Card -->
-                    <label class="seovela-provider-card <?php echo $ai_provider === 'openai' ? 'active' : ''; ?> <?php echo $openai_configured ? 'configured' : ''; ?>">
+                    <label class="seovela-provider-card <?php echo esc_attr( $ai_provider === 'openai' ? 'active' : '' ); ?> <?php echo esc_attr( $openai_configured ? 'configured' : '' ); ?>">
                         <input type="radio" name="seovela_ai_provider" value="openai" <?php checked( $ai_provider, 'openai' ); ?> />
                         <div class="seovela-provider-header">
                             <div class="seovela-provider-logo">
@@ -159,7 +159,7 @@ $claude_configured = ! empty( $claude_key_raw );
                     </label>
                     
                     <!-- Gemini Card -->
-                    <label class="seovela-provider-card <?php echo $ai_provider === 'gemini' ? 'active' : ''; ?> <?php echo $gemini_configured ? 'configured' : ''; ?>">
+                    <label class="seovela-provider-card <?php echo esc_attr( $ai_provider === 'gemini' ? 'active' : '' ); ?> <?php echo esc_attr( $gemini_configured ? 'configured' : '' ); ?>">
                         <input type="radio" name="seovela_ai_provider" value="gemini" <?php checked( $ai_provider, 'gemini' ); ?> />
                         <div class="seovela-provider-header">
                             <div class="seovela-provider-logo gemini">
@@ -190,7 +190,7 @@ $claude_configured = ! empty( $claude_key_raw );
                     </label>
                     
                     <!-- Claude Card -->
-                    <label class="seovela-provider-card <?php echo $ai_provider === 'claude' ? 'active' : ''; ?> <?php echo $claude_configured ? 'configured' : ''; ?>">
+                    <label class="seovela-provider-card <?php echo esc_attr( $ai_provider === 'claude' ? 'active' : '' ); ?> <?php echo esc_attr( $claude_configured ? 'configured' : '' ); ?>">
                         <input type="radio" name="seovela_ai_provider" value="claude" <?php checked( $ai_provider, 'claude' ); ?> />
                         <div class="seovela-provider-header">
                             <div class="seovela-provider-logo claude">
@@ -214,7 +214,7 @@ $claude_configured = ! empty( $claude_key_raw );
             </div>
 
             <!-- OpenAI Configuration -->
-            <div class="seovela-card seovela-ai-config" id="openai-config" <?php echo $ai_provider !== 'openai' ? 'style="display:none;"' : ''; ?>>
+            <div class="seovela-card seovela-ai-config" id="openai-config" <?php echo esc_attr( $ai_provider !== 'openai' ? 'style="display:none;"' : '' ); ?>>
                 <h2>
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" style="vertical-align: middle; margin-right: 8px;">
                         <path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729z"/>
@@ -305,7 +305,7 @@ $claude_configured = ! empty( $claude_key_raw );
             </div>
 
             <!-- Gemini Configuration -->
-            <div class="seovela-card seovela-ai-config" id="gemini-config" <?php echo $ai_provider !== 'gemini' ? 'style="display:none;"' : ''; ?>>
+            <div class="seovela-card seovela-ai-config" id="gemini-config" <?php echo esc_attr( $ai_provider !== 'gemini' ? 'style="display:none;"' : '' ); ?>>
                 <h2>
                     <svg viewBox="0 0 24 24" width="24" height="24" style="vertical-align: middle; margin-right: 8px;">
                         <defs>
@@ -389,7 +389,7 @@ $claude_configured = ! empty( $claude_key_raw );
             </div>
 
             <!-- Claude Configuration -->
-            <div class="seovela-card seovela-ai-config" id="claude-config" <?php echo $ai_provider !== 'claude' ? 'style="display:none;"' : ''; ?>>
+            <div class="seovela-card seovela-ai-config" id="claude-config" <?php echo esc_attr( $ai_provider !== 'claude' ? 'style="display:none;"' : '' ); ?>>
                 <h2>
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="none" style="vertical-align: middle; margin-right: 8px;">
                         <path d="M16.98 7.41L12.58 3 8.18 7.41 12.58 11.82l4.4-4.41zM3 12.59l4.41 4.41 4.41-4.41L7.41 8.18 3 12.59zM12.58 13.36l-4.41 4.41 4.41 4.41 4.41-4.41-4.41-4.41zM17.76 8.18l-4.41 4.41 4.41 4.41L22.17 12.59 17.76 8.18z" fill="#D97757"/>
@@ -608,7 +608,10 @@ $claude_configured = ! empty( $claude_key_raw );
     </div><!-- .seovela-page-body -->
 </div><!-- .seovela-premium-page -->
 
-<style>
+<?php
+wp_register_style( 'seovela-settings-ai-inline-style', false );
+wp_enqueue_style( 'seovela-settings-ai-inline-style' );
+wp_add_inline_style( 'seovela-settings-ai-inline-style', <<<'SEOVELA_CSS'
 /* AI Settings Page Styles */
 .seovela-provider-cards {
     display: grid;
@@ -885,9 +888,15 @@ $claude_configured = ! empty( $claude_key_raw );
 .seovela-pricing-item li:last-child {
     border-bottom: none;
 }
-</style>
+SEOVELA_CSS
+);
+?>
 
-<script>
+<?php
+wp_register_script( 'seovela-settings-ai-inline-script', false, array( 'jquery' ), false, true );
+wp_enqueue_script( 'seovela-settings-ai-inline-script' );
+ob_start();
+?>
 jQuery(document).ready(function($) {
     // Provider selection
     $("input[name='seovela_ai_provider']").on("change", function() {
@@ -917,7 +926,7 @@ jQuery(document).ready(function($) {
                 action: "seovela_test_ai_connection",
                 provider: provider,
                 api_key: provider === "openai" ? $("#seovela_openai_api_key").val() : (provider === "claude" ? $("#seovela_claude_api_key").val() : $("#seovela_gemini_api_key").val()),
-                nonce: "<?php echo wp_create_nonce( 'seovela_test_ai' ); ?>"
+                nonce: "<?php echo esc_attr( wp_create_nonce( 'seovela_test_ai' ) ); ?>"
             },
             success: function(response) {
                 if (response.success) {
@@ -940,4 +949,6 @@ jQuery(document).ready(function($) {
         $(".seovela-range-value").text($(this).val());
     });
 });
-</script>
+<?php
+wp_add_inline_script( 'seovela-settings-ai-inline-script', ob_get_clean() );
+?>

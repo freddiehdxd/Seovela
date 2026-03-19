@@ -78,17 +78,7 @@ class Seovela_Admin {
      * @return string Base64-encoded SVG data URI
      */
     private function get_menu_icon() {
-        $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">'
-            . '<path d="M3 15V13L5 10L8 12L12 6L17 9V15H3Z" fill="currentColor" opacity="0.2"/>'
-            . '<path d="M3 15L5 10L8 12L12 6L17 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>'
-            . '<circle cx="5" cy="10" r="1.5" fill="currentColor"/>'
-            . '<circle cx="8" cy="12" r="1.5" fill="currentColor"/>'
-            . '<circle cx="12" cy="6" r="1.5" fill="currentColor"/>'
-            . '<circle cx="17" cy="9" r="1.5" fill="currentColor"/>'
-            . '<path d="M2 17H18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>'
-            . '</svg>';
-
-        return 'data:image/svg+xml;base64,' . base64_encode( $svg );
+        return Seovela_Icons::get_menu_icon();
     }
 
     /**
@@ -500,10 +490,10 @@ class Seovela_Admin {
         $tools = array();
 
         $tool_gradients = array(
-            'dashicons-admin-links'    => 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
-            'dashicons-format-image'   => 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
-            'dashicons-database-export' => 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-            'dashicons-media-text'     => 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
+            'dashicons-admin-links'    => 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+            'dashicons-format-image'   => 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+            'dashicons-database-export' => 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+            'dashicons-media-text'     => 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
         );
 
         if ( get_option( 'seovela_internal_links_enabled', true ) ) {

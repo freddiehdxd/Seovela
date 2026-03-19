@@ -225,23 +225,23 @@ $active_section = isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['s
             </div>
             <div class="seovela-page-header-tabs">
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=meta' ) ); ?>" class="seovela-header-tab active">
-                    <span class="dashicons dashicons-edit-page"></span>
+                    <?php Seovela_Icons::render( 'meta', 16 ); ?>
                     <?php esc_html_e( 'Titles & Meta', 'seovela' ); ?>
                 </a>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=sitemap' ) ); ?>" class="seovela-header-tab">
-                    <span class="dashicons dashicons-networking"></span>
+                    <?php Seovela_Icons::render( 'sitemap', 16 ); ?>
                     <?php esc_html_e( 'Sitemap', 'seovela' ); ?>
                 </a>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=schema' ) ); ?>" class="seovela-header-tab">
-                    <span class="dashicons dashicons-code-standards"></span>
+                    <?php Seovela_Icons::render( 'schema', 16 ); ?>
                     <?php esc_html_e( 'Schema', 'seovela' ); ?>
                 </a>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=indexing' ) ); ?>" class="seovela-header-tab">
-                    <span class="dashicons dashicons-search"></span>
+                    <?php Seovela_Icons::render( 'indexing', 16 ); ?>
                     <?php esc_html_e( 'Indexing', 'seovela' ); ?>
                 </a>
                 <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=ai' ) ); ?>" class="seovela-header-tab">
-                    <span class="dashicons dashicons-superhero-alt"></span>
+                    <?php Seovela_Icons::render( 'ai', 16 ); ?>
                     <?php esc_html_e( 'AI Optimization', 'seovela' ); ?>
                 </a>
             </div>
@@ -256,25 +256,25 @@ $active_section = isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['s
         <div class="seovela-settings-sidebar">
             <ul class="seovela-settings-menu">
                 <li class="seovela-menu-header"><?php esc_html_e( 'Global Meta', 'seovela' ); ?></li>
-                <li class="<?php echo $active_section === 'global' ? 'active' : ''; ?>">
+                <li class="<?php echo esc_attr( $active_section === 'global' ? 'active' : '' ); ?>">
                     <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=meta&section=global' ) ); ?>">
                         <span class="dashicons dashicons-admin-site"></span>
                         <?php esc_html_e( 'Global Meta', 'seovela' ); ?>
                     </a>
                 </li>
-                <li class="<?php echo $active_section === 'local-seo' ? 'active' : ''; ?>">
+                <li class="<?php echo esc_attr( $active_section === 'local-seo' ? 'active' : '' ); ?>">
                     <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=meta&section=local-seo' ) ); ?>">
                         <span class="dashicons dashicons-location"></span>
                         <?php esc_html_e( 'Local SEO', 'seovela' ); ?>
                     </a>
                 </li>
-                <li class="<?php echo $active_section === 'social' ? 'active' : ''; ?>">
+                <li class="<?php echo esc_attr( $active_section === 'social' ? 'active' : '' ); ?>">
                     <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=meta&section=social' ) ); ?>">
                         <span class="dashicons dashicons-share"></span>
                         <?php esc_html_e( 'Social Meta', 'seovela' ); ?>
                     </a>
                 </li>
-                <li class="<?php echo $active_section === 'homepage' ? 'active' : ''; ?>">
+                <li class="<?php echo esc_attr( $active_section === 'homepage' ? 'active' : '' ); ?>">
                     <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=meta&section=homepage' ) ); ?>">
                         <span class="dashicons dashicons-admin-home"></span>
                         <?php esc_html_e( 'Homepage', 'seovela' ); ?>
@@ -282,13 +282,13 @@ $active_section = isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['s
                 </li>
                 
                 <li class="seovela-menu-header"><?php esc_html_e( 'Post Types', 'seovela' ); ?></li>
-                <li class="<?php echo $active_section === 'posts' ? 'active' : ''; ?>">
+                <li class="<?php echo esc_attr( $active_section === 'posts' ? 'active' : '' ); ?>">
                     <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=meta&section=posts' ) ); ?>">
                         <span class="dashicons dashicons-admin-post"></span>
                         <?php esc_html_e( 'Posts', 'seovela' ); ?>
                     </a>
                 </li>
-                <li class="<?php echo $active_section === 'pages' ? 'active' : ''; ?>">
+                <li class="<?php echo esc_attr( $active_section === 'pages' ? 'active' : '' ); ?>">
                     <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=meta&section=pages' ) ); ?>">
                         <span class="dashicons dashicons-admin-page"></span>
                         <?php esc_html_e( 'Pages', 'seovela' ); ?>
@@ -296,13 +296,13 @@ $active_section = isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['s
                 </li>
                 
                 <li class="seovela-menu-header"><?php esc_html_e( 'Taxonomies', 'seovela' ); ?></li>
-                <li class="<?php echo $active_section === 'categories' ? 'active' : ''; ?>">
+                <li class="<?php echo esc_attr( $active_section === 'categories' ? 'active' : '' ); ?>">
                     <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=meta&section=categories' ) ); ?>">
                         <span class="dashicons dashicons-category"></span>
                         <?php esc_html_e( 'Categories', 'seovela' ); ?>
                     </a>
                 </li>
-                <li class="<?php echo $active_section === 'tags' ? 'active' : ''; ?>">
+                <li class="<?php echo esc_attr( $active_section === 'tags' ? 'active' : '' ); ?>">
                     <a href="<?php echo esc_url( admin_url( 'admin.php?page=seovela-settings&tab=meta&section=tags' ) ); ?>">
                         <span class="dashicons dashicons-tag"></span>
                         <?php esc_html_e( 'Tags', 'seovela' ); ?>
@@ -941,7 +941,11 @@ $active_section = isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['s
     </div><!-- .seovela-page-body -->
 </div><!-- .seovela-premium-page -->
 
-<script>
+<?php
+wp_register_script( 'seovela-settings-meta-inline', false, array( 'jquery' ), false, true );
+wp_enqueue_script( 'seovela-settings-meta-inline' );
+ob_start();
+?>
 jQuery(document).ready(function($) {
     // Media Uploader
     var mediaUploader;
@@ -1056,4 +1060,6 @@ jQuery(document).ready(function($) {
         updateSeoMeter(this);
     });
 });
-</script>
+<?php
+wp_add_inline_script( 'seovela-settings-meta-inline', ob_get_clean() );
+?>

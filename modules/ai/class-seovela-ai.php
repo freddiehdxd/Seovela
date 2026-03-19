@@ -94,21 +94,23 @@ class Seovela_AI {
      * @param WP_REST_Request $request Request object.
      */
     public function stream_ai_content( $request ) {
-        // Increase time limit for long-running streaming requests.
-        @set_time_limit( 300 );
+        // These PHP limit overrides are intentionally scoped to this streaming function only.
+        // SSE streaming requires extended execution time and unbuffered output to work correctly.
+        // Each override is suppressed with @ in case the server disables these functions.
+        @set_time_limit( 300 ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- Intentional; may be disabled by hosting.
 
         // Kill all output buffering
         while ( ob_get_level() > 0 ) {
             ob_end_clean();
         }
 
-        // Disable compression that would buffer output
+        // Disable compression that would buffer SSE output (scoped to this function only).
         if ( function_exists( 'apache_setenv' ) ) {
-            @apache_setenv( 'no-gzip', '1' );
+            @apache_setenv( 'no-gzip', '1' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
         }
-        @ini_set( 'zlib.output_compression', '0' );
-        @ini_set( 'output_buffering', 'off' );
-        @ini_set( 'implicit_flush', '1' );
+        @ini_set( 'zlib.output_compression', '0' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+        @ini_set( 'output_buffering', 'off' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+        @ini_set( 'implicit_flush', '1' ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 
         // SSE headers
         header( 'Content-Type: text/event-stream; charset=utf-8' );

@@ -50,7 +50,7 @@ class Seovela_Settings {
 
         register_setting( 'seovela_sitemap_settings', 'seovela_sitemap_taxonomies', array(
             'type'              => 'array',
-            'sanitize_callback' => array( 'Seovela_Helpers', 'sanitize_post_types' ),
+            'sanitize_callback' => array( 'Seovela_Helpers', 'sanitize_taxonomies' ),
             'default'           => array( 'category' ),
         ) );
 
@@ -143,7 +143,7 @@ class Seovela_Settings {
 
         register_setting( 'seovela_llms_txt_settings', 'seovela_llms_txt_taxonomies', array(
             'type'              => 'array',
-            'sanitize_callback' => array( 'Seovela_Helpers', 'sanitize_post_types' ),
+            'sanitize_callback' => array( 'Seovela_Helpers', 'sanitize_taxonomies' ),
             'default'           => array(),
         ) );
 

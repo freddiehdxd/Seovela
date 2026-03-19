@@ -117,7 +117,7 @@ $low_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE status = 
 				</svg>
 			</div>
 			<div class="stat-content">
-				<div class="stat-number"><?php echo number_format( $stats->total_suggestions ?: 0 ); ?></div>
+				<div class="stat-number"><?php echo esc_html( number_format( $stats->total_suggestions ?: 0 ) ); ?></div>
 				<div class="stat-label"><?php esc_html_e( 'Opportunities', 'seovela' ); ?></div>
 			</div>
 		</div>
@@ -128,7 +128,7 @@ $low_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE status = 
 				</svg>
 			</div>
 			<div class="stat-content">
-				<div class="stat-number"><?php echo number_format( $stats->posts_with_suggestions ?: 0 ); ?></div>
+				<div class="stat-number"><?php echo esc_html( number_format( $stats->posts_with_suggestions ?: 0 ) ); ?></div>
 				<div class="stat-label"><?php esc_html_e( 'Posts to Improve', 'seovela' ); ?></div>
 			</div>
 		</div>
@@ -139,7 +139,7 @@ $low_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE status = 
 				</svg>
 			</div>
 			<div class="stat-content">
-				<div class="stat-number"><?php echo $stats->avg_score ? number_format( $stats->avg_score * 100, 0 ) . '%' : '0%'; ?></div>
+				<div class="stat-number"><?php echo esc_html( $stats->avg_score ? number_format( $stats->avg_score * 100, 0 ) . '%' : '0%' ); ?></div>
 				<div class="stat-label"><?php esc_html_e( 'Avg Relevance', 'seovela' ); ?></div>
 			</div>
 		</div>
@@ -150,7 +150,7 @@ $low_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE status = 
 				</svg>
 			</div>
 			<div class="stat-content">
-				<div class="stat-number"><?php echo number_format( $orphan_count ?: 0 ); ?></div>
+				<div class="stat-number"><?php echo esc_html( number_format( $orphan_count ?: 0 ) ); ?></div>
 				<div class="stat-label"><?php esc_html_e( 'Orphan Pages', 'seovela' ); ?></div>
 			</div>
 		</div>
@@ -292,7 +292,7 @@ $low_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE status = 
 							</td>
 							<td class="column-score">
 								<div class="score-badge score-<?php echo esc_attr( $score_class ); ?>">
-									<span class="score-value"><?php echo number_format( $score * 100 ); ?>%</span>
+									<span class="score-value"><?php echo esc_html( number_format( $score * 100 ) ); ?>%</span>
 									<span class="score-label"><?php echo esc_html( ucfirst( $score_class ) ); ?></span>
 								</div>
 							</td>
@@ -420,7 +420,10 @@ $low_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE status = 
 <!-- Toast Notification -->
 <div id="seovela-il-toast" class="seovela-il-toast"></div>
 
-<style>
+<?php
+wp_register_style( 'seovela-internal-links-inline-style', false );
+wp_enqueue_style( 'seovela-internal-links-inline-style' );
+wp_add_inline_style( 'seovela-internal-links-inline-style', <<<'SEOVELA_CSS'
 /* Internal Links Modern Styles */
 .seovela-internal-links-page {
 	max-width: 1400px;
@@ -1486,9 +1489,15 @@ $low_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE status = 
 		overflow-x: auto;
 	}
 }
-</style>
+SEOVELA_CSS
+);
+?>
 
-<script>
+<?php
+wp_register_script( 'seovela-internal-links-inline-script', false, array( 'jquery' ), false, true );
+wp_enqueue_script( 'seovela-internal-links-inline-script' );
+ob_start();
+?>
 jQuery(document).ready(function($) {
 	// Toast notification
 	function showToast(message, type) {
@@ -1532,7 +1541,7 @@ jQuery(document).ready(function($) {
 			type: "POST",
 			data: {
 				action: "seovela_get_orphan_pages",
-				nonce: "<?php echo wp_create_nonce( 'seovela_internal_links' ); ?>"
+				nonce: "<?php echo esc_attr( wp_create_nonce( 'seovela_internal_links' ) ); ?>"
 			},
 			success: function(response) {
 				if (response.success && response.data.orphans.length > 0) {
@@ -1641,4 +1650,6 @@ jQuery(document).ready(function($) {
 		}
 	});
 });
-</script>
+<?php
+wp_add_inline_script( 'seovela-internal-links-inline-script', ob_get_clean() );
+?>

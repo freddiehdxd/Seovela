@@ -16,7 +16,7 @@ $redirect_url = isset( $settings_404['redirect_url'] ) ? $settings_404['redirect
 $redirect_enabled = isset( $settings_404['redirect_enabled'] ) ? $settings_404['redirect_enabled'] : 0;
 ?>
 
-<div class="seovela-premium-page seovela-404-premium">
+<div class="seovela-premium-page seovela-404-premium seovela-404-monitor-page">
 
 	<!-- Premium Header -->
 	<div class="seovela-page-header">
@@ -50,7 +50,7 @@ $redirect_enabled = isset( $settings_404['redirect_enabled'] ) ? $settings_404['
 						</div>
 					</div>
 					<button type="button" class="seovela-header-settings-btn seovela-open-settings">
-						<span class="dashicons dashicons-admin-generic"></span>
+						<?php Seovela_Icons::render( 'settings', 18 ); ?>
 					</button>
 				</div>
 			</div>
@@ -59,12 +59,12 @@ $redirect_enabled = isset( $settings_404['redirect_enabled'] ) ? $settings_404['
 			<?php $current_status = isset( $_GET['status'] ) ? sanitize_text_field( wp_unslash( $_GET['status'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
 			<div class="seovela-page-header-tabs">
 				<a href="<?php echo esc_url( add_query_arg( 'status', 'unresolved' ) ); ?>" class="seovela-header-tab <?php echo ( empty( $current_status ) || $current_status !== 'resolved' ) ? 'active' : ''; ?>">
-					<span class="dashicons dashicons-flag"></span>
+					<?php Seovela_Icons::render( 'flag', 16 ); ?>
 					<?php esc_html_e( 'Unresolved', 'seovela' ); ?>
 					<span class="tab-badge"><?php echo esc_html( $statistics['unresolved'] ); ?></span>
 				</a>
 				<a href="<?php echo esc_url( add_query_arg( 'status', 'resolved' ) ); ?>" class="seovela-header-tab <?php echo ( $current_status === 'resolved' ) ? 'active' : ''; ?>">
-					<span class="dashicons dashicons-yes-alt"></span>
+					<?php Seovela_Icons::render( 'check-circle', 16 ); ?>
 					<?php esc_html_e( 'Resolved', 'seovela' ); ?>
 				</a>
 			</div>
@@ -83,7 +83,7 @@ $redirect_enabled = isset( $settings_404['redirect_enabled'] ) ? $settings_404['
 					<?php endif; ?>
 					<input type="search" name="search" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( isset( $_GET['search'] ) ? $_GET['search'] : '' ) ) ); ?>" placeholder="<?php esc_attr_e( 'Search URLs...', 'seovela' ); ?>">
 					<button type="submit" class="button">
-						<span class="dashicons dashicons-search"></span>
+						<?php Seovela_Icons::render( 'search', 16 ); ?>
 					</button>
 				</form>
 			</div>
@@ -109,7 +109,7 @@ $redirect_enabled = isset( $settings_404['redirect_enabled'] ) ? $settings_404['
 									<div class="url-cell">
 										<code><?php echo esc_html( $log->url ); ?></code>
 										<a href="<?php echo esc_url( $log->url ); ?>" target="_blank" class="test-link" title="<?php esc_attr_e( 'Test URL', 'seovela' ); ?>">
-											<span class="dashicons dashicons-external"></span>
+											<?php Seovela_Icons::render( 'external', 14 ); ?>
 										</a>
 									</div>
 								</td>
@@ -133,14 +133,14 @@ $redirect_enabled = isset( $settings_404['redirect_enabled'] ) ? $settings_404['
 									<div class="action-buttons">
 										<?php if ( ! $log->resolved ) : ?>
 											<button class="btn-action btn-primary seovela-create-redirect" data-log-id="<?php echo esc_attr( $log->id ); ?>" data-source-url="<?php echo esc_attr( $log->url ); ?>" title="<?php esc_attr_e( 'Create Redirect', 'seovela' ); ?>">
-												<span class="dashicons dashicons-admin-links"></span>
+												<?php Seovela_Icons::render( 'link', 14 ); ?>
 											</button>
 											<button class="btn-action btn-success seovela-resolve-404" data-log-id="<?php echo esc_attr( $log->id ); ?>" title="<?php esc_attr_e( 'Mark Resolved', 'seovela' ); ?>">
-												<span class="dashicons dashicons-yes"></span>
+												<?php Seovela_Icons::render( 'check', 14 ); ?>
 											</button>
 										<?php endif; ?>
 										<button class="btn-action btn-danger seovela-delete-404" data-log-id="<?php echo esc_attr( $log->id ); ?>" title="<?php esc_attr_e( 'Delete', 'seovela' ); ?>">
-											<span class="dashicons dashicons-trash"></span>
+											<?php Seovela_Icons::render( 'trash', 14 ); ?>
 										</button>
 									</div>
 								</td>
@@ -150,7 +150,7 @@ $redirect_enabled = isset( $settings_404['redirect_enabled'] ) ? $settings_404['
 						<tr>
 							<td colspan="5" class="seovela-empty-state">
 								<div class="empty-icon">
-									<span class="dashicons dashicons-yes-alt"></span>
+									<?php Seovela_Icons::render( 'check-circle', 48 ); ?>
 								</div>
 								<p>
 									<?php
@@ -181,14 +181,14 @@ $redirect_enabled = isset( $settings_404['redirect_enabled'] ) ? $settings_404['
 					$args['search'] = rawurlencode( $current_search );
 				}
 
-				echo paginate_links( array(
+				echo wp_kses_post( paginate_links( array(
 					'base'      => add_query_arg( $args ),
 					'format'    => '',
-					'prev_text' => '<span class="dashicons dashicons-arrow-left-alt2"></span>',
-					'next_text' => '<span class="dashicons dashicons-arrow-right-alt2"></span>',
+					'prev_text' => Seovela_Icons::get( 'arrow-left', 16 ),
+					'next_text' => Seovela_Icons::get( 'arrow-right', 16 ),
 					'total'     => $total_pages,
 					'current'   => $page,
-				) );
+				) ) );
 				?>
 			</div>
 		<?php endif; ?>
@@ -203,7 +203,7 @@ $redirect_enabled = isset( $settings_404['redirect_enabled'] ) ? $settings_404['
 		<div class="panel-header">
 			<h2><?php esc_html_e( '404 Settings', 'seovela' ); ?></h2>
 			<button type="button" class="panel-close">
-				<span class="dashicons dashicons-no-alt"></span>
+				<?php Seovela_Icons::render( 'close', 18 ); ?>
 			</button>
 		</div>
 		
@@ -237,7 +237,7 @@ $redirect_enabled = isset( $settings_404['redirect_enabled'] ) ? $settings_404['
 					</label>
 				</div>
 				
-				<div class="setting-field redirect-url-field" style="<?php echo $redirect_enabled ? '' : 'opacity: 0.5;'; ?>">
+				<div class="setting-field redirect-url-field" style="<?php echo esc_attr( $redirect_enabled ? '' : 'opacity: 0.5;' ); ?>">
 					<label for="redirect-url"><?php esc_html_e( 'Redirect URL', 'seovela' ); ?></label>
 					<input type="url" id="redirect-url" name="redirect_url" value="<?php echo esc_attr( $redirect_url ); ?>" placeholder="<?php echo esc_attr( home_url( '/' ) ); ?>" <?php echo $redirect_enabled ? '' : 'disabled'; ?>>
 					<p class="field-hint"><?php esc_html_e( 'All 404 pages will redirect to this URL', 'seovela' ); ?></p>
@@ -300,46 +300,51 @@ $redirect_enabled = isset( $settings_404['redirect_enabled'] ) ? $settings_404['
 	</div>
 </div>
 
-<script>
-var seovela404Monitor = {
-	ajaxUrl: "<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>",
-	nonce: "<?php echo esc_js( wp_create_nonce( 'seovela_404_monitor' ) ); ?>"
-};
-</script>
+<?php
+wp_register_script( 'seovela-404-monitor-inline', false, array(), false, true );
+wp_enqueue_script( 'seovela-404-monitor-inline' );
+wp_add_inline_script( 'seovela-404-monitor-inline', 'var seovela404Monitor = {
+	ajaxUrl: "' . esc_js( admin_url( 'admin-ajax.php' ) ) . '",
+	nonce: "' . esc_js( wp_create_nonce( 'seovela_404_monitor' ) ) . '"
+};' );
+?>
 
-<style>
-/* 404 Monitor - Page-specific styles */
+<?php
+wp_register_style( 'seovela-404-monitor-inline', false );
+wp_enqueue_style( 'seovela-404-monitor-inline' );
+wp_add_inline_style( 'seovela-404-monitor-inline', '/* 404 Monitor - Page-specific styles */
 /* (Header, stats, breadcrumb handled by unified premium CSS in admin.css) */
 
 /* Header settings button */
 .seovela-header-settings-btn {
-	width: 44px;
-	height: 44px;
-	border-radius: 12px;
-	background: rgba(255, 255, 255, 0.1);
-	backdrop-filter: blur(12px);
-	-webkit-backdrop-filter: blur(12px);
-	border: 1px solid rgba(255, 255, 255, 0.15);
-	color: rgba(255, 255, 255, 0.7);
+	width: 36px;
+	height: 36px;
+	border-radius: 8px;
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	color: #475569;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	transition: all 0.2s ease;
 	flex-shrink: 0;
-	margin-top: 8px;
 }
 
 .seovela-header-settings-btn:hover {
-	background: rgba(255, 255, 255, 0.2);
-	color: #ffffff;
-	border-color: rgba(255, 255, 255, 0.3);
+	background: #f1f5f9;
+	color: #0f172a;
+	border-color: #cbd5e1;
 }
 
 .seovela-header-settings-btn .dashicons {
-	font-size: 20px;
-	width: 20px;
-	height: 20px;
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+}
+
+.seovela-header-settings-btn .seovela-icon {
+	color: currentColor;
 }
 
 /* Toolbar */
@@ -939,5 +944,5 @@ var seovela404Monitor = {
 		width: 100%;
 		right: -100%;
 	}
-}
-</style>
+}' );
+?>

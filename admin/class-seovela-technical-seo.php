@@ -54,9 +54,13 @@ class Seovela_Technical_SEO_Admin {
 	 * Constructor
 	 */
 	public function __construct() {
-		// Get singleton instances (don't create new ones to avoid duplicate hooks)
-		$this->redirects = Seovela_Redirects::get_instance();
-		$this->monitor_404 = Seovela_404_Monitor::get_instance();
+		// Get singleton instances only if the module classes are loaded
+		if ( class_exists( 'Seovela_Redirects' ) ) {
+			$this->redirects = Seovela_Redirects::get_instance();
+		}
+		if ( class_exists( 'Seovela_404_Monitor' ) ) {
+			$this->monitor_404 = Seovela_404_Monitor::get_instance();
+		}
 
 		// Menu registration is handled centrally by Seovela_Admin::add_admin_menu().
 		// The admin class delegates rendering back to this class via render_redirects_page()
@@ -110,6 +114,10 @@ class Seovela_Technical_SEO_Admin {
 	 * Render redirects page
 	 */
 	public function render_redirects_page() {
+		if ( ! $this->redirects ) {
+			echo '<div class="wrap"><p>' . esc_html__( 'Redirects module is not enabled.', 'seovela' ) . '</p></div>';
+			return;
+		}
 		// Get redirects
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Pagination/search params, no state change.
 		$page = isset( $_GET['paged'] ) ? max( 1, absint( wp_unslash( $_GET['paged'] ) ) ) : 1;
@@ -137,6 +145,10 @@ class Seovela_Technical_SEO_Admin {
 	 * Render 404 monitor page
 	 */
 	public function render_404_monitor_page() {
+		if ( ! $this->monitor_404 ) {
+			echo '<div class="wrap"><p>' . esc_html__( '404 Monitor module is not enabled.', 'seovela' ) . '</p></div>';
+			return;
+		}
 		// Get 404 logs
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Pagination/search params, no state change.
 		$page = isset( $_GET['paged'] ) ? max( 1, absint( wp_unslash( $_GET['paged'] ) ) ) : 1;
@@ -371,7 +383,7 @@ class Seovela_Technical_SEO_Admin {
 		header( 'Pragma: no-cache' );
 		header( 'Expires: 0' );
 
-		echo $csv; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo $csv; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Raw CSV download, not rendered as HTML.
 		exit;
 	}
 
@@ -395,9 +407,10 @@ class Seovela_Technical_SEO_Admin {
 			wp_send_json_error( array( 'message' => __( 'File upload error', 'seovela' ) ) );
 		}
 
-		// Validate file extension.
-		$ext = strtolower( pathinfo( $file['name'], PATHINFO_EXTENSION ) );
-		if ( 'csv' !== $ext ) {
+		// Sanitize filename and validate file type.
+		$file['name'] = sanitize_file_name( $file['name'] );
+		$filetype = wp_check_filetype( $file['name'], array( 'csv' => 'text/csv' ) );
+		if ( empty( $filetype['ext'] ) ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid file type. Please upload a CSV file.', 'seovela' ) ) );
 		}
 

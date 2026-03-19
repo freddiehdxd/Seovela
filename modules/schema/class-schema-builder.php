@@ -329,8 +329,8 @@ class Seovela_Schema_Builder {
             }
 
             echo '<script type="application/ld+json">' . "\n";
-            echo wp_json_encode( $schema );
-            echo "\n" . '</script>' . "\n";
+            echo wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG );
+            echo "\n" . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON-LD structured data must not be HTML-escaped; wp_json_encode with JSON_HEX_TAG prevents XSS.
         }
     }
 

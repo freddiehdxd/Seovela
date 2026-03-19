@@ -75,12 +75,14 @@ class Seovela_Core {
             require_once SEOVELA_PLUGIN_DIR . 'includes/class-seovela-frontend.php';
         }
 
-        // AI module - load early for both admin and REST API requests
-        // This is lightweight (only registers hooks) and needed for REST streaming endpoint
-        require_once SEOVELA_PLUGIN_DIR . 'modules/ai/class-seovela-ai.php';
+        // AI module — only needed for admin and REST API, skip on frontend page loads
+        if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+            require_once SEOVELA_PLUGIN_DIR . 'modules/ai/class-seovela-ai.php';
+        }
 
         // Admin classes
         if ( is_admin() ) {
+            require_once SEOVELA_PLUGIN_DIR . 'admin/class-seovela-icons.php';
             require_once SEOVELA_PLUGIN_DIR . 'admin/class-seovela-admin.php';
             require_once SEOVELA_PLUGIN_DIR . 'admin/class-seovela-settings.php';
             require_once SEOVELA_PLUGIN_DIR . 'admin/class-seovela-metabox.php';
@@ -89,10 +91,14 @@ class Seovela_Core {
             require_once SEOVELA_PLUGIN_DIR . 'modules/import-export/class-seovela-import-export.php';
         }
 
-        // Load Technical SEO features (both frontend and admin)
-        require_once SEOVELA_PLUGIN_DIR . 'modules/redirects/class-seovela-redirects.php';
-        require_once SEOVELA_PLUGIN_DIR . 'modules/404-monitor/class-seovela-404-monitor.php';
-        
+        // Load Technical SEO features only when their modules are enabled
+        if ( get_option( 'seovela_redirects_enabled', true ) ) {
+            require_once SEOVELA_PLUGIN_DIR . 'modules/redirects/class-seovela-redirects.php';
+        }
+        if ( get_option( 'seovela_404_monitor_enabled', true ) ) {
+            require_once SEOVELA_PLUGIN_DIR . 'modules/404-monitor/class-seovela-404-monitor.php';
+        }
+
         // Load Technical SEO admin (admin only)
         if ( is_admin() ) {
             require_once SEOVELA_PLUGIN_DIR . 'admin/class-seovela-technical-seo.php';
@@ -121,10 +127,13 @@ class Seovela_Core {
         // Initialize module loader
         $this->module_loader = new Seovela_Module_Loader();
 
-        // Initialize Technical SEO features (redirects & 404 monitor)
-        // These need to run on both frontend and admin
-        Seovela_Redirects::get_instance();
-        Seovela_404_Monitor::get_instance();
+        // Initialize Technical SEO features only when enabled
+        if ( class_exists( 'Seovela_Redirects' ) ) {
+            Seovela_Redirects::get_instance();
+        }
+        if ( class_exists( 'Seovela_404_Monitor' ) ) {
+            Seovela_404_Monitor::get_instance();
+        }
 
         // Initialize admin
         if ( is_admin() ) {
@@ -164,16 +173,13 @@ class Seovela_Core {
      */
     private function check_db_updates() {
         if ( ! get_option( 'seovela_tables_created_v120' ) ) {
-             if ( ! class_exists( 'Seovela_Redirects' ) ) {
-                 require_once SEOVELA_PLUGIN_DIR . 'modules/redirects/class-seovela-redirects.php';
-             }
-             if ( ! class_exists( 'Seovela_404_Monitor' ) ) {
-                 require_once SEOVELA_PLUGIN_DIR . 'modules/404-monitor/class-seovela-404-monitor.php';
-             }
-             
-             Seovela_Redirects::create_table();
-             Seovela_404_Monitor::create_table();
-             update_option( 'seovela_tables_created_v120', true );
+            // Always load for table creation regardless of module status
+            require_once SEOVELA_PLUGIN_DIR . 'modules/redirects/class-seovela-redirects.php';
+            require_once SEOVELA_PLUGIN_DIR . 'modules/404-monitor/class-seovela-404-monitor.php';
+
+            Seovela_Redirects::create_table();
+            Seovela_404_Monitor::create_table();
+            update_option( 'seovela_tables_created_v120', true );
         }
     }
 }

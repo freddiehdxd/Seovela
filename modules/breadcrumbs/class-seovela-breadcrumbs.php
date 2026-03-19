@@ -448,7 +448,7 @@ class Seovela_Breadcrumbs {
 	 * @param array $args Optional arguments
 	 */
 	public function output( $args = array() ) {
-		echo $this->get_html( $args ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo wp_kses_post( $this->get_html( $args ) );
 	}
 }
 

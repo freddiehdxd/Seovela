@@ -131,8 +131,13 @@ function seovela_activate() {
         'seovela_internal_links_enabled',
         'seovela_image_seo_enabled',
         'seovela_gsc_integration_enabled',
+        'seovela_llms_txt_enabled',
         'seovela_sitemap_post_types',
         'seovela_sitemap_taxonomies',
+        'seovela_robots_max_snippet',
+        'seovela_robots_max_video_preview',
+        'seovela_robots_max_image_preview',
+        'seovela_noindex_empty_archives',
     );
 
     foreach ( $defaults as $key => $value ) {

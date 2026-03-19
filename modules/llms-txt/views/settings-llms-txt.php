@@ -185,7 +185,7 @@ $estimated_links = min( $total_posts, $posts_limit * count( $selected_post_types
                                 $post_count = wp_count_posts( $post_type->name );
                                 $published_count = isset( $post_count->publish ) ? $post_count->publish : 0;
                             ?>
-                                <label class="seovela-llms-checkbox-card <?php echo $is_checked ? 'checked' : ''; ?>">
+                                <label class="seovela-llms-checkbox-card <?php echo esc_attr( $is_checked ? 'checked' : '' ); ?>">
                                     <input 
                                         type="checkbox" 
                                         name="seovela_llms_txt_post_types[]" 
@@ -230,7 +230,7 @@ $estimated_links = min( $total_posts, $posts_limit * count( $selected_post_types
                                     $term_count = 0;
                                 }
                             ?>
-                                <label class="seovela-llms-checkbox-card <?php echo $is_checked ? 'checked' : ''; ?>">
+                                <label class="seovela-llms-checkbox-card <?php echo esc_attr( $is_checked ? 'checked' : '' ); ?>">
                                     <input 
                                         type="checkbox" 
                                         name="seovela_llms_txt_taxonomies[]" 
@@ -346,7 +346,11 @@ $estimated_links = min( $total_posts, $posts_limit * count( $selected_post_types
     </footer>
 </div>
 
-<script>
+<?php
+wp_register_script( 'seovela-llms-txt-inline', false, array( 'jquery' ), false, true );
+wp_enqueue_script( 'seovela-llms-txt-inline' );
+ob_start();
+?>
 jQuery(document).ready(function($) {
     // Update stats in real-time
     function updateStats() {
@@ -416,6 +420,8 @@ jQuery(document).ready(function($) {
         $(".seovela-llms-footer .seovela-llms-btn-primary").addClass("seovela-llms-btn-loading");
     });
 });
-</script>
+<?php
+wp_add_inline_script( 'seovela-llms-txt-inline', ob_get_clean() );
+?>
 
 <?php

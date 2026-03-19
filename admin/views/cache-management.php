@@ -43,9 +43,9 @@ if ( isset( $_POST['seovela_clear_cache'] ) && check_admin_referer( 'seovela_cle
 					<td><strong><?php esc_html_e( 'Options Cached', 'seovela' ); ?></strong></td>
 					<td>
 						<?php 
-						echo $cache_stats['options_cached'] 
-							? '<span style="color: green;">✓ ' . esc_html__( 'Yes', 'seovela' ) . '</span>' 
-							: '<span style="color: orange;">○ ' . esc_html__( 'Not Yet', 'seovela' ) . '</span>';
+						echo wp_kses_post( $cache_stats['options_cached']
+							? '<span style="color: green;">✓ ' . esc_html__( 'Yes', 'seovela' ) . '</span>'
+							: '<span style="color: orange;">○ ' . esc_html__( 'Not Yet', 'seovela' ) . '</span>' );
 						?>
 					</td>
 				</tr>
@@ -94,7 +94,10 @@ if ( isset( $_POST['seovela_clear_cache'] ) && check_admin_referer( 'seovela_cle
 	</div>
 </div>
 
-<style>
+<?php
+wp_register_style( 'seovela-cache-management-inline', false );
+wp_enqueue_style( 'seovela-cache-management-inline' );
+wp_add_inline_style( 'seovela-cache-management-inline', <<<'SEOVELA_CSS'
 .seovela-cache-management h3 {
 	font-size: 20px;
 	margin-bottom: 20px;
@@ -109,5 +112,7 @@ if ( isset( $_POST['seovela_clear_cache'] ) && check_admin_referer( 'seovela_cle
 .seovela-cache-management .widefat tr:nth-child(even) {
 	background: #f9f9f9;
 }
-</style>
+SEOVELA_CSS
+);
+?>
 

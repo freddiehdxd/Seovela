@@ -1,4 +1,4 @@
-=== Seovela - AI SEO Plugin ===
+=== Seovela ===
 Contributors: freddiehdxd
 Tags: seo, meta tags, sitemap, schema, ai seo
 Requires at least: 6.0

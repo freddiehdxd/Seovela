@@ -178,16 +178,18 @@ class Seovela_Import_Export {
 
 		$file = $_FILES['seovela_import_file'];
 
-		// Validate file size (max 1 MB).
-		if ( $file['size'] > MB_IN_BYTES ) {
-			add_settings_error( 'seovela_import', 'import_error', __( 'File too large. Maximum size is 1 MB.', 'seovela' ), 'error' );
+		// Sanitize filename and validate file type.
+		$file['name'] = sanitize_file_name( $file['name'] );
+		$filetype = wp_check_filetype( $file['name'], array( 'json' => 'application/json' ) );
+
+		if ( empty( $filetype['ext'] ) ) {
+			add_settings_error( 'seovela_import', 'import_error', __( 'Invalid file type. Please upload a JSON file.', 'seovela' ), 'error' );
 			return;
 		}
 
-		// Validate file extension.
-		$ext = strtolower( pathinfo( $file['name'], PATHINFO_EXTENSION ) );
-		if ( 'json' !== $ext ) {
-			add_settings_error( 'seovela_import', 'import_error', __( 'Invalid file type. Please upload a JSON file.', 'seovela' ), 'error' );
+		// Validate file size (max 1 MB).
+		if ( $file['size'] > MB_IN_BYTES ) {
+			add_settings_error( 'seovela_import', 'import_error', __( 'File too large. Maximum size is 1 MB.', 'seovela' ), 'error' );
 			return;
 		}
 

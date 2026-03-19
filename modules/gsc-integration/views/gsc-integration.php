@@ -322,8 +322,8 @@ if ( $is_connected && $has_property ) {
 						<div class="gsc-stat-content">
 							<div class="gsc-stat-value" id="stat-clicks"><?php echo esc_html( number_format( $stats['total_clicks'] ) ); ?></div>
 							<div class="gsc-stat-label"><?php esc_html_e( 'Total Clicks', 'seovela' ); ?></div>
-							<div class="gsc-stat-change <?php echo $stats['clicks_change'] >= 0 ? 'positive' : 'negative'; ?>">
-								<span class="change-arrow"><?php echo $stats['clicks_change'] >= 0 ? '↑' : '↓'; ?></span>
+							<div class="gsc-stat-change <?php echo esc_attr( $stats['clicks_change'] >= 0 ? 'positive' : 'negative' ); ?>">
+								<span class="change-arrow"><?php echo esc_html( $stats['clicks_change'] >= 0 ? '↑' : '↓' ); ?></span>
 								<span class="change-value"><?php echo esc_html( abs( $stats['clicks_change'] ) ); ?>%</span>
 								<span class="change-period"><?php esc_html_e( 'vs previous', 'seovela' ); ?></span>
 							</div>
@@ -340,8 +340,8 @@ if ( $is_connected && $has_property ) {
 						<div class="gsc-stat-content">
 							<div class="gsc-stat-value" id="stat-impressions"><?php echo esc_html( number_format( $stats['total_impressions'] ) ); ?></div>
 							<div class="gsc-stat-label"><?php esc_html_e( 'Impressions', 'seovela' ); ?></div>
-							<div class="gsc-stat-change <?php echo $stats['impressions_change'] >= 0 ? 'positive' : 'negative'; ?>">
-								<span class="change-arrow"><?php echo $stats['impressions_change'] >= 0 ? '↑' : '↓'; ?></span>
+							<div class="gsc-stat-change <?php echo esc_attr( $stats['impressions_change'] >= 0 ? 'positive' : 'negative' ); ?>">
+								<span class="change-arrow"><?php echo esc_html( $stats['impressions_change'] >= 0 ? '↑' : '↓' ); ?></span>
 								<span class="change-value"><?php echo esc_html( abs( $stats['impressions_change'] ) ); ?>%</span>
 								<span class="change-period"><?php esc_html_e( 'vs previous', 'seovela' ); ?></span>
 							</div>
@@ -569,7 +569,10 @@ if ( $is_connected && $has_property ) {
 	<?php endif; ?>
 </div>
 
-<style>
+<?php
+wp_register_style( 'seovela-gsc-integration-inline', false );
+wp_enqueue_style( 'seovela-gsc-integration-inline' );
+wp_add_inline_style( 'seovela-gsc-integration-inline', <<<'SEOVELA_CSS'
 /* GSC Page Styles - Centralized OAuth Version */
 :root {
 	--gsc-primary: #4285F4;
@@ -1373,4 +1376,6 @@ if ( $is_connected && $has_property ) {
 @media (max-width: 480px) {
 	.gsc-features-grid { grid-template-columns: 1fr; }
 }
-</style>
+SEOVELA_CSS
+);
+?>

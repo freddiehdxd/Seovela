@@ -62,7 +62,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<button class="button seovela-import-redirects"><?php esc_html_e( 'Import CSV', 'seovela' ); ?></button>
 			<button class="button seovela-export-redirects"><?php esc_html_e( 'Export CSV', 'seovela' ); ?></button>
 			<button class="button button-primary seovela-add-redirect-btn">
-				<span class="dashicons dashicons-plus-alt2" style="margin-top: 3px; margin-right: 2px;"></span>
+				<?php Seovela_Icons::render( 'plus', 16 ); ?>
 				<?php esc_html_e( 'Add New', 'seovela' ); ?>
 			</button>
 		</div>
@@ -134,14 +134,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="tablenav bottom">
 			<div class="tablenav-pages">
 				<?php
-				echo paginate_links( array(
+				echo wp_kses_post( paginate_links( array(
 					'base'      => add_query_arg( 'paged', '%#%' ),
 					'format'    => '',
 					'prev_text' => __( '&laquo;', 'seovela' ),
 					'next_text' => __( '&raquo;', 'seovela' ),
 					'total'     => $total_pages,
 					'current'   => $page,
-				) );
+				) ) );
 				?>
 			</div>
 		</div>
@@ -225,7 +225,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div>
 </div>
 
-<script>
+<?php
+wp_register_script( 'seovela-redirects-inline', false, array( 'jquery' ), false, true );
+wp_enqueue_script( 'seovela-redirects-inline' );
+ob_start();
+?>
 // Fallback if localization fails
 if (typeof seovelaRedirects === "undefined") {
     var seovelaRedirects = {
@@ -233,4 +237,6 @@ if (typeof seovelaRedirects === "undefined") {
         nonce: "<?php echo esc_js( wp_create_nonce( 'seovela_redirects' ) ); ?>"
     };
 }
-</script>
+<?php
+wp_add_inline_script( 'seovela-redirects-inline', ob_get_clean() );
+?>

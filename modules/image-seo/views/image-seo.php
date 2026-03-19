@@ -14,7 +14,10 @@ $image_seo = Seovela_Image_Seo::get_instance();
 ?>
 
 <div class="seovela-image-seo-page">
-	<style>
+<?php
+wp_register_style( 'seovela-image-seo-inline-style', false );
+wp_enqueue_style( 'seovela-image-seo-inline-style' );
+wp_add_inline_style( 'seovela-image-seo-inline-style', <<<'SEOVELA_CSS'
 		.size-info{display:flex;flex-direction:column;gap:3px}
 		.size-info .size-label{display:none!important}
 		.size-info .size-original,.size-info .size-value.original{font-size:12px;font-weight:500;color:#94a3b8;text-decoration:line-through}
@@ -22,7 +25,9 @@ $image_seo = Seovela_Image_Seo::get_instance();
 		.size-info .size-savings,.size-info .savings-badge{display:inline-flex;padding:3px 8px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:#fff;border-radius:4px;font-size:11px;font-weight:700;width:fit-content}
 		.size-info .size-comparison{display:flex;flex-direction:column;gap:3px}
 		.size-info .size-row{display:flex;align-items:baseline}
-	</style>
+SEOVELA_CSS
+);
+?>
 	<!-- Header -->
 	<div class="seovela-imgseo-header">
 		<div class="seovela-imgseo-header-left">
@@ -62,7 +67,7 @@ $image_seo = Seovela_Image_Seo::get_instance();
 					</svg>
 				</div>
 				<div class="seovela-imgseo-stat-content">
-					<span class="seovela-imgseo-stat-number" id="stat-total"><?php echo number_format( $stats['total_images'] ); ?></span>
+					<span class="seovela-imgseo-stat-number" id="stat-total"><?php echo esc_html( number_format( $stats['total_images'] ) ); ?></span>
 					<span class="seovela-imgseo-stat-label"><?php esc_html_e( 'Total Images', 'seovela' ); ?></span>
 				</div>
 			</div>
@@ -74,7 +79,7 @@ $image_seo = Seovela_Image_Seo::get_instance();
 					</svg>
 				</div>
 				<div class="seovela-imgseo-stat-content">
-					<span class="seovela-imgseo-stat-number" id="stat-missing-alt"><?php echo number_format( $stats['missing_alt'] ); ?></span>
+					<span class="seovela-imgseo-stat-number" id="stat-missing-alt"><?php echo esc_html( number_format( $stats['missing_alt'] ) ); ?></span>
 					<span class="seovela-imgseo-stat-label"><?php esc_html_e( 'Missing Alt', 'seovela' ); ?></span>
 				</div>
 			</div>
@@ -86,7 +91,7 @@ $image_seo = Seovela_Image_Seo::get_instance();
 					</svg>
 				</div>
 				<div class="seovela-imgseo-stat-content">
-					<span class="seovela-imgseo-stat-number" id="stat-oversized"><?php echo number_format( $stats['oversized'] ); ?></span>
+					<span class="seovela-imgseo-stat-number" id="stat-oversized"><?php echo esc_html( number_format( $stats['oversized'] ) ); ?></span>
 					<span class="seovela-imgseo-stat-label"><?php esc_html_e( 'Oversized', 'seovela' ); ?></span>
 				</div>
 			</div>
@@ -98,7 +103,7 @@ $image_seo = Seovela_Image_Seo::get_instance();
 					</svg>
 				</div>
 				<div class="seovela-imgseo-stat-content">
-					<span class="seovela-imgseo-stat-number" id="stat-webp"><?php echo number_format( $stats['has_webp'] ); ?></span>
+					<span class="seovela-imgseo-stat-number" id="stat-webp"><?php echo esc_html( number_format( $stats['has_webp'] ) ); ?></span>
 					<span class="seovela-imgseo-stat-label"><?php esc_html_e( 'WebP Ready', 'seovela' ); ?></span>
 				</div>
 			</div>
@@ -110,7 +115,7 @@ $image_seo = Seovela_Image_Seo::get_instance();
 					</svg>
 				</div>
 				<div class="seovela-imgseo-stat-content">
-					<span class="seovela-imgseo-stat-number" id="stat-convertible"><?php echo number_format( $stats['convertible'] ); ?></span>
+					<span class="seovela-imgseo-stat-number" id="stat-convertible"><?php echo esc_html( number_format( $stats['convertible'] ) ); ?></span>
 					<span class="seovela-imgseo-stat-label"><?php esc_html_e( 'Can Convert', 'seovela' ); ?></span>
 			</div>
 		</div>
@@ -122,7 +127,7 @@ $image_seo = Seovela_Image_Seo::get_instance();
 					</svg>
 				</div>
 				<div class="seovela-imgseo-stat-content">
-					<span class="seovela-imgseo-stat-number" id="stat-savings"><?php echo size_format( $stats['webp_savings'] ); ?></span>
+					<span class="seovela-imgseo-stat-number" id="stat-savings"><?php echo esc_html( size_format( $stats['webp_savings'] ) ); ?></span>
 					<span class="seovela-imgseo-stat-label"><?php esc_html_e( 'Space Saved', 'seovela' ); ?></span>
 				</div>
 			</div>
@@ -500,7 +505,7 @@ $image_seo = Seovela_Image_Seo::get_instance();
 
 				<!-- Library Status -->
 				<div class="seovela-imgseo-library-status">
-					<div class="library-card <?php echo $libraries['imagick']['available'] && $libraries['imagick']['webp_support'] ? 'available' : 'unavailable'; ?>">
+					<div class="library-card <?php echo esc_attr( $libraries['imagick']['available'] && $libraries['imagick']['webp_support'] ? 'available' : 'unavailable' ); ?>">
 						<div class="library-icon">
 							<?php if ( $libraries['imagick']['available'] && $libraries['imagick']['webp_support'] ) : ?>
 								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-success">
@@ -516,7 +521,7 @@ $image_seo = Seovela_Image_Seo::get_instance();
 							<h4>Imagick</h4>
 							<?php if ( $libraries['imagick']['available'] ) : ?>
 								<p><?php echo esc_html( $libraries['imagick']['version'] ); ?></p>
-								<span class="library-badge <?php echo $libraries['imagick']['webp_support'] ? 'success' : 'warning'; ?>">
+								<span class="library-badge <?php echo esc_attr( $libraries['imagick']['webp_support'] ? 'success' : 'warning' ); ?>">
 									<?php echo $libraries['imagick']['webp_support'] ? esc_html__( 'WebP Supported', 'seovela' ) : esc_html__( 'No WebP Support', 'seovela' ); ?>
 								</span>
 							<?php else : ?>
@@ -526,7 +531,7 @@ $image_seo = Seovela_Image_Seo::get_instance();
 						</div>
 					</div>
 
-					<div class="library-card <?php echo $libraries['gd']['available'] && $libraries['gd']['webp_support'] ? 'available' : 'unavailable'; ?>">
+					<div class="library-card <?php echo esc_attr( $libraries['gd']['available'] && $libraries['gd']['webp_support'] ? 'available' : 'unavailable' ); ?>">
 						<div class="library-icon">
 							<?php if ( $libraries['gd']['available'] && $libraries['gd']['webp_support'] ) : ?>
 								<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon-success">
@@ -542,7 +547,7 @@ $image_seo = Seovela_Image_Seo::get_instance();
 							<h4>GD Library</h4>
 							<?php if ( $libraries['gd']['available'] ) : ?>
 								<p><?php echo esc_html( $libraries['gd']['version'] ); ?></p>
-								<span class="library-badge <?php echo $libraries['gd']['webp_support'] ? 'success' : 'warning'; ?>">
+								<span class="library-badge <?php echo esc_attr( $libraries['gd']['webp_support'] ? 'success' : 'warning' ); ?>">
 									<?php echo $libraries['gd']['webp_support'] ? esc_html__( 'WebP Supported', 'seovela' ) : esc_html__( 'No WebP Support', 'seovela' ); ?>
 								</span>
 							<?php else : ?>
@@ -610,13 +615,18 @@ $image_seo = Seovela_Image_Seo::get_instance();
 						</div>
 					</div>
 
-					<script>
+<?php
+wp_register_script( 'seovela-image-seo-inline-script', false, array( 'jquery' ), false, true );
+wp_enqueue_script( 'seovela-image-seo-inline-script' );
+wp_add_inline_script( 'seovela-image-seo-inline-script', <<<'SEOVELA_JS'
 					jQuery(document).ready(function($) {
 						$("input[name='replace_original']").on("change", function() {
 							$("#replace-original-warning").toggle($(this).is(":checked"));
 						});
 					});
-				</script>
+SEOVELA_JS
+);
+?>
 
 					</form>
 			</div>
@@ -696,15 +706,15 @@ $image_seo = Seovela_Image_Seo::get_instance();
 				<div class="seovela-imgseo-conversion-actions">
 					<div class="conversion-stats">
 						<div class="conversion-stat">
-							<span class="stat-number" id="webp-convertible"><?php echo number_format( $stats['convertible'] ); ?></span>
+							<span class="stat-number" id="webp-convertible"><?php echo esc_html( number_format( $stats['convertible'] ) ); ?></span>
 							<span class="stat-label"><?php esc_html_e( 'Images can be converted', 'seovela' ); ?></span>
 						</div>
 						<div class="conversion-stat">
-							<span class="stat-number" id="webp-converted"><?php echo number_format( $stats['has_webp'] ); ?></span>
+							<span class="stat-number" id="webp-converted"><?php echo esc_html( number_format( $stats['has_webp'] ) ); ?></span>
 							<span class="stat-label"><?php esc_html_e( 'Already have WebP', 'seovela' ); ?></span>
 						</div>
 						<div class="conversion-stat savings">
-							<span class="stat-number" id="webp-total-savings"><?php echo size_format( $stats['webp_savings'] ); ?></span>
+							<span class="stat-number" id="webp-total-savings"><?php echo esc_html( size_format( $stats['webp_savings'] ) ); ?></span>
 							<span class="stat-label"><?php esc_html_e( 'Total space saved', 'seovela' ); ?></span>
 						</div>
 					</div>

@@ -444,18 +444,25 @@ class Seovela_Redirects {
 	/**
 	 * Increment hit counter
 	 *
+	 * Defers the DB write to a shutdown function so the redirect response
+	 * is sent immediately without waiting for the database UPDATE to finish.
+	 *
 	 * @param int $redirect_id Redirect ID
 	 */
 	private function increment_hits( $redirect_id ) {
-		global $wpdb;
+		$table = $this->table_name;
+		$time  = current_time( 'mysql' );
 
-		$wpdb->query(
-			$wpdb->prepare(
-				"UPDATE {$this->table_name} SET hits = hits + 1, last_hit = %s WHERE id = %d",
-				current_time( 'mysql' ),
-				$redirect_id
-			)
-		);
+		register_shutdown_function( static function () use ( $redirect_id, $table, $time ) {
+			global $wpdb;
+			$wpdb->query(
+				$wpdb->prepare(
+					"UPDATE {$table} SET hits = hits + 1, last_hit = %s WHERE id = %d",
+					$time,
+					$redirect_id
+				)
+			);
+		} );
 	}
 
 	/**

@@ -70,7 +70,24 @@ class Seovela_Helpers {
         if ( ! is_array( $post_types ) ) {
             return array();
         }
-        return array_map( 'sanitize_key', $post_types );
+        $valid_post_types = get_post_types( array( 'public' => true ) );
+        return array_values( array_intersect( array_map( 'sanitize_key', $post_types ), $valid_post_types ) );
+    }
+
+    /**
+     * Sanitize taxonomy slugs array
+     *
+     * Validates each slug against registered taxonomies.
+     *
+     * @param array $taxonomies Array of taxonomy slugs.
+     * @return array Sanitized array of valid taxonomy slugs.
+     */
+    public static function sanitize_taxonomies( $taxonomies ) {
+        if ( ! is_array( $taxonomies ) ) {
+            return array();
+        }
+        $valid_taxonomies = get_taxonomies( array( 'public' => true ) );
+        return array_values( array_intersect( array_map( 'sanitize_key', $taxonomies ), $valid_taxonomies ) );
     }
 
     /**
@@ -265,7 +282,7 @@ class Seovela_Helpers {
 
         // Fallback if constants aren't defined
         if ( empty( $salt ) ) {
-            $salt = 'seovela-default-encryption-key-' . md5( ABSPATH );
+            $salt = 'seovela-default-encryption-key-' . md5( wp_salt( 'auth' ) );
         }
 
         return hash( 'sha256', $salt, true ); // 32 bytes for AES-256

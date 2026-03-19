@@ -2080,7 +2080,7 @@ class Seovela_Image_Seo {
 	 */
 	private function get_webp_htaccess_rules() {
 		$upload_dir = wp_upload_dir();
-		$upload_path = str_replace( ABSPATH, '', $upload_dir['basedir'] );
+		$upload_path = ltrim( wp_make_link_relative( $upload_dir['baseurl'] ), '/' );
 
 		return '# BEGIN SEOVela WebP
 <IfModule mod_rewrite.c>
@@ -2235,7 +2235,7 @@ AddType image/webp .webp
 						$.post(ajaxurl, {
 							action: "seovela_convert_single_webp",
 							attachment_id: id,
-							nonce: "' . wp_create_nonce( 'seovela_convert_webp' ) . '"
+							nonce: "' . esc_js( wp_create_nonce( 'seovela_convert_webp' ) ) . '"
 						}, function(response) {
 							if (response.success) {
 								location.reload();
@@ -2284,7 +2284,7 @@ AddType image/webp .webp
 				$.post(ajaxurl, {
 					action: "seovela_convert_single_webp",
 					attachment_id: id,
-					nonce: "' . wp_create_nonce( 'seovela_convert_webp' ) . '"
+					nonce: "' . esc_js( wp_create_nonce( 'seovela_convert_webp' ) ) . '"
 				}, function(response) {
 					if (response.success) {
 						// Replace button with success badge

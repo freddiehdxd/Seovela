@@ -187,53 +187,55 @@ class Seovela_404_Monitor {
 	 * @param int    $resolved   Resolved status (0=unresolved, 1=resolved, 2=bot scan)
 	 */
 	private function log_entry( $url, $referer, $user_agent, $ip_address, $resolved = 0 ) {
-		global $wpdb;
+		$table = $this->table_name;
 
-		// Check if URL already logged (match on same resolved status for bot scans)
-		$existing = $wpdb->get_row(
-			$wpdb->prepare(
-				"SELECT id, count FROM {$this->table_name} WHERE url = %s AND resolved = %d",
-				$url,
-				$resolved
-			)
-		);
+		// Defer DB work to after the 404 response is sent to the browser
+		add_action( 'shutdown', static function () use ( $table, $url, $referer, $user_agent, $ip_address, $resolved ) {
+			global $wpdb;
 
-		$current_time = current_time( 'mysql' );
-
-		if ( $existing ) {
-			// Update existing entry
-			$wpdb->update(
-				$this->table_name,
-				array(
-					'count'      => $existing->count + 1,
-					'last_hit'   => $current_time,
-					'referer'    => $referer,
-					'user_agent' => $user_agent,
-					'ip_address' => $ip_address,
-				),
-				array( 'id' => $existing->id ),
-				array( '%d', '%s', '%s', '%s', '%s' ),
-				array( '%d' )
+			$existing = $wpdb->get_row(
+				$wpdb->prepare(
+					"SELECT id, count FROM {$table} WHERE url = %s AND resolved = %d",
+					$url,
+					$resolved
+				)
 			);
-		} else {
-			// Insert new entry
-			$wpdb->insert(
-				$this->table_name,
-				array(
-					'url'        => $url,
-					'referer'    => $referer,
-					'user_agent' => $user_agent,
-					'ip_address' => $ip_address,
-					'count'      => 1,
-					'first_hit'  => $current_time,
-					'last_hit'   => $current_time,
-					'resolved'   => $resolved,
-				),
-				array( '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%d' )
-			);
-		}
 
-		do_action( 'seovela_404_logged', $url, $referer );
+			$current_time = current_time( 'mysql' );
+
+			if ( $existing ) {
+				$wpdb->update(
+					$table,
+					array(
+						'count'      => $existing->count + 1,
+						'last_hit'   => $current_time,
+						'referer'    => $referer,
+						'user_agent' => $user_agent,
+						'ip_address' => $ip_address,
+					),
+					array( 'id' => $existing->id ),
+					array( '%d', '%s', '%s', '%s', '%s' ),
+					array( '%d' )
+				);
+			} else {
+				$wpdb->insert(
+					$table,
+					array(
+						'url'        => $url,
+						'referer'    => $referer,
+						'user_agent' => $user_agent,
+						'ip_address' => $ip_address,
+						'count'      => 1,
+						'first_hit'  => $current_time,
+						'last_hit'   => $current_time,
+						'resolved'   => $resolved,
+					),
+					array( '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%d' )
+				);
+			}
+
+			do_action( 'seovela_404_logged', $url, $referer );
+		} );
 	}
 
 	/**
@@ -274,12 +276,16 @@ class Seovela_404_Monitor {
 		$orderby         = in_array( $args['orderby'], $allowed_orderby, true ) ? $args['orderby'] : 'last_hit';
 		$order           = in_array( strtoupper( $args['order'] ), array( 'ASC', 'DESC' ), true ) ? strtoupper( $args['order'] ) : 'DESC';
 
-		$order_sql = sprintf( 'ORDER BY %s %s', $orderby, $order );
-		$limit_sql = sprintf( 'LIMIT %d OFFSET %d', absint( $args['limit'] ), absint( $args['offset'] ) );
-
-		$sql = "SELECT * FROM {$this->table_name} WHERE {$where_sql} {$order_sql} {$limit_sql}"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name is plugin-prefixed, orderby/order are allowlisted.
-
-		return $wpdb->get_results( $sql );
+		// $orderby is from a strict allowlist; $order is a literal ASC/DESC.
+		// Using %i identifier placeholder for table name and column name (WP 6.2+).
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $where_sql is built entirely from wpdb::prepare() calls above; $order is strictly ASC/DESC from allowlist.
+		return $wpdb->get_results( $wpdb->prepare(
+			"SELECT * FROM %i WHERE {$where_sql} ORDER BY %i " . $order . " LIMIT %d OFFSET %d",
+			$this->table_name,
+			$orderby,
+			absint( $args['limit'] ),
+			absint( $args['offset'] )
+		) );
 	}
 
 	/**

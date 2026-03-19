@@ -39,6 +39,9 @@ class Seovela_Ajax {
 		
 		// Schema preview
 		add_action( 'wp_ajax_seovela_preview_schema', array( $this, 'preview_schema' ) );
+
+		// Dashboard tip dismissal
+		add_action( 'wp_ajax_seovela_dismiss_tip', array( $this, 'dismiss_tip' ) );
 	}
 
 	/**
@@ -115,6 +118,23 @@ class Seovela_Ajax {
 		wp_send_json_success( array(
 			'preview' => $preview,
 		) );
+	}
+
+	/**
+	 * Dismiss dashboard tip banner
+	 *
+	 * Stores dismissal in user meta so the tip stays hidden across page loads.
+	 */
+	public function dismiss_tip() {
+		check_ajax_referer( 'seovela_dismiss_tip', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Permission denied', 'seovela' ) ) );
+		}
+
+		update_user_meta( get_current_user_id(), 'seovela_tip_dismissed', 1 );
+
+		wp_send_json_success();
 	}
 }
 

@@ -13,12 +13,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Handle module toggle
 if ( isset( $_POST['seovela_save_modules'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['seovela_modules_nonce'] ) ), 'seovela_save_modules' ) ) {
     $modules = Seovela_Module_Loader::get_available_modules();
-    
+
     foreach ( $modules as $module_key => $module_info ) {
         $enabled = isset( $_POST['seovela_module_' . $module_key] ) ? true : false;
         update_option( $module_info['option_key'], $enabled );
     }
-    
+
+    // Clear dashboard stats cache so changes reflect immediately
+    delete_transient( 'seovela_dashboard_stats' );
+
     add_settings_error( 'seovela_modules', 'modules_saved', __( 'Modules updated successfully!', 'seovela' ), 'success' );
 }
 
@@ -48,70 +51,70 @@ $module_categories = array(
     ),
 );
 
-// Define module icons using Dashicons
+// Define module icons using custom SVGs
 $module_meta = array(
     'meta' => array(
-        'icon' => 'dashicons-edit-page',
+        'icon' => 'meta',
         'gradient' => 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
         'color' => '#0ea5e9',
         'bg' => 'rgba(14, 165, 233, 0.1)',
     ),
     'sitemap' => array(
-        'icon' => 'dashicons-networking',
+        'icon' => 'sitemap',
         'gradient' => 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
         'color' => '#f59e0b',
         'bg' => 'rgba(245, 158, 11, 0.1)',
     ),
     'schema' => array(
-        'icon' => 'dashicons-code-standards',
+        'icon' => 'schema',
         'gradient' => 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
         'color' => '#6366f1',
         'bg' => 'rgba(99, 102, 241, 0.1)',
     ),
     'optimizer' => array(
-        'icon' => 'dashicons-performance',
+        'icon' => 'optimizer',
         'gradient' => 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
         'color' => '#8b5cf6',
         'bg' => 'rgba(139, 92, 246, 0.1)',
     ),
     'redirects' => array(
-        'icon' => 'dashicons-randomize',
+        'icon' => 'redirects',
         'gradient' => 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
         'color' => '#10b981',
         'bg' => 'rgba(16, 185, 129, 0.1)',
     ),
     '404-monitor' => array(
-        'icon' => 'dashicons-warning',
+        'icon' => '404-monitor',
         'gradient' => 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
         'color' => '#ef4444',
         'bg' => 'rgba(239, 68, 68, 0.1)',
     ),
     'ai' => array(
-        'icon' => 'dashicons-superhero-alt',
+        'icon' => 'ai',
         'gradient' => 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
         'color' => '#ec4899',
         'bg' => 'rgba(236, 72, 153, 0.1)',
     ),
     'internal-links' => array(
-        'icon' => 'dashicons-admin-links',
+        'icon' => 'internal-links',
         'gradient' => 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
         'color' => '#06b6d4',
         'bg' => 'rgba(6, 182, 212, 0.1)',
     ),
     'image-seo' => array(
-        'icon' => 'dashicons-format-image',
+        'icon' => 'image-seo',
         'gradient' => 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
         'color' => '#f97316',
         'bg' => 'rgba(249, 115, 22, 0.1)',
     ),
     'gsc-integration' => array(
-        'icon' => 'dashicons-chart-bar',
+        'icon' => 'gsc-integration',
         'gradient' => 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
         'color' => '#22c55e',
         'bg' => 'rgba(34, 197, 94, 0.1)',
     ),
     'llms-txt' => array(
-        'icon' => 'dashicons-media-code',
+        'icon' => 'llms-txt',
         'gradient' => 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
         'color' => '#14b8a6',
         'bg' => 'rgba(20, 184, 166, 0.1)',
@@ -129,7 +132,7 @@ foreach ( $modules as $module_key => $module_info ) {
 ?>
 
 <div class="seovela-modules-premium">
-    
+
     <!-- Premium Header -->
     <div class="seovela-modules-header">
         <div class="seovela-modules-header-bg"></div>
@@ -156,7 +159,7 @@ foreach ( $modules as $module_key => $module_info ) {
 
     <form method="post" id="seovela-modules-form">
         <?php wp_nonce_field( 'seovela_save_modules', 'seovela_modules_nonce' ); ?>
-        
+
         <!-- Module Categories -->
         <?php foreach ( $module_categories as $cat_key => $category ) : ?>
             <div class="seovela-module-category">
@@ -166,7 +169,7 @@ foreach ( $modules as $module_key => $module_info ) {
                         <span class="seovela-category-desc"><?php echo esc_html( $category['description'] ); ?></span>
                     </div>
                     <div class="seovela-category-count">
-                        <?php 
+                        <?php
                         $cat_active = 0;
                         foreach ( $category['modules'] as $mod_key ) {
                             if ( isset( $modules[ $mod_key ] ) ) {
@@ -180,47 +183,43 @@ foreach ( $modules as $module_key => $module_info ) {
                         ?>
                     </div>
                 </div>
-                
+
                 <div class="seovela-modules-cards">
                     <?php foreach ( $category['modules'] as $module_key ) : ?>
-                        <?php 
+                        <?php
                         if ( ! isset( $modules[ $module_key ] ) ) continue;
                         $module_info = $modules[ $module_key ];
                         $enabled = get_option( $module_info['option_key'], true );
                         $is_locked = false;
                         $meta = isset( $module_meta[ $module_key ] ) ? $module_meta[ $module_key ] : array(
-                            'icon' => 'dashicons-admin-generic',
+                            'icon' => 'settings',
                             'gradient' => 'linear-gradient(135deg, #64748b 0%, #475569 100%)',
                             'color' => '#64748b',
                             'bg' => 'rgba(100, 116, 139, 0.1)',
                         );
                         ?>
-                        
+
                         <div class="seovela-module-card-premium <?php echo $is_locked ? 'is-locked' : ''; ?> <?php echo $enabled && ! $is_locked ? 'is-active' : ''; ?>" data-module="<?php echo esc_attr( $module_key ); ?>">
-                            
-                            <?php if ( $is_locked ) : ?>
-                                <div class="seovela-module-pro-ribbon">
-                                    <span><?php esc_html_e( 'PRO', 'seovela' ); ?></span>
-                                </div>
-                            <?php endif; ?>
-                            
+
                             <div class="seovela-module-card-inner">
                                 <!-- Icon -->
                                 <div class="seovela-module-icon-premium" style="background: <?php echo esc_attr( $meta['bg'] ); ?>;">
-                                    <span class="dashicons <?php echo esc_attr( $meta['icon'] ); ?>" style="background: <?php echo esc_attr( $meta['gradient'] ); ?>; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"></span>
+                                    <span class="seovela-module-svg-icon" style="color: <?php echo esc_attr( $meta['color'] ); ?>;">
+                                        <?php Seovela_Icons::render( $meta['icon'], 26 ); ?>
+                                    </span>
                                 </div>
-                                
+
                                 <!-- Content -->
                                 <div class="seovela-module-info-premium">
                                     <h3><?php echo esc_html( $module_info['name'] ); ?></h3>
                                     <p><?php echo esc_html( $module_info['description'] ); ?></p>
                                 </div>
-                                
+
                                 <!-- Toggle -->
                                 <div class="seovela-module-toggle-area">
                                         <label class="seovela-toggle-premium">
-                                            <input 
-                                                type="checkbox" 
+                                            <input
+                                                type="checkbox"
                                                 name="seovela_module_<?php echo esc_attr( $module_key ); ?>"
                                                 <?php checked( $enabled ); ?>
                                                 class="seovela-module-toggle-input"
@@ -233,7 +232,7 @@ foreach ( $modules as $module_key => $module_info ) {
                                         </label>
                                 </div>
                             </div>
-                            
+
                             <!-- Active indicator bar -->
                             <?php if ( $enabled && ! $is_locked ) : ?>
                                 <div class="seovela-module-active-bar" style="background: <?php echo esc_attr( $meta['gradient'] ); ?>;"></div>
@@ -248,12 +247,12 @@ foreach ( $modules as $module_key => $module_info ) {
         <div class="seovela-modules-save-bar">
             <div class="seovela-save-bar-inner">
                 <div class="seovela-save-bar-info">
-                    <span class="dashicons dashicons-info-outline"></span>
+                    <?php Seovela_Icons::render( 'info', 16 ); ?>
                     <span><?php esc_html_e( 'Disabling unused modules helps improve site performance.', 'seovela' ); ?></span>
                 </div>
                 <div class="seovela-save-bar-actions">
                     <button type="submit" name="seovela_save_modules" class="seovela-btn-save">
-                        <span class="dashicons dashicons-saved"></span>
+                        <?php Seovela_Icons::render( 'save', 16 ); ?>
                         <?php esc_html_e( 'Save Changes', 'seovela' ); ?>
                     </button>
                 </div>
@@ -262,14 +261,17 @@ foreach ( $modules as $module_key => $module_info ) {
     </form>
 </div>
 
-<style>
+<?php
+wp_register_style( 'seovela-modules-inline-style', false );
+wp_enqueue_style( 'seovela-modules-inline-style' );
+wp_add_inline_style( 'seovela-modules-inline-style', <<<'SEOVELA_CSS'
 /* Premium Modules Page Styles */
 .seovela-modules-premium {
     margin: -20px -20px 0 -2px;
     background: #f8fafc;
-    min-height: calc(100vh - 32px);
     padding-bottom: 100px;
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 
 /* Header */
@@ -296,23 +298,11 @@ foreach ( $modules as $module_key => $module_info ) {
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: 
-        radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+    background-image:
+        radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
         radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
         radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.1) 0%, transparent 40%);
     z-index: 1;
-}
-
-.seovela-modules-header-bg::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    opacity: 0.5;
-    z-index: 2;
 }
 
 .seovela-modules-header-content {
@@ -454,32 +444,6 @@ foreach ( $modules as $module_key => $module_info ) {
     border-color: #059669;
 }
 
-.seovela-module-card-premium.is-locked {
-    opacity: 0.85;
-    background: linear-gradient(to bottom, #fafafa 0%, #f5f5f5 100%);
-}
-
-.seovela-module-card-premium.is-locked:hover {
-    transform: none;
-    box-shadow: none;
-}
-
-/* PRO Ribbon */
-.seovela-module-pro-ribbon {
-    position: absolute;
-    top: 14px;
-    right: -30px;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    color: #ffffff;
-    font-size: 10px;
-    font-weight: 800;
-    padding: 4px 36px;
-    transform: rotate(45deg);
-    z-index: 10;
-    letter-spacing: 0.1em;
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
-}
-
 /* Card Inner */
 .seovela-module-card-inner {
     padding: 24px;
@@ -504,10 +468,30 @@ foreach ( $modules as $module_key => $module_info ) {
     transform: scale(1.1);
 }
 
-.seovela-module-icon-premium .dashicons {
-    font-size: 26px;
-    width: 26px;
-    height: 26px;
+.seovela-module-svg-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.seovela-module-svg-icon .seovela-icon {
+    transition: transform 0.3s ease;
+}
+
+.seovela-module-card-premium:hover .seovela-module-svg-icon .seovela-icon {
+    transform: scale(1.1);
+}
+
+/* Save bar SVG icons */
+.seovela-save-bar-info .seovela-icon {
+    color: #64748b;
+    flex-shrink: 0;
+}
+
+.seovela-btn-save .seovela-icon {
+    color: currentColor;
+    margin-right: 2px;
 }
 
 /* Module Info */
@@ -587,7 +571,7 @@ foreach ( $modules as $module_key => $module_info ) {
 }
 
 .seovela-toggle-premium input:focus + .seovela-toggle-track {
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
 }
 
 .seovela-toggle-status {
@@ -601,34 +585,6 @@ foreach ( $modules as $module_key => $module_info ) {
 
 .seovela-toggle-premium input:checked ~ .seovela-toggle-status {
     color: #10b981;
-}
-
-/* Unlock Button */
-.seovela-unlock-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-    color: #ffffff;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 10px 16px;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-}
-
-.seovela-unlock-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
-    color: #ffffff;
-}
-
-.seovela-unlock-btn .dashicons {
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
 }
 
 /* Active Bar */
@@ -671,10 +627,6 @@ foreach ( $modules as $module_key => $module_info ) {
     font-size: 14px;
 }
 
-.seovela-save-bar-info .dashicons {
-    color: #94a3b8;
-}
-
 .seovela-save-bar-actions {
     display: flex;
     gap: 12px;
@@ -684,7 +636,7 @@ foreach ( $modules as $module_key => $module_info ) {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     color: #ffffff;
     font-size: 15px;
     font-weight: 700;
@@ -693,47 +645,13 @@ foreach ( $modules as $module_key => $module_info ) {
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
 }
 
 .seovela-btn-save:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.45);
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-}
-
-.seovela-btn-save .dashicons {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-}
-
-.seovela-btn-upgrade {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    color: #ffffff;
-    font-size: 15px;
-    font-weight: 700;
-    padding: 14px 28px;
-    border: none;
-    border-radius: 10px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
-}
-
-.seovela-btn-upgrade:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
-    color: #ffffff;
-}
-
-.seovela-btn-upgrade .dashicons {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
 }
 
 /* Responsive */
@@ -748,11 +666,11 @@ foreach ( $modules as $module_key => $module_info ) {
         flex-direction: column;
         text-align: center;
     }
-    
+
     .seovela-modules-header-text p {
         max-width: 100%;
     }
-    
+
     .seovela-modules-stats {
         width: 100%;
         justify-content: center;
@@ -763,31 +681,31 @@ foreach ( $modules as $module_key => $module_info ) {
     .seovela-modules-header {
         padding: 32px 20px;
     }
-    
+
     .seovela-modules-header-text h1 {
         font-size: 28px;
     }
-    
+
     .seovela-module-category {
         padding: 0 20px;
     }
-    
+
     .seovela-module-category:first-of-type {
         padding-top: 24px;
     }
-    
+
     .seovela-modules-cards {
         grid-template-columns: 1fr;
     }
-    
+
     .seovela-module-card-inner {
         flex-wrap: wrap;
     }
-    
+
     .seovela-module-info-premium {
         flex: 1 1 calc(100% - 72px);
     }
-    
+
     .seovela-module-toggle-area {
         width: 100%;
         padding-top: 16px;
@@ -796,27 +714,28 @@ foreach ( $modules as $module_key => $module_info ) {
         display: flex;
         justify-content: flex-end;
     }
-    
+
     .seovela-save-bar-inner {
         flex-direction: column;
     }
-    
+
     .seovela-save-bar-info {
         text-align: center;
     }
-    
+
     .seovela-save-bar-actions {
         width: 100%;
         flex-direction: column;
     }
-    
-    .seovela-btn-save,
-    .seovela-btn-upgrade {
+
+    .seovela-btn-save {
         width: 100%;
         justify-content: center;
     }
-    
+
     .seovela-modules-save-bar {
+        margin-left: 20px;
+        margin-right: 20px;
         padding: 20px;
     }
 
@@ -838,19 +757,15 @@ foreach ( $modules as $module_key => $module_info ) {
     background: #f0fdf4;
     border-color: #10b981;
 }
+SEOVELA_CSS
+);
+?>
 
-/* Animation for toggle change */
-@keyframes pulse-success {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-    50% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0.2); }
-}
-
-.seovela-module-card-premium.is-active {
-    animation: pulse-success 0.5s ease;
-}
-</style>
-
-<script>
+<?php
+wp_register_script( 'seovela-modules-inline-script', false, array( 'jquery' ), false, true );
+wp_enqueue_script( 'seovela-modules-inline-script' );
+ob_start();
+?>
 jQuery(document).ready(function($) {
     // Toggle status text update
     $(".seovela-module-toggle-input").on("change", function() {
@@ -882,4 +797,6 @@ jQuery(document).ready(function($) {
         });
     }
 });
-</script>
+<?php
+wp_add_inline_script( 'seovela-modules-inline-script', ob_get_clean() );
+?>

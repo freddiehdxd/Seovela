@@ -42,15 +42,15 @@ $active_ie_tab = isset( $_GET['ie_tab'] ) ? sanitize_key( wp_unslash( $_GET['ie_
                 </div>
             </div>
             <div class="seovela-page-header-tabs">
-                <a href="#seovela-ie-export" class="seovela-header-tab seovela-ie-tab <?php echo $active_ie_tab === 'export' ? 'active' : ''; ?>" data-tab="export">
+                <a href="#seovela-ie-export" class="seovela-header-tab seovela-ie-tab <?php echo esc_attr( $active_ie_tab === 'export' ? 'active' : '' ); ?>" data-tab="export">
                     <span class="dashicons dashicons-download"></span>
                     <?php esc_html_e( 'Export', 'seovela' ); ?>
                 </a>
-                <a href="#seovela-ie-import" class="seovela-header-tab seovela-ie-tab <?php echo $active_ie_tab === 'import' ? 'active' : ''; ?>" data-tab="import">
+                <a href="#seovela-ie-import" class="seovela-header-tab seovela-ie-tab <?php echo esc_attr( $active_ie_tab === 'import' ? 'active' : '' ); ?>" data-tab="import">
                     <span class="dashicons dashicons-upload"></span>
                     <?php esc_html_e( 'Import', 'seovela' ); ?>
                 </a>
-                <a href="#seovela-ie-migration" class="seovela-header-tab seovela-ie-tab <?php echo $active_ie_tab === 'migration' ? 'active' : ''; ?>" data-tab="migration">
+                <a href="#seovela-ie-migration" class="seovela-header-tab seovela-ie-tab <?php echo esc_attr( $active_ie_tab === 'migration' ? 'active' : '' ); ?>" data-tab="migration">
                     <span class="dashicons dashicons-migrate"></span>
                     <?php esc_html_e( 'Migration', 'seovela' ); ?>
                 </a>
@@ -61,7 +61,7 @@ $active_ie_tab = isset( $_GET['ie_tab'] ) ? sanitize_key( wp_unslash( $_GET['ie_
     <div class="seovela-page-body">
 
         <!-- Export Tab -->
-        <div id="seovela-ie-export" class="seovela-ie-content <?php echo $active_ie_tab === 'export' ? 'active' : ''; ?>">
+        <div id="seovela-ie-export" class="seovela-ie-content <?php echo esc_attr( $active_ie_tab === 'export' ? 'active' : '' ); ?>">
             <div class="seovela-premium-card">
                 <div class="seovela-premium-card-header">
                     <div class="card-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
@@ -87,7 +87,7 @@ $active_ie_tab = isset( $_GET['ie_tab'] ) ? sanitize_key( wp_unslash( $_GET['ie_
         </div>
 
         <!-- Import Tab -->
-        <div id="seovela-ie-import" class="seovela-ie-content <?php echo $active_ie_tab === 'import' ? 'active' : ''; ?>">
+        <div id="seovela-ie-import" class="seovela-ie-content <?php echo esc_attr( $active_ie_tab === 'import' ? 'active' : '' ); ?>">
             <div class="seovela-premium-info info-amber">
                 <div class="info-icon">&#9888;&#65039;</div>
                 <div class="info-content">
@@ -132,7 +132,7 @@ $active_ie_tab = isset( $_GET['ie_tab'] ) ? sanitize_key( wp_unslash( $_GET['ie_
         </div>
 
         <!-- Migration Tab -->
-        <div id="seovela-ie-migration" class="seovela-ie-content <?php echo $active_ie_tab === 'migration' ? 'active' : ''; ?>">
+        <div id="seovela-ie-migration" class="seovela-ie-content <?php echo esc_attr( $active_ie_tab === 'migration' ? 'active' : '' ); ?>">
 
             <div class="seovela-premium-info info-blue">
                 <div class="info-icon">&#128712;</div>
@@ -225,16 +225,24 @@ $active_ie_tab = isset( $_GET['ie_tab'] ) ? sanitize_key( wp_unslash( $_GET['ie_
     </div><!-- .seovela-page-body -->
 </div><!-- .seovela-premium-page -->
 
-<style>
+<?php
+wp_register_style( 'seovela-import-export-inline-style', false );
+wp_enqueue_style( 'seovela-import-export-inline-style' );
+wp_add_inline_style( 'seovela-import-export-inline-style', <<<'SEOVELA_CSS'
 .seovela-ie-content {
     display: none;
 }
 .seovela-ie-content.active {
     display: block;
 }
-</style>
+SEOVELA_CSS
+);
+?>
 
-<script>
+<?php
+wp_register_script( 'seovela-import-export-inline-script', false, array( 'jquery' ), false, true );
+wp_enqueue_script( 'seovela-import-export-inline-script' );
+wp_add_inline_script( 'seovela-import-export-inline-script', <<<'SEOVELA_JS'
 jQuery(document).ready(function($) {
     // Tab switching
     $(".seovela-ie-tab").on("click", function(e) {
@@ -250,4 +258,6 @@ jQuery(document).ready(function($) {
         $("#seovela-ie-" + tab).addClass("active");
     });
 });
-</script>
+SEOVELA_JS
+);
+?>

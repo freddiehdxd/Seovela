@@ -1,8 +1,8 @@
 /**
- * Seovela Dashboard v2 - Premium Design System
+ * Seovela Dashboard v3 - Premium SaaS Design System
  *
- * A modern, visually stunning dashboard for the Seovela SEO plugin
- * Featuring glassmorphism, gradients, animations, and micro-interactions
+ * Clean, data-forward dashboard inspired by Linear, Vercel, and Stripe.
+ * All styles scoped under .seovela-dashboard to avoid WP admin conflicts.
  *
  * @package Seovela
  */
@@ -10,92 +10,69 @@
 /* ============================================
    CSS Custom Properties / Design Tokens
    ============================================ */
-:root {
-    /* Primary Palette - Vibrant Purple/Blue */
-    --sv-primary-50: #f5f3ff;
-    --sv-primary-100: #ede9fe;
-    --sv-primary-200: #ddd6fe;
-    --sv-primary-300: #c4b5fd;
-    --sv-primary-400: #a78bfa;
-    --sv-primary-500: #8b5cf6;
-    --sv-primary-600: #7c3aed;
-    --sv-primary-700: #6d28d9;
-    --sv-primary-800: #5b21b6;
-    --sv-primary-900: #4c1d95;
+.seovela-dashboard {
+    /* Brand */
+    --sv-brand: #6366f1;
+    --sv-brand-hover: #4f46e5;
+    --sv-brand-light: #eef2ff;
+    --sv-brand-50: #eef2ff;
+    --sv-brand-100: #e0e7ff;
+    --sv-brand-600: #4f46e5;
+    --sv-brand-700: #4338ca;
 
-    /* Neutral Palette */
-    --sv-gray-50: #fafafa;
-    --sv-gray-100: #f4f4f5;
-    --sv-gray-200: #e4e4e7;
-    --sv-gray-300: #d4d4d8;
-    --sv-gray-400: #a1a1aa;
-    --sv-gray-500: #71717a;
-    --sv-gray-600: #52525b;
-    --sv-gray-700: #3f3f46;
-    --sv-gray-800: #27272a;
-    --sv-gray-900: #18181b;
+    /* Backgrounds */
+    --sv-bg: #f8fafc;
+    --sv-surface: #ffffff;
 
-    /* Semantic Colors */
-    --sv-success: #10b981;
-    --sv-success-light: #d1fae5;
-    --sv-warning: #f59e0b;
-    --sv-warning-light: #fef3c7;
-    --sv-error: #ef4444;
-    --sv-error-light: #fee2e2;
-    --sv-info: #3b82f6;
-    --sv-info-light: #dbeafe;
+    /* Text */
+    --sv-text-primary: #0f172a;
+    --sv-text-secondary: #475569;
+    --sv-text-tertiary: #94a3b8;
 
-    /* Background & Surface */
-    --sv-bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    --sv-surface-glass: rgba(255, 255, 255, 0.95);
-    --sv-surface-glass-dark: rgba(255, 255, 255, 0.08);
-    --sv-surface-card: #ffffff;
-    
-    /* Typography */
-    --sv-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --sv-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-    
-    /* Spacing */
-    --sv-space-xs: 4px;
-    --sv-space-sm: 8px;
-    --sv-space-md: 16px;
-    --sv-space-lg: 24px;
-    --sv-space-xl: 32px;
-    --sv-space-2xl: 48px;
-    --sv-space-3xl: 64px;
-    
-    /* Border Radius */
-    --sv-radius-sm: 8px;
-    --sv-radius-md: 12px;
-    --sv-radius-lg: 16px;
-    --sv-radius-xl: 24px;
-    --sv-radius-full: 9999px;
-    
+    /* Borders */
+    --sv-border: #e2e8f0;
+    --sv-border-light: #f1f5f9;
+
+    /* Status */
+    --sv-green: #10b981;
+    --sv-green-light: #ecfdf5;
+    --sv-amber: #f59e0b;
+    --sv-amber-light: #fffbeb;
+    --sv-red: #ef4444;
+    --sv-red-light: #fef2f2;
+
     /* Shadows */
-    --sv-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --sv-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --sv-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --sv-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    --sv-shadow-glow: 0 0 40px rgba(139, 92, 246, 0.3);
-    
+    --sv-shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+    --sv-shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --sv-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.04);
+    --sv-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+
+    /* Radius */
+    --sv-radius-sm: 6px;
+    --sv-radius-md: 8px;
+    --sv-radius-lg: 12px;
+    --sv-radius-xl: 16px;
+    --sv-radius-full: 9999px;
+
     /* Transitions */
-    --sv-transition-fast: 150ms ease;
-    --sv-transition-base: 250ms ease;
-    --sv-transition-slow: 400ms ease;
-    --sv-transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    --sv-ease: 200ms ease;
+    --sv-ease-spring: 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* Typography */
+    --sv-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
 /* ============================================
-   Base Dashboard Wrapper
+   Base Wrapper
    ============================================ */
 .wrap.seovela-dashboard.seovela-dashboard-v2 {
     position: relative;
-    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    background: var(--sv-bg);
     margin: -20px -20px 0 -10px;
-    padding: 0;
-    min-height: calc(100vh - 32px);
-    font-family: var(--sv-font-family);
-    overflow-x: hidden;
+    padding: 0 0 40px;
+    font-family: var(--sv-font);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 .wrap.seovela-dashboard.seovela-dashboard-v2 * {
@@ -103,899 +80,841 @@
 }
 
 /* ============================================
-   Animated Background
+   Header
    ============================================ */
-.seovela-dash-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 400px;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 0;
-}
-
-.seovela-dash-bg-gradient {
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    right: -50%;
-    bottom: -50%;
-    background: 
-        radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 30%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-        radial-gradient(ellipse at 40% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%);
-    animation: bgPulse 20s ease-in-out infinite;
-}
-
-.seovela-dash-bg-pattern {
-    position: absolute;
-    inset: 0;
-    background-image: 
-        radial-gradient(circle at 1px 1px, rgba(139, 92, 246, 0.08) 1px, transparent 0);
-    background-size: 40px 40px;
-    opacity: 0.5;
-}
-
-@keyframes bgPulse {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(10px, -10px) scale(1.02); }
-    66% { transform: translate(-10px, 10px) scale(0.98); }
-}
-
-/* ============================================
-   Header Section
-   ============================================ */
-.seovela-dash-header {
+.seovela-dashboard .seovela-dash-header {
     position: relative;
     z-index: 10;
-    padding: var(--sv-space-lg) var(--sv-space-xl);
-    background: var(--sv-surface-glass);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+    padding: 20px 32px;
+    background: var(--sv-surface);
+    border-bottom: 1px solid var(--sv-border);
 }
 
-.seovela-dash-header-content {
-    max-width: 1400px;
+.seovela-dashboard .seovela-dash-header-content {
+    max-width: 1280px;
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: var(--sv-space-lg);
+    gap: 16px;
 }
 
-.seovela-dash-brand {
+.seovela-dashboard .seovela-dash-brand {
     display: flex;
     align-items: center;
-    gap: var(--sv-space-md);
+    gap: 12px;
 }
 
-.seovela-dash-logo {
-    width: 48px;
-    height: 48px;
-    flex-shrink: 0;
-}
-
-.seovela-dash-logo svg {
-    width: 100%;
-    height: 100%;
-    filter: drop-shadow(0 4px 12px rgba(102, 126, 234, 0.4));
-}
-
-.seovela-dash-title-group {
+.seovela-dashboard .seovela-dash-title-group {
     display: flex;
-    flex-direction: column;
-    gap: 2px;
+    align-items: center;
+    gap: 10px;
 }
 
-.seovela-dash-title-group h1 {
+.seovela-dashboard .seovela-dash-title-group h1 {
     font-size: 24px;
-    font-weight: 800;
-    color: var(--sv-gray-900);
+    font-weight: 700;
+    color: var(--sv-text-primary);
     margin: 0;
     padding: 0;
-    letter-spacing: -0.5px;
-    display: block;
+    letter-spacing: -0.025em;
+    line-height: 1;
 }
 
-.seovela-dash-title-group h1:before {
+.seovela-dashboard .seovela-dash-title-group h1::before {
     display: none;
 }
 
-.seovela-dash-version {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--sv-primary-600);
-    background: var(--sv-primary-100);
+.seovela-dashboard .seovela-dash-version {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--sv-text-tertiary);
+    background: var(--sv-border-light);
     padding: 2px 8px;
     border-radius: var(--sv-radius-full);
-    width: fit-content;
+    line-height: 1.4;
 }
 
-.seovela-dash-header-actions {
+.seovela-dashboard .seovela-dash-header-actions {
     display: flex;
     align-items: center;
-    gap: var(--sv-space-sm);
+    gap: 8px;
 }
 
 /* Buttons */
-.seovela-btn {
+.seovela-dashboard .seovela-btn {
     display: inline-flex;
     align-items: center;
-    gap: var(--sv-space-sm);
-    padding: 10px 20px;
-    font-size: 14px;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
     font-weight: 600;
+    font-family: var(--sv-font);
     border-radius: var(--sv-radius-md);
     text-decoration: none;
     cursor: pointer;
-    transition: all var(--sv-transition-base);
+    transition: all var(--sv-ease);
     border: none;
+    line-height: 1.4;
 }
 
-.seovela-btn-upgrade {
-    background: linear-gradient(135deg, var(--sv-primary-500) 0%, var(--sv-primary-700) 100%);
-    color: white;
-    box-shadow: var(--sv-shadow-md), 0 0 20px rgba(139, 92, 246, 0.3);
+.seovela-dashboard .seovela-btn-primary {
+    background: var(--sv-brand);
+    color: #fff;
+    box-shadow: var(--sv-shadow-xs);
 }
 
-.seovela-btn-upgrade:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--sv-shadow-lg), 0 0 30px rgba(139, 92, 246, 0.4);
-    color: white;
+.seovela-dashboard .seovela-btn-primary:hover {
+    background: var(--sv-brand-hover);
+    color: #fff;
+    box-shadow: var(--sv-shadow-sm);
+    transform: translateY(-1px);
 }
 
-.seovela-btn-icon {
-    font-size: 16px;
+.seovela-dashboard .seovela-btn-primary svg {
+    flex-shrink: 0;
 }
 
-.seovela-btn-secondary {
-    background: var(--sv-gray-100);
-    color: var(--sv-gray-700);
-    padding: 10px;
+.seovela-dashboard .seovela-btn-secondary {
+    background: var(--sv-bg);
+    color: var(--sv-text-secondary);
+    padding: 8px;
+    border: 1px solid var(--sv-border);
 }
 
-.seovela-btn-secondary:hover {
-    background: var(--sv-gray-200);
-    color: var(--sv-gray-900);
-}
-
-.seovela-btn-secondary .dashicons {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-    margin: 0;
-}
-
-.seovela-pro-active-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--sv-space-sm);
-    padding: 8px 16px;
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    color: #92400e;
-    font-size: 13px;
-    font-weight: 700;
-    border-radius: var(--sv-radius-full);
-    border: 2px solid #fbbf24;
-}
-
-.seovela-pro-icon {
-    font-size: 16px;
+.seovela-dashboard .seovela-btn-secondary:hover {
+    background: var(--sv-border-light);
+    color: var(--sv-text-primary);
 }
 
 /* ============================================
    Main Content Area
    ============================================ */
-.seovela-dash-main {
+.seovela-dashboard .seovela-dash-main {
     position: relative;
     z-index: 5;
-    max-width: 1400px;
+    max-width: 1280px;
     margin: 0 auto;
-    padding: var(--sv-space-xl);
+    padding: 24px 32px;
     display: flex;
     flex-direction: column;
-    gap: var(--sv-space-xl);
+    gap: 20px;
 }
 
 /* ============================================
-   Top Row: Score + Stats
+   1. SEO Health Score — Hero Card
    ============================================ */
-.seovela-dash-top-row {
-    display: grid;
-    grid-template-columns: 480px 1fr;
-    gap: var(--sv-space-xl);
-    align-items: stretch;
-}
-
-/* SEO Health Score Card */
-.seovela-dash-score-card {
-    background: var(--sv-surface-card);
+.seovela-dashboard .seovela-dash-hero {
+    background: var(--sv-surface);
     border-radius: var(--sv-radius-xl);
-    padding: var(--sv-space-xl);
+    padding: 32px;
     display: flex;
     align-items: center;
-    gap: var(--sv-space-xl);
-    box-shadow: var(--sv-shadow-lg);
-    border: 1px solid var(--sv-gray-100);
-    position: relative;
-    overflow: hidden;
+    gap: 40px;
+    box-shadow: var(--sv-shadow-sm);
+    border: 1px solid var(--sv-border);
+    animation: svFadeIn 0.4s ease both;
 }
 
-.seovela-dash-score-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--sv-primary-500), var(--sv-info), var(--sv-success));
-}
-
-.seovela-score-ring-container {
+/* Score Ring */
+.seovela-dashboard .seovela-score-ring-container {
     position: relative;
     width: 180px;
     height: 180px;
     flex-shrink: 0;
 }
 
-.seovela-score-ring {
+.seovela-dashboard .seovela-score-ring {
     width: 100%;
     height: 100%;
     transform: rotate(-90deg);
 }
 
-.seovela-score-ring-bg {
+.seovela-dashboard .seovela-score-ring-bg {
     fill: none;
-    stroke: var(--sv-gray-100);
-    stroke-width: 12;
+    stroke: var(--sv-border-light);
+    stroke-width: 10;
 }
 
-.seovela-score-ring-progress {
+.seovela-dashboard .seovela-score-ring-progress {
     fill: none;
-    stroke-width: 12;
+    stroke-width: 10;
     stroke-linecap: round;
     stroke-dasharray: 534;
     stroke-dashoffset: 534;
-    transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-    filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.4));
+    transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.seovela-score-content {
+.seovela-dashboard .seovela-score-content {
     position: absolute;
     inset: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 6px;
 }
 
-.seovela-score-number {
+.seovela-dashboard .seovela-score-number {
     font-size: 48px;
     font-weight: 800;
-    color: var(--sv-gray-900);
+    color: var(--sv-text-primary);
     line-height: 1;
-    letter-spacing: -2px;
+    letter-spacing: -0.03em;
 }
 
-.seovela-score-label {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--sv-gray-500);
-    margin-top: 4px;
-}
-
-.seovela-score-details {
-    flex: 1;
-}
-
-.seovela-score-details h3 {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--sv-gray-900);
-    margin: 0 0 var(--sv-space-sm);
-}
-
-.seovela-score-details > p {
-    font-size: 14px;
-    color: var(--sv-gray-500);
-    margin: 0 0 var(--sv-space-lg);
-    line-height: 1.5;
-}
-
-.seovela-score-factors {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sv-space-sm);
-}
-
-.seovela-score-factor {
-    display: flex;
-    align-items: center;
-    gap: var(--sv-space-sm);
-    padding: var(--sv-space-sm) var(--sv-space-md);
-    background: var(--sv-gray-50);
-    border-radius: var(--sv-radius-sm);
-}
-
-.seovela-factor-icon {
-    font-size: 16px;
-}
-
-.seovela-factor-label {
-    flex: 1;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--sv-gray-600);
-}
-
-.seovela-factor-value {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--sv-gray-900);
-}
-
-/* Quick Stats Grid */
-.seovela-dash-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--sv-space-md);
-}
-
-.seovela-stat-card {
-    position: relative;
-    background: var(--sv-surface-card);
-    border-radius: var(--sv-radius-lg);
-    padding: var(--sv-space-lg);
-    display: flex;
-    align-items: center;
-    gap: var(--sv-space-md);
-    box-shadow: var(--sv-shadow-md);
-    border: 1px solid var(--sv-gray-100);
-    overflow: hidden;
-    transition: all var(--sv-transition-base);
-}
-
-.seovela-stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--sv-shadow-xl);
-}
-
-.seovela-stat-card-bg {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    opacity: 0.08;
-    transform: translate(30%, -30%);
-    transition: all var(--sv-transition-slow);
-}
-
-.seovela-stat-posts .seovela-stat-card-bg { background: var(--sv-primary-500); }
-.seovela-stat-optimized .seovela-stat-card-bg { background: var(--sv-success); }
-.seovela-stat-modules .seovela-stat-card-bg { background: var(--sv-info); }
-.seovela-stat-license .seovela-stat-card-bg { background: var(--sv-warning); }
-
-.seovela-stat-card:hover .seovela-stat-card-bg {
-    transform: translate(20%, -20%) scale(1.2);
-    opacity: 0.12;
-}
-
-.seovela-stat-icon {
-    font-size: 32px;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-.seovela-stat-content {
-    position: relative;
-    z-index: 2;
-}
-
-.seovela-stat-number {
-    display: block;
-    font-size: 32px;
-    font-weight: 800;
-    color: var(--sv-gray-900);
-    line-height: 1;
-    letter-spacing: -1px;
-}
-
-.seovela-stat-number.seovela-stat-text {
-    font-size: 22px;
-    letter-spacing: 0;
-}
-
-.seovela-stat-label {
-    display: block;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--sv-gray-500);
-    margin-top: 4px;
-}
-
-/* ============================================
-   Tip Banner
-   ============================================ */
-.seovela-dash-tip-banner {
-    display: flex;
-    align-items: center;
-    gap: var(--sv-space-md);
-    padding: var(--sv-space-md) var(--sv-space-lg);
-    background: linear-gradient(135deg, var(--sv-primary-50) 0%, var(--sv-info-light) 100%);
-    border: 1px solid var(--sv-primary-200);
-    border-radius: var(--sv-radius-lg);
-    position: relative;
-}
-
-.seovela-tip-icon {
-    font-size: 24px;
-    flex-shrink: 0;
-}
-
-.seovela-tip-content {
-    flex: 1;
-}
-
-.seovela-tip-label {
-    display: block;
+.seovela-dashboard .seovela-score-badge {
     font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--sv-primary-600);
-    margin-bottom: 2px;
-}
-
-.seovela-tip-content p {
-    margin: 0;
-    font-size: 14px;
-    color: var(--sv-gray-700);
-    line-height: 1.4;
-}
-
-.seovela-tip-dismiss {
-    background: none;
-    border: none;
-    padding: var(--sv-space-sm);
-    cursor: pointer;
-    color: var(--sv-gray-400);
-    transition: all var(--sv-transition-fast);
-    border-radius: var(--sv-radius-sm);
-}
-
-.seovela-tip-dismiss:hover {
-    background: rgba(0, 0, 0, 0.05);
-    color: var(--sv-gray-600);
-}
-
-.seovela-tip-dismiss .dashicons {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-}
-
-/* ============================================
-   Main Grid: Modules + Activity
-   ============================================ */
-.seovela-dash-main-grid {
-    display: grid;
-    grid-template-columns: 1fr 340px;
-    gap: var(--sv-space-xl);
-    align-items: start;
-}
-
-/* Section Common Styles */
-.seovela-dash-section {
-    background: var(--sv-surface-card);
-    border-radius: var(--sv-radius-xl);
-    padding: var(--sv-space-xl);
-    box-shadow: var(--sv-shadow-md);
-    border: 1px solid var(--sv-gray-100);
-}
-
-.seovela-section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--sv-space-lg);
-}
-
-.seovela-section-header h2 {
-    display: flex;
-    align-items: center;
-    gap: var(--sv-space-sm);
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--sv-gray-900);
-    margin: 0;
-    padding: 0;
-    border: none;
-}
-
-.seovela-section-icon {
-    font-size: 20px;
-}
-
-.seovela-link-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 13px;
     font-weight: 600;
-    color: var(--sv-primary-600);
-    text-decoration: none;
-    transition: all var(--sv-transition-fast);
+    padding: 2px 10px;
+    border-radius: var(--sv-radius-full);
+    letter-spacing: 0.02em;
 }
 
-.seovela-link-btn:hover {
-    color: var(--sv-primary-700);
-    gap: 8px;
+.seovela-dashboard .seovela-score-badge--excellent {
+    background: var(--sv-green-light);
+    color: #065f46;
 }
 
-.seovela-link-btn .dashicons {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
+.seovela-dashboard .seovela-score-badge--good {
+    background: #eff6ff;
+    color: #1e40af;
 }
 
-/* Modules Quick Grid */
-.seovela-modules-quick-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--sv-space-md);
+.seovela-dashboard .seovela-score-badge--needs-work {
+    background: var(--sv-amber-light);
+    color: #92400e;
 }
 
-.seovela-module-quick-card {
-    display: flex;
-    align-items: center;
-    gap: var(--sv-space-md);
-    padding: var(--sv-space-md);
-    background: var(--sv-gray-50);
-    border: 2px solid transparent;
-    border-radius: var(--sv-radius-md);
-    text-decoration: none;
-    transition: all var(--sv-transition-base);
+.seovela-dashboard .seovela-score-badge--critical {
+    background: var(--sv-red-light);
+    color: #991b1b;
 }
 
-.seovela-module-quick-card:hover {
-    background: white;
-    border-color: var(--sv-primary-200);
-    box-shadow: var(--sv-shadow-md);
-    transform: translateY(-2px);
-}
-
-.seovela-module-quick-card.seovela-module-active {
-    border-color: var(--sv-success);
-    background: linear-gradient(135deg, var(--sv-success-light) 0%, white 100%);
-}
-
-.seovela-module-quick-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: var(--sv-radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    box-shadow: var(--sv-shadow-md);
-}
-
-.seovela-module-quick-icon span {
-    font-size: 22px;
-    filter: brightness(0) invert(1);
-}
-
-.seovela-module-quick-info {
+/* Hero Details */
+.seovela-dashboard .seovela-hero-details {
     flex: 1;
     min-width: 0;
 }
 
-.seovela-module-quick-info h4 {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--sv-gray-900);
-    margin: 0 0 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.seovela-dashboard .seovela-hero-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--sv-text-primary);
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
 }
 
-.seovela-module-status {
+.seovela-dashboard .seovela-hero-subtitle {
+    font-size: 13px;
+    color: var(--sv-text-tertiary);
+    margin: 0 0 20px;
+    line-height: 1.5;
+}
+
+/* Progress Bars */
+.seovela-dashboard .seovela-hero-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.seovela-dashboard .seovela-bar-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.seovela-dashboard .seovela-bar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.seovela-dashboard .seovela-bar-label {
     font-size: 12px;
     font-weight: 500;
+    color: var(--sv-text-secondary);
 }
 
-.seovela-module-status.status-active {
-    color: var(--sv-success);
+.seovela-dashboard .seovela-bar-value {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--sv-text-primary);
 }
 
-.seovela-module-status.status-inactive {
-    color: var(--sv-gray-400);
+.seovela-dashboard .seovela-bar-track {
+    height: 6px;
+    background: var(--sv-border-light);
+    border-radius: var(--sv-radius-full);
+    overflow: hidden;
 }
 
-.seovela-module-arrow {
-    color: var(--sv-gray-300);
-    transition: all var(--sv-transition-fast);
+.seovela-dashboard .seovela-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--sv-brand), #818cf8);
+    border-radius: var(--sv-radius-full);
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1) 0.5s;
+    min-width: 0;
 }
 
-.seovela-module-quick-card:hover .seovela-module-arrow {
-    color: var(--sv-primary-500);
-    transform: translateX(4px);
+/* Hero CTA */
+.seovela-dashboard .seovela-hero-cta {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--sv-border-light);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--sv-text-secondary);
+    line-height: 1.4;
 }
 
-.seovela-module-arrow .dashicons {
-    font-size: 18px;
+.seovela-dashboard .seovela-hero-cta strong {
+    color: var(--sv-text-primary);
+}
+
+.seovela-dashboard .seovela-hero-cta a {
+    color: var(--sv-brand);
+    text-decoration: none;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: color var(--sv-ease);
+}
+
+.seovela-dashboard .seovela-hero-cta a:hover {
+    color: var(--sv-brand-hover);
+}
+
+/* ============================================
+   2. Alert Banner
+   ============================================ */
+.seovela-dashboard .seovela-dash-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-radius: var(--sv-radius-md);
+    font-size: 13px;
+    font-weight: 500;
+    animation: svFadeIn 0.4s ease 0.1s both;
+}
+
+.seovela-dashboard .seovela-dash-alert--warning {
+    background: var(--sv-amber-light);
+    border-left: 3px solid var(--sv-amber);
+    color: #92400e;
+}
+
+.seovela-dashboard .seovela-dash-alert--warning .seovela-alert-icon {
+    color: var(--sv-amber);
+    flex-shrink: 0;
+}
+
+.seovela-dashboard .seovela-dash-alert--success {
+    background: var(--sv-green-light);
+    border-left: 3px solid var(--sv-green);
+    color: #065f46;
+}
+
+.seovela-dashboard .seovela-dash-alert--success .seovela-alert-icon {
+    color: var(--sv-green);
+    flex-shrink: 0;
+}
+
+.seovela-dashboard .seovela-alert-text {
+    flex: 1;
+    line-height: 1.4;
+}
+
+.seovela-dashboard .seovela-alert-link {
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    color: inherit;
+    transition: opacity var(--sv-ease);
+}
+
+.seovela-dashboard .seovela-alert-link:hover {
+    opacity: 0.8;
+    color: inherit;
+}
+
+/* ============================================
+   3. Stats Row — 4-Column Mini Cards
+   ============================================ */
+.seovela-dashboard .seovela-dash-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    animation: svFadeIn 0.4s ease 0.15s both;
+}
+
+.seovela-dashboard .seovela-stat-mini {
+    background: var(--sv-surface);
+    border: 1px solid var(--sv-border);
+    border-radius: var(--sv-radius-lg);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: var(--sv-shadow-xs);
+    transition: box-shadow var(--sv-ease), transform var(--sv-ease);
+}
+
+.seovela-dashboard .seovela-stat-mini:hover {
+    box-shadow: var(--sv-shadow-md);
+    transform: translateY(-2px);
+}
+
+.seovela-dashboard .seovela-stat-mini-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--sv-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.seovela-dashboard .seovela-stat-mini-icon svg {
     width: 18px;
     height: 18px;
 }
 
-/* Side Column */
-.seovela-dash-side-column {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sv-space-lg);
+.seovela-dashboard .seovela-stat-mini-icon--indigo {
+    background: var(--sv-brand-light);
+    color: var(--sv-brand);
 }
 
-/* Quick Actions */
-.seovela-actions-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sv-space-sm);
+.seovela-dashboard .seovela-stat-mini-icon--green {
+    background: var(--sv-green-light);
+    color: var(--sv-green);
 }
 
-.seovela-action-item {
+.seovela-dashboard .seovela-stat-mini-icon--purple {
+    background: #f5f3ff;
+    color: #8b5cf6;
+}
+
+.seovela-dashboard .seovela-stat-mini-icon--star {
+    background: var(--sv-amber-light);
+    color: var(--sv-amber);
+}
+
+.seovela-dashboard .seovela-stat-mini-number {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--sv-text-primary);
+    line-height: 1;
+    letter-spacing: -0.02em;
+}
+
+.seovela-dashboard .seovela-stat-mini-text {
+    font-size: 20px;
+    letter-spacing: 0;
+}
+
+.seovela-dashboard .seovela-stat-mini-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--sv-text-tertiary);
+    line-height: 1;
+}
+
+/* "Free" premium card — subtle indigo gradient */
+.seovela-dashboard .seovela-stat-mini--premium {
+    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+    border-color: #c7d2fe;
+}
+
+/* ============================================
+   4. Contextual Tip Banner
+   ============================================ */
+.seovela-dashboard .seovela-dash-tip {
     display: flex;
     align-items: center;
-    gap: var(--sv-space-md);
-    padding: var(--sv-space-md);
-    background: var(--sv-gray-50);
+    gap: 10px;
+    padding: 10px 16px;
+    background: var(--sv-surface);
+    border: 1px solid var(--sv-border);
     border-radius: var(--sv-radius-md);
-    text-decoration: none;
-    color: var(--sv-gray-700);
-    font-size: 14px;
-    font-weight: 500;
-    transition: all var(--sv-transition-fast);
+    animation: svFadeIn 0.4s ease 0.2s both;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.seovela-action-item:hover {
-    background: var(--sv-primary-50);
-    color: var(--sv-primary-700);
-    transform: translateX(4px);
-}
-
-.seovela-action-icon {
-    font-size: 18px;
-}
-
-/* Needs Attention */
-.seovela-attention-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sv-space-sm);
-}
-
-.seovela-attention-item {
+.seovela-dashboard .seovela-tip-icon-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--sv-radius-full);
+    background: var(--sv-amber-light);
+    color: var(--sv-amber);
     display: flex;
     align-items: center;
-    gap: var(--sv-space-sm);
-    padding: var(--sv-space-sm) var(--sv-space-md);
-    background: var(--sv-warning-light);
-    border-radius: var(--sv-radius-sm);
-    text-decoration: none;
-    transition: all var(--sv-transition-fast);
+    justify-content: center;
+    flex-shrink: 0;
 }
 
-.seovela-attention-item:hover {
-    background: #fde68a;
-    transform: translateX(4px);
-}
-
-.seovela-attention-type {
-    font-size: 14px;
-}
-
-.seovela-attention-title {
+.seovela-dashboard .seovela-tip-body {
     flex: 1;
+    min-width: 0;
+}
+
+.seovela-dashboard .seovela-tip-body p {
+    margin: 0;
     font-size: 13px;
-    font-weight: 500;
-    color: var(--sv-gray-700);
+    color: var(--sv-text-secondary);
+    line-height: 1.5;
+}
+
+.seovela-dashboard .seovela-tip-action {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sv-brand);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color var(--sv-ease);
+}
+
+.seovela-dashboard .seovela-tip-action:hover {
+    color: var(--sv-brand-hover);
+}
+
+.seovela-dashboard .seovela-tip-dismiss {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--sv-text-tertiary);
+    border-radius: var(--sv-radius-sm);
+    transition: all var(--sv-ease);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.seovela-dashboard .seovela-tip-dismiss:hover {
+    background: var(--sv-border-light);
+    color: var(--sv-text-secondary);
+}
+
+/* ============================================
+   5. Main Grid: Modules + Sidebar
+   ============================================ */
+.seovela-dashboard .seovela-dash-main-grid {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 20px;
+    align-items: start;
+    animation: svFadeIn 0.4s ease 0.25s both;
+}
+
+/* Module Section */
+.seovela-dashboard .seovela-dash-modules-section {
+    background: var(--sv-surface);
+    border-radius: var(--sv-radius-xl);
+    padding: 24px;
+    box-shadow: var(--sv-shadow-sm);
+    border: 1px solid var(--sv-border);
+}
+
+.seovela-dashboard .seovela-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.seovela-dashboard .seovela-section-header h2 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--sv-text-primary);
+    margin: 0;
+    padding: 0;
+    letter-spacing: -0.01em;
+    border: none;
+}
+
+.seovela-dashboard .seovela-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--sv-brand);
+    text-decoration: none;
+    transition: all var(--sv-ease);
+}
+
+.seovela-dashboard .seovela-link-btn:hover {
+    color: var(--sv-brand-hover);
+    gap: 6px;
+}
+
+.seovela-dashboard .seovela-link-btn svg {
+    flex-shrink: 0;
+}
+
+/* Module Grid — 3 columns */
+.seovela-dashboard .seovela-modules-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--sv-border-light);
+    border-radius: var(--sv-radius-md);
+    overflow: hidden;
+    border: 1px solid var(--sv-border-light);
+}
+
+/* Module Row */
+.seovela-dashboard .seovela-module-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--sv-surface);
+    text-decoration: none;
+    transition: background var(--sv-ease);
+    min-height: 60px;
+    position: relative;
+}
+
+.seovela-dashboard .seovela-module-row:hover {
+    background: var(--sv-bg);
+}
+
+.seovela-dashboard .seovela-module-row--active {
+    border-left: 2px solid var(--sv-brand);
+    padding-left: 12px;
+}
+
+/* Module Icon */
+.seovela-dashboard .seovela-module-row-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--sv-radius-sm);
+    background: var(--sv-brand-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.seovela-dashboard .seovela-module-row-icon .seovela-icon {
+    color: var(--sv-brand);
+    width: 18px;
+    height: 18px;
+}
+
+/* Module Info */
+.seovela-dashboard .seovela-module-row-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.seovela-dashboard .seovela-module-row-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--sv-text-primary);
+    line-height: 1.3;
+}
+
+.seovela-dashboard .seovela-module-row-desc {
+    font-size: 11px;
+    color: var(--sv-text-tertiary);
+    line-height: 1.3;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.seovela-attention-badge {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 3px 8px;
-    background: #f59e0b;
-    color: white;
+/* Module Toggle (visual indicator) */
+.seovela-dashboard .seovela-module-toggle {
+    width: 28px;
+    height: 16px;
     border-radius: var(--sv-radius-full);
+    background: var(--sv-border);
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    transition: background var(--sv-ease);
+    flex-shrink: 0;
+}
+
+.seovela-dashboard .seovela-module-toggle--on {
+    background: var(--sv-green);
+}
+
+.seovela-dashboard .seovela-module-toggle-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform var(--sv-ease);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.seovela-dashboard .seovela-module-toggle--on .seovela-module-toggle-dot {
+    transform: translateX(12px);
+}
+
+/* Module Arrow */
+.seovela-dashboard .seovela-module-row-arrow {
+    color: var(--sv-text-tertiary);
+    flex-shrink: 0;
+    transition: all var(--sv-ease);
+    opacity: 0;
+}
+
+.seovela-dashboard .seovela-module-row-arrow svg {
+    display: block;
+}
+
+.seovela-dashboard .seovela-module-row:hover .seovela-module-row-arrow {
+    opacity: 1;
+    color: var(--sv-brand);
+    transform: translateX(2px);
 }
 
 /* ============================================
-   Resources Section
+   Quick Actions Sidebar
    ============================================ */
-.seovela-dash-resources {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--sv-space-lg);
+.seovela-dashboard .seovela-dash-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
-.seovela-resource-card {
-    background: var(--sv-surface-card);
+.seovela-dashboard .seovela-sidebar-card {
+    background: var(--sv-surface);
     border-radius: var(--sv-radius-lg);
-    padding: var(--sv-space-xl);
-    text-align: center;
-    box-shadow: var(--sv-shadow-md);
-    border: 1px solid var(--sv-gray-100);
-    transition: all var(--sv-transition-base);
+    padding: 20px;
+    box-shadow: var(--sv-shadow-sm);
+    border: 1px solid var(--sv-border);
 }
 
-.seovela-resource-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--sv-shadow-xl);
-}
-
-.seovela-resource-icon {
-    font-size: 36px;
-    margin-bottom: var(--sv-space-md);
-}
-
-.seovela-resource-card h3 {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--sv-gray-900);
-    margin: 0 0 var(--sv-space-sm);
-}
-
-.seovela-resource-card p {
+.seovela-dashboard .seovela-sidebar-card h3 {
     font-size: 13px;
-    color: var(--sv-gray-500);
-    margin: 0 0 var(--sv-space-lg);
-    line-height: 1.5;
+    font-weight: 700;
+    color: var(--sv-text-primary);
+    margin: 0 0 12px;
+    padding: 0;
+    letter-spacing: -0.01em;
 }
 
-.seovela-resource-link {
-    display: inline-flex;
+.seovela-dashboard .seovela-quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.seovela-dashboard .seovela-qa-item {
+    display: flex;
     align-items: center;
-    gap: var(--sv-space-xs);
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--sv-primary-600);
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--sv-radius-sm);
     text-decoration: none;
-    transition: all var(--sv-transition-fast);
+    color: var(--sv-text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all var(--sv-ease);
+    line-height: 1.3;
 }
 
-.seovela-resource-link:hover {
-    color: var(--sv-primary-700);
-    gap: var(--sv-space-sm);
+.seovela-dashboard .seovela-qa-item:hover {
+    background: var(--sv-brand-light);
+    color: var(--sv-brand);
 }
 
-.seovela-resource-link .dashicons {
-    font-size: 14px;
-    width: 14px;
-    height: 14px;
+.seovela-dashboard .seovela-qa-item svg {
+    flex-shrink: 0;
+    opacity: 0.6;
+    transition: opacity var(--sv-ease);
+}
+
+.seovela-dashboard .seovela-qa-item:hover svg {
+    opacity: 1;
+}
+
+.seovela-dashboard .seovela-qa-item span:first-of-type {
+    flex: 1;
+}
+
+/* 404 badge */
+.seovela-dashboard .seovela-qa-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    background: var(--sv-red);
+    color: #fff;
+    border-radius: var(--sv-radius-full);
+    line-height: 1.3;
+}
+
+.seovela-dashboard .seovela-qa-item--alert {
+    color: var(--sv-red);
+}
+
+.seovela-dashboard .seovela-qa-item--alert:hover {
+    background: var(--sv-red-light);
+    color: var(--sv-red);
 }
 
 /* ============================================
    Footer
    ============================================ */
-.seovela-dash-footer {
+.seovela-dashboard .seovela-dash-footer {
     text-align: center;
-    padding: var(--sv-space-xl) 0;
-    border-top: 1px solid var(--sv-gray-200);
-    margin-top: var(--sv-space-lg);
+    padding: 24px 32px;
+    border-top: 1px solid var(--sv-border);
 }
 
-.seovela-dash-footer p {
+.seovela-dashboard .seovela-dash-footer p {
     margin: 0;
-    font-size: 13px;
-    color: var(--sv-gray-500);
+    font-size: 12px;
+    color: var(--sv-text-tertiary);
 }
 
-.seovela-dash-footer a {
-    color: var(--sv-primary-600);
+.seovela-dashboard .seovela-heart {
+    color: var(--sv-red);
+}
+
+.seovela-dashboard .seovela-dash-footer a {
+    color: var(--sv-brand);
     text-decoration: none;
     font-weight: 500;
 }
 
-.seovela-dash-footer a:hover {
+.seovela-dashboard .seovela-dash-footer a:hover {
     text-decoration: underline;
 }
 
 /* ============================================
-   Responsive Design
+   SVG Icon System Overrides
    ============================================ */
-@media (max-width: 1200px) {
-    .seovela-dash-top-row {
-        grid-template-columns: 1fr;
-    }
-    
-    .seovela-dash-score-card {
-        max-width: 600px;
-    }
-    
-    .seovela-dash-main-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .seovela-modules-quick-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
+.seovela-dashboard .seovela-icon {
+    display: inline-flex;
+    vertical-align: middle;
+    flex-shrink: 0;
+    line-height: 1;
 }
 
-@media (max-width: 900px) {
-    .seovela-dash-header-content {
-        flex-wrap: wrap;
-    }
-    
-    .seovela-dash-stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .seovela-modules-quick-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .seovela-dash-resources {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 600px) {
-    .seovela-dash-main {
-        padding: var(--sv-space-md);
-    }
-    
-    .seovela-dash-header {
-        padding: var(--sv-space-md);
-    }
-    
-    .seovela-dash-score-card {
-        flex-direction: column;
-        text-align: center;
-        padding: var(--sv-space-lg);
-    }
-    
-    .seovela-score-ring-container {
-        width: 150px;
-        height: 150px;
-    }
-    
-    .seovela-score-number {
-        font-size: 40px;
-    }
-    
-    .seovela-dash-stats-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .seovela-modules-quick-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .seovela-stat-number {
-        font-size: 26px;
-    }
-    
-    .seovela-btn-upgrade span:not(.seovela-btn-icon) {
-        display: none;
-    }
+.seovela-dashboard .seovela-btn-secondary .seovela-icon {
+    color: currentColor;
 }
 
 /* ============================================
    Animations
    ============================================ */
-@keyframes fadeInUp {
+@keyframes svFadeIn {
     from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(8px);
     }
     to {
         opacity: 1;
@@ -1003,85 +922,170 @@
     }
 }
 
-@keyframes scaleIn {
-    from {
-        opacity: 0;
-        transform: scale(0.9);
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .seovela-dashboard *,
+    .seovela-dashboard *::before,
+    .seovela-dashboard *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
 
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(20px);
+    .seovela-dashboard .seovela-score-ring-progress {
+        transition-duration: 0.01ms !important;
     }
-    to {
-        opacity: 1;
-        transform: translateX(0);
+
+    .seovela-dashboard .seovela-bar-fill {
+        transition-duration: 0.01ms !important;
     }
 }
 
-.seovela-dash-header {
-    animation: fadeInUp 0.5s ease forwards;
+/* ============================================
+   Loading Skeleton States (CSS-only)
+   ============================================ */
+.seovela-dashboard .seovela-skeleton {
+    background: linear-gradient(90deg, var(--sv-border-light) 25%, var(--sv-border) 50%, var(--sv-border-light) 75%);
+    background-size: 200% 100%;
+    animation: svSkeleton 1.5s ease infinite;
+    border-radius: var(--sv-radius-sm);
 }
 
-.seovela-dash-score-card {
-    animation: scaleIn 0.6s ease 0.1s forwards;
-    opacity: 0;
+@keyframes svSkeleton {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
 
-.seovela-dash-stats-grid .seovela-stat-card {
-    animation: fadeInUp 0.5s ease forwards;
-    opacity: 0;
+/* ============================================
+   Responsive Design
+   ============================================ */
+
+/* Tablet - below 1200px */
+@media (max-width: 1200px) {
+    .seovela-dashboard .seovela-modules-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .seovela-dashboard .seovela-dash-main-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .seovela-dashboard .seovela-dash-sidebar {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
-.seovela-stat-card:nth-child(1) { animation-delay: 0.2s; }
-.seovela-stat-card:nth-child(2) { animation-delay: 0.3s; }
-.seovela-stat-card:nth-child(3) { animation-delay: 0.4s; }
-.seovela-stat-card:nth-child(4) { animation-delay: 0.5s; }
+/* Below 900px */
+@media (max-width: 900px) {
+    .seovela-dashboard .seovela-dash-hero {
+        flex-direction: column;
+        text-align: center;
+        gap: 24px;
+        padding: 24px;
+    }
 
-.seovela-dash-tip-banner {
-    animation: slideInRight 0.5s ease 0.4s forwards;
-    opacity: 0;
+    .seovela-dashboard .seovela-score-ring-container {
+        width: 150px;
+        height: 150px;
+    }
+
+    .seovela-dashboard .seovela-score-number {
+        font-size: 40px;
+    }
+
+    .seovela-dashboard .seovela-hero-bars {
+        text-align: left;
+    }
+
+    .seovela-dashboard .seovela-dash-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .seovela-dashboard .seovela-dash-sidebar {
+        grid-template-columns: 1fr;
+    }
 }
 
-.seovela-dash-section {
-    animation: fadeInUp 0.6s ease forwards;
-    opacity: 0;
+/* WordPress mobile admin breakpoint — below 782px */
+@media (max-width: 782px) {
+    .wrap.seovela-dashboard.seovela-dashboard-v2 {
+        margin: -10px -12px 0 -12px;
+    }
+
+    .seovela-dashboard .seovela-dash-header {
+        padding: 16px;
+    }
+
+    .seovela-dashboard .seovela-dash-main {
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .seovela-dashboard .seovela-dash-header-content {
+        flex-wrap: wrap;
+    }
+
+    .seovela-dashboard .seovela-btn-primary span {
+        display: none;
+    }
+
+    .seovela-dashboard .seovela-dash-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .seovela-dashboard .seovela-stat-mini {
+        padding: 12px;
+    }
+
+    .seovela-dashboard .seovela-stat-mini-number {
+        font-size: 20px;
+    }
+
+    .seovela-dashboard .seovela-modules-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .seovela-dashboard .seovela-dash-modules-section {
+        padding: 16px;
+    }
+
+    .seovela-dashboard .seovela-dash-hero {
+        padding: 20px;
+    }
 }
 
-.seovela-dash-modules { animation-delay: 0.5s; }
-.seovela-dash-actions { animation-delay: 0.6s; }
-.seovela-dash-attention { animation-delay: 0.7s; }
+/* Below 480px */
+@media (max-width: 480px) {
+    .seovela-dashboard .seovela-dash-stats {
+        grid-template-columns: 1fr 1fr;
+    }
 
-.seovela-resource-card {
-    animation: fadeInUp 0.5s ease forwards;
-    opacity: 0;
+    .seovela-dashboard .seovela-hero-cta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
 }
-
-.seovela-resource-card:nth-child(1) { animation-delay: 0.7s; }
-.seovela-resource-card:nth-child(2) { animation-delay: 0.8s; }
-.seovela-resource-card:nth-child(3) { animation-delay: 0.9s; }
 
 /* ============================================
    Print Styles
    ============================================ */
 @media print {
-    .seovela-dash-bg,
-    .seovela-btn-upgrade,
-    .seovela-tip-dismiss {
+    .seovela-dashboard .seovela-dash-tip,
+    .seovela-dashboard .seovela-tip-dismiss,
+    .seovela-dashboard .seovela-btn-primary {
         display: none !important;
     }
-    
-    .seovela-dash-section,
-    .seovela-stat-card,
-    .seovela-resource-card {
+
+    .seovela-dashboard .seovela-dash-modules-section,
+    .seovela-dashboard .seovela-sidebar-card,
+    .seovela-dashboard .seovela-stat-mini,
+    .seovela-dashboard .seovela-dash-hero {
         box-shadow: none !important;
         border: 1px solid #ddd !important;
     }
 }
 
+/* Admin menu icon — handled in admin.css */
