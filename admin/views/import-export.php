@@ -225,17 +225,16 @@ $active_ie_tab = isset( $_GET['ie_tab'] ) ? sanitize_key( wp_unslash( $_GET['ie_
     </div><!-- .seovela-page-body -->
 </div><!-- .seovela-premium-page -->
 
-<?php
-wp_add_inline_style( 'seovela-admin', '
+<style>
 .seovela-ie-content {
     display: none;
 }
 .seovela-ie-content.active {
     display: block;
 }
-' );
+</style>
 
-wp_add_inline_script( 'seovela-admin', '
+<script>
 jQuery(document).ready(function($) {
     // Tab switching
     $(".seovela-ie-tab").on("click", function(e) {
@@ -251,5 +250,4 @@ jQuery(document).ready(function($) {
         $("#seovela-ie-" + tab).addClass("active");
     });
 });
-' );
-?>
+</script>

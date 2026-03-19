@@ -608,8 +608,7 @@ $claude_configured = ! empty( $claude_key_raw );
     </div><!-- .seovela-page-body -->
 </div><!-- .seovela-premium-page -->
 
-<?php
-wp_add_inline_style( 'seovela-admin', '
+<style>
 /* AI Settings Page Styles */
 .seovela-provider-cards {
     display: grid;
@@ -886,12 +885,12 @@ wp_add_inline_style( 'seovela-admin', '
 .seovela-pricing-item li:last-child {
     border-bottom: none;
 }
-' );
+</style>
 
-wp_add_inline_script( 'seovela-admin', '
+<script>
 jQuery(document).ready(function($) {
     // Provider selection
-    $("input[name=\'seovela_ai_provider\']").on("change", function() {
+    $("input[name='seovela_ai_provider']").on("change", function() {
         var provider = $(this).val();
 
         // Update card states
@@ -909,7 +908,7 @@ jQuery(document).ready(function($) {
         var provider = $button.data("provider");
         var originalText = $button.text();
 
-        $button.text("' . esc_js( __( 'Testing...', 'seovela' ) ) . '").prop("disabled", true);
+        $button.text("<?php echo esc_js( __( 'Testing...', 'seovela' ) ); ?>").prop("disabled", true);
 
         $.ajax({
             url: ajaxurl,
@@ -918,17 +917,17 @@ jQuery(document).ready(function($) {
                 action: "seovela_test_ai_connection",
                 provider: provider,
                 api_key: provider === "openai" ? $("#seovela_openai_api_key").val() : (provider === "claude" ? $("#seovela_claude_api_key").val() : $("#seovela_gemini_api_key").val()),
-                nonce: "' . wp_create_nonce( 'seovela_test_ai' ) . '"
+                nonce: "<?php echo wp_create_nonce( 'seovela_test_ai' ); ?>"
             },
             success: function(response) {
                 if (response.success) {
-                    alert("' . esc_js( __( 'Connection successful! API key is valid.', 'seovela' ) ) . '");
+                    alert("<?php echo esc_js( __( 'Connection successful! API key is valid.', 'seovela' ) ); ?>");
                 } else {
-                    alert("' . esc_js( __( 'Connection failed: ', 'seovela' ) ) . '" + response.data.message);
+                    alert("<?php echo esc_js( __( 'Connection failed: ', 'seovela' ) ); ?>" + response.data.message);
                 }
             },
             error: function() {
-                alert("' . esc_js( __( 'Connection test failed. Please try again.', 'seovela' ) ) . '");
+                alert("<?php echo esc_js( __( 'Connection test failed. Please try again.', 'seovela' ) ); ?>");
             },
             complete: function() {
                 $button.text(originalText).prop("disabled", false);
@@ -941,5 +940,4 @@ jQuery(document).ready(function($) {
         $(".seovela-range-value").text($(this).val());
     });
 });
-' );
-?>
+</script>

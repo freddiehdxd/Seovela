@@ -262,9 +262,6 @@ foreach ( $modules as $module_key => $module_info ) {
     </form>
 </div>
 
-<?php
-ob_start();
-?>
 <style>
 /* Premium Modules Page Styles */
 .seovela-modules-premium {
@@ -852,13 +849,8 @@ ob_start();
     animation: pulse-success 0.5s ease;
 }
 </style>
-<?php
-$modules_css = ob_get_clean();
-// Strip the <style> and </style> tags from the captured output.
-$modules_css = preg_replace( '/<\/?style[^>]*>/', '', $modules_css );
-wp_add_inline_style( 'seovela-admin', $modules_css );
 
-wp_add_inline_script( 'seovela-admin', '
+<script>
 jQuery(document).ready(function($) {
     // Toggle status text update
     $(".seovela-module-toggle-input").on("change", function() {
@@ -867,10 +859,10 @@ jQuery(document).ready(function($) {
 
         if ($(this).is(":checked")) {
             $card.addClass("is-active");
-            $status.text("' . esc_js( __( 'On', 'seovela' ) ) . '");
+            $status.text("<?php echo esc_js( __( 'On', 'seovela' ) ); ?>");
         } else {
             $card.removeClass("is-active");
-            $status.text("' . esc_js( __( 'Off', 'seovela' ) ) . '");
+            $status.text("<?php echo esc_js( __( 'Off', 'seovela' ) ); ?>");
         }
 
         // Update stats counter
@@ -890,5 +882,4 @@ jQuery(document).ready(function($) {
         });
     }
 });
-' );
-?>
+</script>

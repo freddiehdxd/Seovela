@@ -569,8 +569,7 @@ if ( $is_connected && $has_property ) {
 	<?php endif; ?>
 </div>
 
-<?php
-wp_add_inline_style( 'seovela-gsc', '
+<style>
 /* GSC Page Styles - Centralized OAuth Version */
 :root {
 	--gsc-primary: #4285F4;
@@ -1374,5 +1373,4 @@ wp_add_inline_style( 'seovela-gsc', '
 @media (max-width: 480px) {
 	.gsc-features-grid { grid-template-columns: 1fr; }
 }
-' );
-?>
+</style>

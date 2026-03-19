@@ -14,8 +14,7 @@ $image_seo = Seovela_Image_Seo::get_instance();
 ?>
 
 <div class="seovela-image-seo-page">
-	<?php
-	wp_add_inline_style( 'seovela-image-seo', '
+	<style>
 		.size-info{display:flex;flex-direction:column;gap:3px}
 		.size-info .size-label{display:none!important}
 		.size-info .size-original,.size-info .size-value.original{font-size:12px;font-weight:500;color:#94a3b8;text-decoration:line-through}
@@ -23,8 +22,7 @@ $image_seo = Seovela_Image_Seo::get_instance();
 		.size-info .size-savings,.size-info .savings-badge{display:inline-flex;padding:3px 8px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:#fff;border-radius:4px;font-size:11px;font-weight:700;width:fit-content}
 		.size-info .size-comparison{display:flex;flex-direction:column;gap:3px}
 		.size-info .size-row{display:flex;align-items:baseline}
-	' );
-	?>
+	</style>
 	<!-- Header -->
 	<div class="seovela-imgseo-header">
 		<div class="seovela-imgseo-header-left">
@@ -612,15 +610,13 @@ $image_seo = Seovela_Image_Seo::get_instance();
 						</div>
 					</div>
 
-					<?php
-					wp_add_inline_script( 'seovela-image-seo', '
-						jQuery(document).ready(function($) {
-							$("input[name=\'replace_original\']").on("change", function() {
-								$("#replace-original-warning").toggle($(this).is(":checked"));
-							});
+					<script>
+					jQuery(document).ready(function($) {
+						$("input[name='replace_original']").on("change", function() {
+							$("#replace-original-warning").toggle($(this).is(":checked"));
 						});
-					' );
-					?>
+					});
+				</script>
 
 					</form>
 			</div>

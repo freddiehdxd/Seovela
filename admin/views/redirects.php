@@ -225,14 +225,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div>
 </div>
 
-<?php
-wp_add_inline_script( 'seovela-admin', '
+<script>
 // Fallback if localization fails
 if (typeof seovelaRedirects === "undefined") {
     var seovelaRedirects = {
-        ajaxUrl: "' . esc_js( admin_url( 'admin-ajax.php' ) ) . '",
-        nonce: "' . esc_js( wp_create_nonce( 'seovela_redirects' ) ) . '"
+        ajaxUrl: "<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>",
+        nonce: "<?php echo esc_js( wp_create_nonce( 'seovela_redirects' ) ); ?>"
     };
 }
-' );
-?>
+</script>

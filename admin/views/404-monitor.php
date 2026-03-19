@@ -300,15 +300,14 @@ $redirect_enabled = isset( $settings_404['redirect_enabled'] ) ? $settings_404['
 	</div>
 </div>
 
-<?php
-wp_add_inline_script( 'seovela-admin', '
+<script>
 var seovela404Monitor = {
-	ajaxUrl: "' . esc_js( admin_url( 'admin-ajax.php' ) ) . '",
-	nonce: "' . esc_js( wp_create_nonce( 'seovela_404_monitor' ) ) . '"
+	ajaxUrl: "<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>",
+	nonce: "<?php echo esc_js( wp_create_nonce( 'seovela_404_monitor' ) ); ?>"
 };
-' );
+</script>
 
-wp_add_inline_style( 'seovela-admin', '
+<style>
 /* 404 Monitor - Page-specific styles */
 /* (Header, stats, breadcrumb handled by unified premium CSS in admin.css) */
 
@@ -930,16 +929,15 @@ wp_add_inline_style( 'seovela-admin', '
 		gap: 12px;
 		align-items: stretch;
 	}
-	
+
 	.seovela-404-premium .seovela-search-box input[type="search"] {
 		min-width: 0;
 		flex: 1;
 	}
-	
+
 	.panel-content {
 		width: 100%;
 		right: -100%;
 	}
 }
-' );
-?>
+</style>

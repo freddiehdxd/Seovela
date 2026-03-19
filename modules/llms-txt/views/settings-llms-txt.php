@@ -346,8 +346,7 @@ $estimated_links = min( $total_posts, $posts_limit * count( $selected_post_types
     </footer>
 </div>
 
-<?php
-wp_add_inline_script( 'seovela-admin', '
+<script>
 jQuery(document).ready(function($) {
     // Update stats in real-time
     function updateStats() {
@@ -373,7 +372,7 @@ jQuery(document).ready(function($) {
     });
 
     // Checkbox card styling
-    $(".seovela-llms-checkbox-card input[type=\'checkbox\']").on("change", function() {
+    $(".seovela-llms-checkbox-card input[type='checkbox']").on("change", function() {
         $(this).closest(".seovela-llms-checkbox-card").toggleClass("checked", this.checked);
         updateStats();
     });
@@ -390,24 +389,24 @@ jQuery(document).ready(function($) {
 
         navigator.clipboard.writeText(url).then(function() {
             $btn.addClass("copied");
-            $btn.find("svg").html(\'<polyline points="20 6 9 17 4 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>\');
+            $btn.find("svg").html('<polyline points="20 6 9 17 4 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>');
 
             setTimeout(function() {
                 $btn.removeClass("copied");
-                $btn.find("svg").html(\'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>\');
+                $btn.find("svg").html('<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>');
             }, 2000);
         });
     });
 
     // Reset options
     $("#seovela-reset-llms-options").on("click", function() {
-        if (confirm("' . esc_js( __( 'Reset all LLMS Txt settings to defaults?', 'seovela' ) ) . '")) {
+        if (confirm("<?php echo esc_js( __( 'Reset all LLMS Txt settings to defaults?', 'seovela' ) ); ?>")) {
             $(".seovela-post-type-checkbox").prop("checked", false);
-            $("input[value=\'post\'], input[value=\'page\']").filter(".seovela-post-type-checkbox").prop("checked", true).trigger("change");
+            $("input[value='post'], input[value='page']").filter(".seovela-post-type-checkbox").prop("checked", true).trigger("change");
             $(".seovela-taxonomy-checkbox").prop("checked", false).trigger("change");
             $("#seovela-limit-slider").val("260");
             $("#seovela-limit-display").text("260");
-            $("textarea[name=\'seovela_llms_txt_additional_content\']").val("");
+            $("textarea[name='seovela_llms_txt_additional_content']").val("");
         }
     });
 
@@ -417,7 +416,6 @@ jQuery(document).ready(function($) {
         $(".seovela-llms-footer .seovela-llms-btn-primary").addClass("seovela-llms-btn-loading");
     });
 });
-' );
-?>
+</script>
 
 <?php

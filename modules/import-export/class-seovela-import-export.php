@@ -1138,15 +1138,23 @@ class Seovela_Import_Export {
 		if ( 'yoast' === $source ) {
 			$yoast_titles = get_option( 'wpseo_titles', array() );
 			if ( isset( $yoast_titles['separator'] ) && ! empty( $yoast_titles['separator'] ) ) {
-				// Yoast stores separators as entity names like 'sc-dash'. Map common ones.
 				$separator = $this->map_yoast_separator( $yoast_titles['separator'] );
 				update_option( 'seovela_separator_character', $separator );
 				$result['processed']++;
 			} else {
 				$result['skipped'][] = __( 'No Yoast title separator setting found.', 'seovela' );
 			}
+
+			// Homepage title and description.
+			if ( isset( $yoast_titles['title-home-wpseo'] ) && ! empty( $yoast_titles['title-home-wpseo'] ) ) {
+				update_option( 'seovela_home_title', sanitize_text_field( $yoast_titles['title-home-wpseo'] ) );
+				$result['processed']++;
+			}
+			if ( isset( $yoast_titles['metadesc-home-wpseo'] ) && ! empty( $yoast_titles['metadesc-home-wpseo'] ) ) {
+				update_option( 'seovela_home_description', sanitize_textarea_field( $yoast_titles['metadesc-home-wpseo'] ) );
+				$result['processed']++;
+			}
 		} elseif ( 'rankmath' === $source ) {
-			// Rank Math stores options in rank-math-options-titles or similar.
 			$rm_titles = get_option( 'rank-math-options-titles', array() );
 			if ( empty( $rm_titles ) ) {
 				$rm_titles = get_option( 'rank_math_options', array() );
@@ -1157,6 +1165,16 @@ class Seovela_Import_Export {
 				$result['processed']++;
 			} else {
 				$result['skipped'][] = __( 'No Rank Math title separator setting found.', 'seovela' );
+			}
+
+			// Homepage title and description.
+			if ( isset( $rm_titles['homepage_title'] ) && ! empty( $rm_titles['homepage_title'] ) ) {
+				update_option( 'seovela_home_title', sanitize_text_field( $rm_titles['homepage_title'] ) );
+				$result['processed']++;
+			}
+			if ( isset( $rm_titles['homepage_description'] ) && ! empty( $rm_titles['homepage_description'] ) ) {
+				update_option( 'seovela_home_description', sanitize_textarea_field( $rm_titles['homepage_description'] ) );
+				$result['processed']++;
 			}
 		}
 

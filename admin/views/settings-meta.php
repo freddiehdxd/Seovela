@@ -900,8 +900,7 @@ $active_section = isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['s
     </div><!-- .seovela-page-body -->
 </div><!-- .seovela-premium-page -->
 
-<?php
-wp_add_inline_script( 'seovela-admin', '
+<script>
 jQuery(document).ready(function($) {
     // Media Uploader
     var mediaUploader;
@@ -912,7 +911,7 @@ jQuery(document).ready(function($) {
 
         var $button = $(this);
         var $box = $button.closest(".seovela-media-upload-box");
-        currentTarget = $box.find("input[type=\'hidden\']").attr("id");
+        currentTarget = $box.find("input[type='hidden']").attr("id");
 
         if (mediaUploader) {
             mediaUploader.open();
@@ -920,9 +919,9 @@ jQuery(document).ready(function($) {
         }
 
         mediaUploader = wp.media({
-            title: "' . esc_js( __( 'Choose Image', 'seovela' ) ) . '",
+            title: "<?php echo esc_js( __( 'Choose Image', 'seovela' ) ); ?>",
             button: {
-                text: "' . esc_js( __( 'Use this image', 'seovela' ) ) . '"
+                text: "<?php echo esc_js( __( 'Use this image', 'seovela' ) ); ?>"
             },
             multiple: false
         });
@@ -939,15 +938,15 @@ jQuery(document).ready(function($) {
             var sizeClass = isSmall ? "seovela-media-preview-small" : "";
 
             $box.html(
-                \'<div class="seovela-media-preview \' + sizeClass + \'">\' +
-                    \'<img src="\' + attachment.url + \'" alt="Image" />\' +
-                    \'<div class="seovela-media-overlay">\' +
-                        \'<button type="button" class="button seovela-upload-image-button">\' +
-                            \'<span class="dashicons dashicons-edit"></span> Change\' +
-                        \'</button>\' +
-                    \'</div>\' +
-                \'</div>\' +
-                \'<input type="hidden" id="\' + currentTarget + \'" name="\' + currentTarget + \'" value="\' + attachment.url + \'" />\'
+                '<div class="seovela-media-preview ' + sizeClass + '">' +
+                    '<img src="' + attachment.url + '" alt="Image" />' +
+                    '<div class="seovela-media-overlay">' +
+                        '<button type="button" class="button seovela-upload-image-button">' +
+                            '<span class="dashicons dashicons-edit"></span> Change' +
+                        '</button>' +
+                    '</div>' +
+                '</div>' +
+                '<input type="hidden" id="' + currentTarget + '" name="' + currentTarget + '" value="' + attachment.url + '" />'
             );
         });
 
@@ -990,19 +989,19 @@ jQuery(document).ready(function($) {
         // Determine status and apply classes
         if (length === 0) {
             $meter.addClass("seovela-meter-empty");
-            $status.addClass("seovela-status-empty").text("' . esc_js( __( 'Empty', 'seovela' ) ) . '");
+            $status.addClass("seovela-status-empty").text("<?php echo esc_js( __( 'Empty', 'seovela' ) ); ?>");
         } else if (length < minLength) {
             $meter.addClass("seovela-meter-short");
-            $status.addClass("seovela-status-short").text("' . esc_js( __( 'Too short', 'seovela' ) ) . '");
+            $status.addClass("seovela-status-short").text("<?php echo esc_js( __( 'Too short', 'seovela' ) ); ?>");
         } else if (length >= minLength && length <= optimalLength) {
             $meter.addClass("seovela-meter-good");
-            $status.addClass("seovela-status-good").text("' . esc_js( __( 'Good', 'seovela' ) ) . '");
+            $status.addClass("seovela-status-good").text("<?php echo esc_js( __( 'Good', 'seovela' ) ); ?>");
         } else if (length > optimalLength && length <= maxLength) {
             $meter.addClass("seovela-meter-warning");
-            $status.addClass("seovela-status-warning").text("' . esc_js( __( 'Acceptable', 'seovela' ) ) . '");
+            $status.addClass("seovela-status-warning").text("<?php echo esc_js( __( 'Acceptable', 'seovela' ) ); ?>");
         } else {
             $meter.addClass("seovela-meter-danger");
-            $status.addClass("seovela-status-danger").text("' . esc_js( __( 'Too long', 'seovela' ) ) . '");
+            $status.addClass("seovela-status-danger").text("<?php echo esc_js( __( 'Too long', 'seovela' ) ); ?>");
         }
     }
 
@@ -1016,5 +1015,4 @@ jQuery(document).ready(function($) {
         updateSeoMeter(this);
     });
 });
-' );
-?>
+</script>
