@@ -61,11 +61,51 @@ if ( isset( $_POST['seovela_save_meta_settings'] ) && wp_verify_nonce( sanitize_
         'seovela_titles_post_tag_robots',
     );
 
-    foreach ( $settings_to_save as $setting ) {
+    // Determine which settings belong to the active section so we only
+    // save fields that are actually present in the current form.
+    $section = isset( $_POST['seovela_meta_section'] ) ? sanitize_key( wp_unslash( $_POST['seovela_meta_section'] ) ) : 'global';
+
+    $section_settings = array(
+        'global' => array(
+            'seovela_robots_index', 'seovela_robots_noindex', 'seovela_robots_nofollow',
+            'seovela_robots_noarchive', 'seovela_robots_noimageindex', 'seovela_robots_nosnippet',
+            'seovela_robots_max_snippet', 'seovela_robots_max_video_preview', 'seovela_robots_max_image_preview',
+            'seovela_noindex_empty_archives', 'seovela_separator_character', 'seovela_capitalize_titles',
+        ),
+        'local-seo' => array(
+            'seovela_knowledge_graph_type', 'seovela_knowledge_graph_name', 'seovela_knowledge_graph_logo',
+        ),
+        'social' => array(
+            'seovela_default_og_image', 'seovela_twitter_card_type',
+        ),
+        'homepage' => array(
+            'seovela_home_title', 'seovela_home_description',
+        ),
+        'posts' => array(
+            'seovela_titles_post_title', 'seovela_titles_post_description',
+            'seovela_titles_post_type', 'seovela_titles_post_robots',
+        ),
+        'pages' => array(
+            'seovela_titles_page_title', 'seovela_titles_page_description',
+            'seovela_titles_page_type', 'seovela_titles_page_robots',
+        ),
+        'categories' => array(
+            'seovela_titles_category_title', 'seovela_titles_category_description',
+            'seovela_titles_category_robots',
+        ),
+        'tags' => array(
+            'seovela_titles_post_tag_title', 'seovela_titles_post_tag_description',
+            'seovela_titles_post_tag_robots',
+        ),
+    );
+
+    $active_settings = isset( $section_settings[ $section ] ) ? $section_settings[ $section ] : array();
+
+    foreach ( $active_settings as $setting ) {
         if ( isset( $_POST[ $setting ] ) ) {
-            if ( in_array( $setting, array( 'seovela_default_og_image', 'seovela_knowledge_graph_logo' ) ) ) {
+            if ( in_array( $setting, array( 'seovela_default_og_image', 'seovela_knowledge_graph_logo' ), true ) ) {
                 update_option( $setting, esc_url_raw( wp_unslash( $_POST[ $setting ] ) ) );
-            } elseif ( in_array( $setting, array( 'seovela_robots_max_snippet', 'seovela_robots_max_video_preview' ) ) ) {
+            } elseif ( in_array( $setting, array( 'seovela_robots_max_snippet', 'seovela_robots_max_video_preview' ), true ) ) {
                 update_option( $setting, intval( wp_unslash( $_POST[ $setting ] ) ) );
             } else {
                 update_option( $setting, sanitize_text_field( wp_unslash( $_POST[ $setting ] ) ) );
@@ -275,6 +315,7 @@ $active_section = isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['s
         <div class="seovela-settings-content-area">
             <form method="post" enctype="multipart/form-data">
                 <?php wp_nonce_field( 'seovela_save_meta_settings', 'seovela_meta_nonce' ); ?>
+                <input type="hidden" name="seovela_meta_section" value="<?php echo esc_attr( $active_section ); ?>" />
 
                 <?php if ( $active_section === 'global' ) : ?>
                     <div class="seovela-settings-section">
