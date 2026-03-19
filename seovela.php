@@ -5,7 +5,7 @@
  * Description: Lightweight, fully free SEO plugin with AI-powered optimization (BYOK). All features included — no premium tier.
  * Version: 2.1.0
  * Author: Freddie
- * Author URI: https://seovela.com
+ * Author URI: https://github.com/freddiehdxd
  * License: GPL-3.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain: seovela
