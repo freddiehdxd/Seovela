@@ -2,7 +2,6 @@
  * Seovela AI Block Editor Integration with Streaming
  *
  * Adds AI sidebar panel to Gutenberg with real-time streaming
- * Shows Pro teaser for free users
  *
  * @package Seovela
  */
@@ -37,47 +36,6 @@
         d: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'
     }));
 
-    // Pro Teaser Component
-    function SeovelaProTeaser() {
-        return el('div', { className: 'seovela-ai-sidebar seovela-ai-pro-teaser' },
-            el('div', { className: 'seovela-ai-teaser-content' },
-                el('div', { className: 'seovela-ai-teaser-icon' },
-                    el('span', { className: 'dashicons dashicons-superhero-alt' })
-                ),
-                el('span', { className: 'seovela-ai-pro-badge' }, seovelaAI.i18n.proFeature),
-                el('h3', null, seovelaAI.i18n.proTitle),
-                el('p', null, seovelaAI.i18n.proDescription),
-                el('ul', { className: 'seovela-ai-teaser-features' },
-                    el('li', null,
-                        el('span', { className: 'dashicons dashicons-yes-alt' }),
-                        seovelaAI.i18n.proFeature1
-                    ),
-                    el('li', null,
-                        el('span', { className: 'dashicons dashicons-yes-alt' }),
-                        seovelaAI.i18n.proFeature2
-                    ),
-                    el('li', null,
-                        el('span', { className: 'dashicons dashicons-yes-alt' }),
-                        seovelaAI.i18n.proFeature3
-                    ),
-                    el('li', null,
-                        el('span', { className: 'dashicons dashicons-yes-alt' }),
-                        seovelaAI.i18n.proFeature4
-                    )
-                ),
-                el('a', {
-                    href: seovelaAI.upgradeUrl,
-                    className: 'seovela-ai-upgrade-btn',
-                    target: '_blank',
-                    rel: 'noopener noreferrer'
-                },
-                    el('span', { className: 'dashicons dashicons-unlock' }),
-                    seovelaAI.i18n.upgradeToPro
-                )
-            )
-        );
-    }
-
     // AI Not Configured Component
     function SeovelaConfigureAI() {
         return el('div', { className: 'seovela-ai-sidebar seovela-ai-configure' },
@@ -100,26 +58,6 @@
 
     // Main Plugin Component
     function SeovelaAIPanel() {
-        // Check if Pro is active
-        if (!seovelaAI.isPro) {
-            return el(Fragment, null,
-                el(PluginSidebarMoreMenuItem, {
-                    target: 'seovela-ai-sidebar'
-                },
-                    el('span', { className: 'dashicons dashicons-superhero-alt', style: { marginRight: '6px' } }),
-                    seovelaAI.i18n.title,
-                    el('span', { className: 'seovela-menu-pro-badge' }, 'PRO')
-                ),
-                el(PluginSidebar, {
-                    name: 'seovela-ai-sidebar',
-                    title: seovelaAI.i18n.title,
-                    icon: AIIcon
-                },
-                    el(SeovelaProTeaser, null)
-                )
-            );
-        }
-
         // Check if AI is configured
         if (!seovelaAI.isConfigured) {
             return el(Fragment, null,
@@ -139,7 +77,7 @@
             );
         }
 
-        // Full AI functionality for Pro users with configured API
+        // Full AI functionality with configured API
         var _useState = useState('improve'),
             activeTab = _useState[0],
             setActiveTab = _useState[1];

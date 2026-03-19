@@ -191,11 +191,14 @@ class Seovela_Internal_Links {
 							<div class="suggestion-content">
 								<strong><?php echo esc_html( $target_post->post_title ); ?></strong>
 								<p class="description">
-									<?php printf( 
-										__( 'Anchor: %s | Reason: %s', 'seovela' ), 
-										esc_html( $suggestion->suggested_anchor ),
-										esc_html( $suggestion->match_reason )
-									); ?>
+									<?php
+									echo esc_html( sprintf(
+										/* translators: 1: suggested anchor text, 2: match reason */
+										__( 'Anchor: %s | Reason: %s', 'seovela' ),
+										$suggestion->suggested_anchor,
+										$suggestion->match_reason
+									) );
+									?>
 								</p>
 								<button type="button" class="button button-small insert-link-btn" 
 									data-url="<?php echo esc_url( get_permalink( $target_post->ID ) ); ?>"
@@ -356,8 +359,8 @@ class Seovela_Internal_Links {
 	 */
 	private function save_settings() {
 		update_option( 'seovela_internal_links_enabled', isset( $_POST['enabled'] ) );
-		update_option( 'seovela_internal_links_min_score', isset( $_POST['min_score'] ) ? floatval( $_POST['min_score'] ) : 0.3 );
-		update_option( 'seovela_internal_links_max_suggestions', isset( $_POST['max_suggestions'] ) ? absint( $_POST['max_suggestions'] ) : 5 );
+		update_option( 'seovela_internal_links_min_score', isset( $_POST['min_score'] ) ? floatval( wp_unslash( $_POST['min_score'] ) ) : 0.3 );
+		update_option( 'seovela_internal_links_max_suggestions', isset( $_POST['max_suggestions'] ) ? absint( wp_unslash( $_POST['max_suggestions'] ) ) : 5 );
 		update_option( 'seovela_internal_links_auto_refresh', isset( $_POST['auto_refresh'] ) );
 	}
 
@@ -564,7 +567,7 @@ class Seovela_Internal_Links {
 			wp_send_json_error( array( 'message' => __( 'Permission denied', 'seovela' ) ) );
 		}
 
-		$post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+		$post_id = isset( $_POST['post_id'] ) ? intval( wp_unslash( $_POST['post_id'] ) ) : 0;
 		$suggestions = $this->get_suggestions_for_post( $post_id );
 
 		wp_send_json_success( array(
@@ -582,7 +585,7 @@ class Seovela_Internal_Links {
 			wp_send_json_error( array( 'message' => __( 'Permission denied', 'seovela' ) ) );
 		}
 
-		$post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+		$post_id = isset( $_POST['post_id'] ) ? intval( wp_unslash( $_POST['post_id'] ) ) : 0;
 		$count = $this->generate_suggestions( $post_id );
 
 		wp_send_json_success( array(

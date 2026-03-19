@@ -122,8 +122,6 @@ class Seovela_AI_Editor {
             'restUrl'      => esc_url_raw( rest_url() ),
             'restNonce'    => wp_create_nonce( 'wp_rest' ),
             'isConfigured' => $this->is_ai_configured(),
-            'isPro'        => true,
-            'upgradeUrl'   => admin_url( 'admin.php?page=seovela-settings&tab=ai' ),
             'settingsUrl'  => admin_url( 'admin.php?page=seovela-settings&tab=ai' ),
             'i18n'         => array(
                 'title'           => __( 'AI Content Assistant', 'seovela' ),
@@ -208,8 +206,6 @@ class Seovela_AI_Editor {
                 'restUrl'      => esc_url_raw( rest_url() ),
                 'restNonce'    => wp_create_nonce( 'wp_rest' ),
                 'isConfigured' => $this->is_ai_configured(),
-                'isPro'        => true,
-                'upgradeUrl'   => admin_url( 'admin.php?page=seovela-settings&tab=ai' ),
                 'settingsUrl'  => admin_url( 'admin.php?page=seovela-settings&tab=ai' ),
             ) );
         }
@@ -244,7 +240,7 @@ class Seovela_AI_Editor {
     }
 
     /**
-     * Render configure AI panel for Pro users without API key
+     * Render configure AI panel when API key is not set
      */
     private function render_configure_ai_panel() {
         ?>
@@ -280,7 +276,7 @@ class Seovela_AI_Editor {
     }
 
     /**
-     * Render full AI panel for Pro users with configured API key
+     * Render full AI panel when API key is configured
      */
     private function render_full_ai_panel() {
         ?>

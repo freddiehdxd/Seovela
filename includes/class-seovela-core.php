@@ -109,14 +109,6 @@ class Seovela_Core {
      */
     private function init_hooks() {
         add_action( 'plugins_loaded', array( $this, 'init' ) );
-        add_action( 'init', array( $this, 'load_textdomain' ) );
-    }
-
-    /**
-     * Load plugin textdomain
-     */
-    public function load_textdomain() {
-        load_plugin_textdomain( 'seovela', false, dirname( SEOVELA_PLUGIN_BASENAME ) . '/languages' );
     }
 
     /**

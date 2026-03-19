@@ -173,7 +173,7 @@ class Seovela_Schema {
 
         // Output a single JSON-LD script tag
         echo '<script type="application/ld+json">' . "\n";
-        echo wp_json_encode( $graph, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT );
+        echo wp_json_encode( $graph );
         echo "\n" . '</script>' . "\n";
     }
 

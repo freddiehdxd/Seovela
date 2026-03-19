@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Handle module toggle
-if ( isset( $_POST['seovela_save_modules'] ) && wp_verify_nonce( $_POST['seovela_modules_nonce'], 'seovela_save_modules' ) ) {
+if ( isset( $_POST['seovela_save_modules'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['seovela_modules_nonce'] ) ), 'seovela_save_modules' ) ) {
     $modules = Seovela_Module_Loader::get_available_modules();
     
     foreach ( $modules as $module_key => $module_info ) {
@@ -262,6 +262,9 @@ foreach ( $modules as $module_key => $module_info ) {
     </form>
 </div>
 
+<?php
+ob_start();
+?>
 <style>
 /* Premium Modules Page Styles */
 .seovela-modules-premium {
@@ -269,7 +272,7 @@ foreach ( $modules as $module_key => $module_info ) {
     background: #f8fafc;
     min-height: calc(100vh - 32px);
     padding-bottom: 100px;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 /* Header */
@@ -849,37 +852,43 @@ foreach ( $modules as $module_key => $module_info ) {
     animation: pulse-success 0.5s ease;
 }
 </style>
+<?php
+$modules_css = ob_get_clean();
+// Strip the <style> and </style> tags from the captured output.
+$modules_css = preg_replace( '/<\/?style[^>]*>/', '', $modules_css );
+wp_add_inline_style( 'seovela-admin', $modules_css );
 
-<script>
+wp_add_inline_script( 'seovela-admin', '
 jQuery(document).ready(function($) {
     // Toggle status text update
-    $('.seovela-module-toggle-input').on('change', function() {
-        var $card = $(this).closest('.seovela-module-card-premium');
-        var $status = $(this).siblings('.seovela-toggle-status');
-        
-        if ($(this).is(':checked')) {
-            $card.addClass('is-active');
-            $status.text('<?php echo esc_js( __( 'On', 'seovela' ) ); ?>');
+    $(".seovela-module-toggle-input").on("change", function() {
+        var $card = $(this).closest(".seovela-module-card-premium");
+        var $status = $(this).siblings(".seovela-toggle-status");
+
+        if ($(this).is(":checked")) {
+            $card.addClass("is-active");
+            $status.text("' . esc_js( __( 'On', 'seovela' ) ) . '");
         } else {
-            $card.removeClass('is-active');
-            $status.text('<?php echo esc_js( __( 'Off', 'seovela' ) ); ?>');
+            $card.removeClass("is-active");
+            $status.text("' . esc_js( __( 'Off', 'seovela' ) ) . '");
         }
-        
+
         // Update stats counter
         updateStats();
     });
-    
+
     function updateStats() {
-        var activeCount = $('.seovela-module-toggle-input:checked').length;
-        $('.seovela-modules-stat-card:first .seovela-modules-stat-number').text(activeCount);
-        
+        var activeCount = $(".seovela-module-toggle-input:checked").length;
+        $(".seovela-modules-stat-card:first .seovela-modules-stat-number").text(activeCount);
+
         // Update category counts
-        $('.seovela-module-category').each(function() {
+        $(".seovela-module-category").each(function() {
             var $category = $(this);
-            var total = $category.find('.seovela-module-card-premium:not(.is-locked)').length;
-            var active = $category.find('.seovela-module-card-premium.is-active').length;
-            $category.find('.seovela-category-count').text(active + '/' + total);
+            var total = $category.find(".seovela-module-card-premium:not(.is-locked)").length;
+            var active = $category.find(".seovela-module-card-premium.is-active").length;
+            $category.find(".seovela-category-count").text(active + "/" + total);
         });
     }
 });
-</script>
+' );
+?>

@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Handle settings save
-if ( isset( $_POST['seovela_save_meta_settings'] ) && wp_verify_nonce( $_POST['seovela_meta_nonce'], 'seovela_save_meta_settings' ) ) {
+if ( isset( $_POST['seovela_save_meta_settings'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['seovela_meta_nonce'] ) ), 'seovela_save_meta_settings' ) ) {
     // Save all settings
     $settings_to_save = array(
         // Robots Meta
@@ -64,11 +64,11 @@ if ( isset( $_POST['seovela_save_meta_settings'] ) && wp_verify_nonce( $_POST['s
     foreach ( $settings_to_save as $setting ) {
         if ( isset( $_POST[ $setting ] ) ) {
             if ( in_array( $setting, array( 'seovela_default_og_image', 'seovela_knowledge_graph_logo' ) ) ) {
-                update_option( $setting, esc_url_raw( $_POST[ $setting ] ) );
+                update_option( $setting, esc_url_raw( wp_unslash( $_POST[ $setting ] ) ) );
             } elseif ( in_array( $setting, array( 'seovela_robots_max_snippet', 'seovela_robots_max_video_preview' ) ) ) {
-                update_option( $setting, intval( $_POST[ $setting ] ) );
+                update_option( $setting, intval( wp_unslash( $_POST[ $setting ] ) ) );
             } else {
-                update_option( $setting, sanitize_text_field( $_POST[ $setting ] ) );
+                update_option( $setting, sanitize_text_field( wp_unslash( $_POST[ $setting ] ) ) );
             }
         } else {
             update_option( $setting, '' );
@@ -163,7 +163,7 @@ $titles_post_tag_robots = get_option( 'seovela_titles_post_tag_robots', 'index' 
 $titles_post_tag_robots = ! empty( $titles_post_tag_robots ) ? $titles_post_tag_robots : 'index';
 
 // Get active section
-$active_section = isset( $_GET['section'] ) ? sanitize_key( $_GET['section'] ) : 'global';
+$active_section = isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['section'] ) ) : 'global';
 ?>
 
 <div class="seovela-premium-page">
@@ -900,119 +900,121 @@ $active_section = isset( $_GET['section'] ) ? sanitize_key( $_GET['section'] ) :
     </div><!-- .seovela-page-body -->
 </div><!-- .seovela-premium-page -->
 
-<script>
+<?php
+wp_add_inline_script( 'seovela-admin', '
 jQuery(document).ready(function($) {
     // Media Uploader
     var mediaUploader;
     var currentTarget;
 
-    $('.seovela-upload-image-button').on('click', function(e) {
+    $(".seovela-upload-image-button").on("click", function(e) {
         e.preventDefault();
-        
+
         var $button = $(this);
-        var $box = $button.closest('.seovela-media-upload-box');
-        currentTarget = $box.find('input[type="hidden"]').attr('id');
+        var $box = $button.closest(".seovela-media-upload-box");
+        currentTarget = $box.find("input[type=\'hidden\']").attr("id");
 
         if (mediaUploader) {
             mediaUploader.open();
             return;
         }
-        
+
         mediaUploader = wp.media({
-            title: '<?php esc_html_e( 'Choose Image', 'seovela' ); ?>',
+            title: "' . esc_js( __( 'Choose Image', 'seovela' ) ) . '",
             button: {
-                text: '<?php esc_html_e( 'Use this image', 'seovela' ); ?>'
+                text: "' . esc_js( __( 'Use this image', 'seovela' ) ) . '"
             },
             multiple: false
         });
-        
-        mediaUploader.on('select', function() {
-            var attachment = mediaUploader.state().get('selection').first().toJSON();
-            var $box = $('#' + currentTarget).closest('.seovela-media-upload-box');
-            
+
+        mediaUploader.on("select", function() {
+            var attachment = mediaUploader.state().get("selection").first().toJSON();
+            var $box = $("#" + currentTarget).closest(".seovela-media-upload-box");
+
             // Update hidden input
-            $('#' + currentTarget).val(attachment.url);
-            
+            $("#" + currentTarget).val(attachment.url);
+
             // Replace placeholder with preview
-            var isSmall = $box.find('.seovela-media-placeholder-small').length > 0;
-            var sizeClass = isSmall ? 'seovela-media-preview-small' : '';
-            
+            var isSmall = $box.find(".seovela-media-placeholder-small").length > 0;
+            var sizeClass = isSmall ? "seovela-media-preview-small" : "";
+
             $box.html(
-                '<div class="seovela-media-preview ' + sizeClass + '">' +
-                    '<img src="' + attachment.url + '" alt="Image" />' +
-                    '<div class="seovela-media-overlay">' +
-                        '<button type="button" class="button seovela-upload-image-button">' +
-                            '<span class="dashicons dashicons-edit"></span> Change' +
-                        '</button>' +
-                    '</div>' +
-                '</div>' +
-                '<input type="hidden" id="' + currentTarget + '" name="' + currentTarget + '" value="' + attachment.url + '" />'
+                \'<div class="seovela-media-preview \' + sizeClass + \'">\' +
+                    \'<img src="\' + attachment.url + \'" alt="Image" />\' +
+                    \'<div class="seovela-media-overlay">\' +
+                        \'<button type="button" class="button seovela-upload-image-button">\' +
+                            \'<span class="dashicons dashicons-edit"></span> Change\' +
+                        \'</button>\' +
+                    \'</div>\' +
+                \'</div>\' +
+                \'<input type="hidden" id="\' + currentTarget + \'" name="\' + currentTarget + \'" value="\' + attachment.url + \'" />\'
             );
         });
-        
+
         mediaUploader.open();
     });
-    
+
     // Re-bind for dynamically created buttons
-    $(document).on('click', '.seovela-upload-image-button', function(e) {
-        if (!$(this).hasClass('seovela-upload-image-button')) return;
+    $(document).on("click", ".seovela-upload-image-button", function(e) {
+        if (!$(this).hasClass("seovela-upload-image-button")) return;
         e.preventDefault();
-        $(this).trigger('click');
+        $(this).trigger("click");
     });
 
     // SEO Meter functionality
     function updateSeoMeter(input) {
         var $input = $(input);
-        var id = $input.attr('id');
+        var id = $input.attr("id");
         var text = $input.val();
         var length = text.length;
-        
-        var minLength = parseInt($input.data('min')) || 30;
-        var optimalLength = parseInt($input.data('optimal')) || 50;
-        var maxLength = parseInt($input.data('max')) || 60;
-        
-        var $meter = $('#' + id + '_meter');
-        var $count = $('#' + id + '_count');
-        var $status = $('#' + id + '_status');
-        
+
+        var minLength = parseInt($input.data("min")) || 30;
+        var optimalLength = parseInt($input.data("optimal")) || 50;
+        var maxLength = parseInt($input.data("max")) || 60;
+
+        var $meter = $("#" + id + "_meter");
+        var $count = $("#" + id + "_count");
+        var $status = $("#" + id + "_status");
+
         // Update character count
         $count.text(length);
-        
+
         // Calculate percentage (capped at 100%)
         var percentage = Math.min((length / maxLength) * 100, 100);
-        $meter.css('width', percentage + '%');
-        
+        $meter.css("width", percentage + "%");
+
         // Remove all status classes
-        $meter.removeClass('seovela-meter-empty seovela-meter-short seovela-meter-good seovela-meter-warning seovela-meter-danger');
-        $status.removeClass('seovela-status-empty seovela-status-short seovela-status-good seovela-status-warning seovela-status-danger');
-        
+        $meter.removeClass("seovela-meter-empty seovela-meter-short seovela-meter-good seovela-meter-warning seovela-meter-danger");
+        $status.removeClass("seovela-status-empty seovela-status-short seovela-status-good seovela-status-warning seovela-status-danger");
+
         // Determine status and apply classes
         if (length === 0) {
-            $meter.addClass('seovela-meter-empty');
-            $status.addClass('seovela-status-empty').text('<?php esc_html_e( 'Empty', 'seovela' ); ?>');
+            $meter.addClass("seovela-meter-empty");
+            $status.addClass("seovela-status-empty").text("' . esc_js( __( 'Empty', 'seovela' ) ) . '");
         } else if (length < minLength) {
-            $meter.addClass('seovela-meter-short');
-            $status.addClass('seovela-status-short').text('<?php esc_html_e( 'Too short', 'seovela' ); ?>');
+            $meter.addClass("seovela-meter-short");
+            $status.addClass("seovela-status-short").text("' . esc_js( __( 'Too short', 'seovela' ) ) . '");
         } else if (length >= minLength && length <= optimalLength) {
-            $meter.addClass('seovela-meter-good');
-            $status.addClass('seovela-status-good').text('<?php esc_html_e( 'Good', 'seovela' ); ?>');
+            $meter.addClass("seovela-meter-good");
+            $status.addClass("seovela-status-good").text("' . esc_js( __( 'Good', 'seovela' ) ) . '");
         } else if (length > optimalLength && length <= maxLength) {
-            $meter.addClass('seovela-meter-warning');
-            $status.addClass('seovela-status-warning').text('<?php esc_html_e( 'Acceptable', 'seovela' ); ?>');
+            $meter.addClass("seovela-meter-warning");
+            $status.addClass("seovela-status-warning").text("' . esc_js( __( 'Acceptable', 'seovela' ) ) . '");
         } else {
-            $meter.addClass('seovela-meter-danger');
-            $status.addClass('seovela-status-danger').text('<?php esc_html_e( 'Too long', 'seovela' ); ?>');
+            $meter.addClass("seovela-meter-danger");
+            $status.addClass("seovela-status-danger").text("' . esc_js( __( 'Too long', 'seovela' ) ) . '");
         }
     }
 
     // Initialize meters on page load
-    $('.seovela-seo-input').each(function() {
+    $(".seovela-seo-input").each(function() {
         updateSeoMeter(this);
     });
 
     // Update meters on input
-    $('.seovela-seo-input').on('input keyup', function() {
+    $(".seovela-seo-input").on("input keyup", function() {
         updateSeoMeter(this);
     });
 });
-</script>
+' );
+?>

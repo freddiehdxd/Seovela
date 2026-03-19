@@ -270,6 +270,9 @@ Requirements:
     /**
      * Stream response from OpenAI
      *
+     * Uses WordPress HTTP API (wp_remote_post). The full response is fetched
+     * and then sent as an SSE event to the client.
+     *
      * @param string $prompt The prompt to send.
      */
     private function stream_openai( $prompt ) {
@@ -283,101 +286,65 @@ Requirements:
             return;
         }
 
-        $payload = wp_json_encode( array(
-            'model'                 => $model,
-            'stream'                => true,
-            'max_completion_tokens' => 4096,
-            'messages'              => array(
-                array(
-                    'role'    => 'system',
-                    'content' => 'You are an expert SEO content writer. Output clean HTML content without markdown formatting. Do not wrap content in code blocks.',
-                ),
-                array(
-                    'role'    => 'user',
-                    'content' => $prompt,
-                ),
+        $response = wp_remote_post( $this->openai_endpoint, array(
+            'timeout'   => 120,
+            'headers'   => array(
+                'Content-Type'  => 'application/json',
+                'Authorization' => 'Bearer ' . $api_key,
             ),
-            'temperature' => floatval( get_option( 'seovela_ai_temperature', 0.7 ) ),
+            'body'      => wp_json_encode( array(
+                'model'                 => $model,
+                'max_completion_tokens' => 4096,
+                'messages'              => array(
+                    array(
+                        'role'    => 'system',
+                        'content' => 'You are an expert SEO content writer. Output clean HTML content without markdown formatting. Do not wrap content in code blocks.',
+                    ),
+                    array(
+                        'role'    => 'user',
+                        'content' => $prompt,
+                    ),
+                ),
+                'temperature' => floatval( get_option( 'seovela_ai_temperature', 0.7 ) ),
+            ) ),
+            'sslverify' => true,
         ) );
 
-        $ca_path = $this->get_ca_bundle_path();
-
-        $ch = curl_init( $this->openai_endpoint ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_init -- Required for SSE streaming.
-
-        $curl_opts = array( // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt_array
-            CURLOPT_HTTPHEADER     => array(
-                'Content-Type: application/json',
-                'Authorization: Bearer ' . $api_key,
-            ),
-            CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => $payload,
-            CURLOPT_RETURNTRANSFER => false,
-            CURLOPT_TIMEOUT        => 120,
-            CURLOPT_WRITEFUNCTION  => function( $curl, $chunk ) {
-                // Check if this is a non-SSE error response (raw JSON from API).
-                $trimmed = trim( $chunk );
-                if ( ! empty( $trimmed ) && $trimmed[0] === '{' ) {
-                    $json = json_decode( $trimmed, true );
-                    if ( $json && isset( $json['error'] ) ) {
-                        $err_msg = isset( $json['error']['message'] ) ? $json['error']['message'] : 'OpenAI API error';
-                        echo "data: " . wp_json_encode( array( 'error' => $err_msg ) ) . "\n\n";
-                        @ob_flush();
-                        @flush();
-                        return strlen( $chunk );
-                    }
-                }
-
-                // Parse SSE data from OpenAI
-                $lines = explode( "\n", $chunk );
-                foreach ( $lines as $line ) {
-                    $line = trim( $line );
-                    if ( strpos( $line, 'data: ' ) === 0 ) {
-                        $data = substr( $line, 6 );
-                        if ( $data === '[DONE]' ) {
-                            continue;
-                        }
-                        $json = json_decode( $data, true );
-                        if ( $json && isset( $json['choices'][0]['delta']['content'] ) ) {
-                            $content = $json['choices'][0]['delta']['content'];
-                            echo "data: " . wp_json_encode( array( 'content' => $content ) ) . "\n\n";
-                            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-                            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-                        } elseif ( $json && isset( $json['error'] ) ) {
-                            // API returned an error in the SSE stream
-                            $err_msg = isset( $json['error']['message'] ) ? $json['error']['message'] : 'Unknown API error';
-                            echo "data: " . wp_json_encode( array( 'error' => $err_msg ) ) . "\n\n";
-                            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-                            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-                        }
-                    }
-                }
-                return strlen( $chunk );
-            },
-        );
-
-        // Only set SSL options if CA bundle exists; otherwise let cURL use system defaults.
-        if ( ! empty( $ca_path ) && file_exists( $ca_path ) ) {
-            $curl_opts[ CURLOPT_SSL_VERIFYPEER ] = true;
-            $curl_opts[ CURLOPT_SSL_VERIFYHOST ] = 2;
-            $curl_opts[ CURLOPT_CAINFO ]         = $ca_path;
+        if ( is_wp_error( $response ) ) {
+            echo "data: " . wp_json_encode( array( 'error' => 'Connection error: ' . $response->get_error_message() ) ) . "\n\n";
+            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+            return;
         }
 
-        curl_setopt_array( $ch, $curl_opts ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt_array
+        $status_code = wp_remote_retrieve_response_code( $response );
+        $body        = json_decode( wp_remote_retrieve_body( $response ), true );
 
-        $exec_result = curl_exec( $ch ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_exec
+        if ( 200 !== $status_code ) {
+            $err_msg = isset( $body['error']['message'] ) ? $body['error']['message'] : 'OpenAI API error (HTTP ' . $status_code . ')';
+            echo "data: " . wp_json_encode( array( 'error' => $err_msg ) ) . "\n\n";
+            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+            return;
+        }
 
-        if ( curl_errno( $ch ) ) {
-            $curl_error = curl_error( $ch );
-            echo "data: " . wp_json_encode( array( 'error' => 'Connection error: ' . $curl_error ) ) . "\n\n";
+        if ( isset( $body['choices'][0]['message']['content'] ) ) {
+            $content = $body['choices'][0]['message']['content'];
+            echo "data: " . wp_json_encode( array( 'content' => $content ) ) . "\n\n";
+            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+        } else {
+            echo "data: " . wp_json_encode( array( 'error' => 'Invalid response from OpenAI.' ) ) . "\n\n";
             @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
             @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
         }
-
-        curl_close( $ch ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_close
     }
 
     /**
      * Stream response from Gemini
+     *
+     * Uses WordPress HTTP API (wp_remote_post). The full response is fetched
+     * and then sent as an SSE event to the client.
      *
      * @param string $prompt The prompt to send.
      */
@@ -392,76 +359,56 @@ Requirements:
             return;
         }
 
-        // Gemini streaming endpoint
-        $url = $this->gemini_endpoint . $model . ':streamGenerateContent?alt=sse&key=' . $api_key;
+        $url = $this->gemini_endpoint . $model . ':generateContent?key=' . $api_key;
 
-        $payload = wp_json_encode( array(
-            'contents' => array(
-                array(
-                    'parts' => array(
-                        array( 'text' => $prompt ),
+        $response = wp_remote_post( $url, array(
+            'timeout'   => 120,
+            'headers'   => array(
+                'Content-Type' => 'application/json',
+            ),
+            'body'      => wp_json_encode( array(
+                'contents' => array(
+                    array(
+                        'parts' => array(
+                            array( 'text' => $prompt ),
+                        ),
                     ),
                 ),
-            ),
-            'generationConfig' => array(
-                'temperature' => floatval( get_option( 'seovela_ai_temperature', 0.7 ) ),
-            ),
+                'generationConfig' => array(
+                    'temperature' => floatval( get_option( 'seovela_ai_temperature', 0.7 ) ),
+                ),
+            ) ),
+            'sslverify' => true,
         ) );
 
-        $ca_path = $this->get_ca_bundle_path();
-        $ch = curl_init( $url ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_init -- Required for SSE streaming.
-
-        $curl_opts = array( // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt_array
-            CURLOPT_HTTPHEADER     => array(
-                'Content-Type: application/json',
-            ),
-            CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => $payload,
-            CURLOPT_RETURNTRANSFER => false,
-            CURLOPT_TIMEOUT        => 120,
-            CURLOPT_WRITEFUNCTION  => function( $curl, $chunk ) {
-                // Parse SSE data from Gemini
-                $lines = explode( "\n", $chunk );
-                foreach ( $lines as $line ) {
-                    $line = trim( $line );
-                    if ( strpos( $line, 'data: ' ) === 0 ) {
-                        $data = substr( $line, 6 );
-                        $json = json_decode( $data, true );
-                        if ( $json && isset( $json['candidates'][0]['content']['parts'][0]['text'] ) ) {
-                            $content = $json['candidates'][0]['content']['parts'][0]['text'];
-                            echo "data: " . wp_json_encode( array( 'content' => $content ) ) . "\n\n";
-                            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-                            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-                        } elseif ( $json && isset( $json['error'] ) ) {
-                            $err_msg = isset( $json['error']['message'] ) ? $json['error']['message'] : 'Gemini API error';
-                            echo "data: " . wp_json_encode( array( 'error' => $err_msg ) ) . "\n\n";
-                            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-                            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-                        }
-                    }
-                }
-                return strlen( $chunk );
-            },
-        );
-
-        if ( ! empty( $ca_path ) && file_exists( $ca_path ) ) {
-            $curl_opts[ CURLOPT_SSL_VERIFYPEER ] = true;
-            $curl_opts[ CURLOPT_SSL_VERIFYHOST ] = 2;
-            $curl_opts[ CURLOPT_CAINFO ]         = $ca_path;
+        if ( is_wp_error( $response ) ) {
+            echo "data: " . wp_json_encode( array( 'error' => 'Connection error: ' . $response->get_error_message() ) ) . "\n\n";
+            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+            return;
         }
 
-        curl_setopt_array( $ch, $curl_opts ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt_array
+        $status_code = wp_remote_retrieve_response_code( $response );
+        $body        = json_decode( wp_remote_retrieve_body( $response ), true );
 
-        curl_exec( $ch ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_exec
+        if ( 200 !== $status_code ) {
+            $err_msg = isset( $body['error']['message'] ) ? $body['error']['message'] : 'Gemini API error (HTTP ' . $status_code . ')';
+            echo "data: " . wp_json_encode( array( 'error' => $err_msg ) ) . "\n\n";
+            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+            return;
+        }
 
-        if ( curl_errno( $ch ) ) {
-            $curl_error = curl_error( $ch );
-            echo "data: " . wp_json_encode( array( 'error' => 'Connection error: ' . $curl_error ) ) . "\n\n";
+        if ( isset( $body['candidates'][0]['content']['parts'][0]['text'] ) ) {
+            $content = $body['candidates'][0]['content']['parts'][0]['text'];
+            echo "data: " . wp_json_encode( array( 'content' => $content ) ) . "\n\n";
+            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+        } else {
+            echo "data: " . wp_json_encode( array( 'error' => 'Invalid response from Gemini.' ) ) . "\n\n";
             @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
             @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
         }
-
-        curl_close( $ch ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_close
     }
 
     /**
@@ -491,30 +438,11 @@ Requirements:
     }
 
     /**
-     * Get the CA bundle path for cURL SSL verification.
-     *
-     * Uses the WordPress-bundled certificate if available, falls back
-     * to the system default.
-     *
-     * @return string Path to CA bundle file.
-     */
-    private function get_ca_bundle_path() {
-        $wp_ca_bundle = ABSPATH . WPINC . '/certificates/ca-bundle.crt';
-
-        if ( file_exists( $wp_ca_bundle ) ) {
-            return $wp_ca_bundle;
-        }
-
-        // Fall back to cURL's default — return empty to let cURL use system CA.
-        return '';
-    }
-
-    /**
      * AJAX handler for generating AI content
      */
     public function ajax_generate_content() {
         // Verify nonce
-        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'seovela_ai_nonce' ) ) {
+        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'seovela_ai_nonce' ) ) {
             wp_send_json_error( array( 'message' => __( 'Security check failed.', 'seovela' ) ) );
         }
 
@@ -524,10 +452,10 @@ Requirements:
         }
 
         // Get parameters
-        $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
-        $type = isset( $_POST['type'] ) ? sanitize_text_field( $_POST['type'] ) : 'title';
-        $content = isset( $_POST['content'] ) ? sanitize_textarea_field( $_POST['content'] ) : '';
-        $focus_keyword = isset( $_POST['focus_keyword'] ) ? sanitize_text_field( $_POST['focus_keyword'] ) : '';
+        $post_id = isset( $_POST['post_id'] ) ? intval( wp_unslash( $_POST['post_id'] ) ) : 0;
+        $type = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : 'title';
+        $content = isset( $_POST['content'] ) ? sanitize_textarea_field( wp_unslash( $_POST['content'] ) ) : '';
+        $focus_keyword = isset( $_POST['focus_keyword'] ) ? sanitize_text_field( wp_unslash( $_POST['focus_keyword'] ) ) : '';
 
         if ( empty( $content ) && $post_id > 0 ) {
             $post = get_post( $post_id );
@@ -559,7 +487,7 @@ Requirements:
      */
     public function ajax_test_connection() {
         // Verify nonce
-        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'seovela_test_ai' ) ) {
+        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'seovela_test_ai' ) ) {
             wp_send_json_error( array( 'message' => __( 'Security check failed.', 'seovela' ) ) );
         }
 
@@ -568,8 +496,8 @@ Requirements:
             wp_send_json_error( array( 'message' => __( 'You do not have permission to perform this action.', 'seovela' ) ) );
         }
 
-        $provider = isset( $_POST['provider'] ) ? sanitize_text_field( $_POST['provider'] ) : 'openai';
-        $api_key = isset( $_POST['api_key'] ) ? sanitize_text_field( $_POST['api_key'] ) : '';
+        $provider = isset( $_POST['provider'] ) ? sanitize_text_field( wp_unslash( $_POST['provider'] ) ) : 'openai';
+        $api_key = isset( $_POST['api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) : '';
 
         // If no key submitted, try to use the saved (encrypted) key
         if ( empty( $api_key ) ) {
@@ -596,7 +524,7 @@ Requirements:
      */
     public function ajax_suggest_keywords() {
         // Verify nonce
-        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'seovela_ai_nonce' ) ) {
+        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'seovela_ai_nonce' ) ) {
             wp_send_json_error( array( 'message' => __( 'Security check failed.', 'seovela' ) ) );
         }
 
@@ -605,8 +533,8 @@ Requirements:
             wp_send_json_error( array( 'message' => __( 'You do not have permission to perform this action.', 'seovela' ) ) );
         }
 
-        $content = isset( $_POST['content'] ) ? sanitize_textarea_field( $_POST['content'] ) : '';
-        $title = isset( $_POST['title'] ) ? sanitize_text_field( $_POST['title'] ) : '';
+        $content = isset( $_POST['content'] ) ? sanitize_textarea_field( wp_unslash( $_POST['content'] ) ) : '';
+        $title = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
 
         if ( empty( $content ) && empty( $title ) ) {
             wp_send_json_error( array( 'message' => __( 'No content available to analyze.', 'seovela' ) ) );
@@ -626,7 +554,7 @@ Requirements:
      */
     public function ajax_improve_content() {
         // Verify nonce
-        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'seovela_ai_nonce' ) ) {
+        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'seovela_ai_nonce' ) ) {
             wp_send_json_error( array( 'message' => __( 'Security check failed.', 'seovela' ) ) );
         }
 
@@ -635,9 +563,9 @@ Requirements:
             wp_send_json_error( array( 'message' => __( 'You do not have permission to perform this action.', 'seovela' ) ) );
         }
 
-        $content = isset( $_POST['content'] ) ? wp_kses_post( $_POST['content'] ) : '';
-        $action_type = isset( $_POST['action_type'] ) ? sanitize_text_field( $_POST['action_type'] ) : 'improve';
-        $focus_keyword = isset( $_POST['focus_keyword'] ) ? sanitize_text_field( $_POST['focus_keyword'] ) : '';
+        $content = isset( $_POST['content'] ) ? wp_kses_post( wp_unslash( $_POST['content'] ) ) : '';
+        $action_type = isset( $_POST['action_type'] ) ? sanitize_text_field( wp_unslash( $_POST['action_type'] ) ) : 'improve';
+        $focus_keyword = isset( $_POST['focus_keyword'] ) ? sanitize_text_field( wp_unslash( $_POST['focus_keyword'] ) ) : '';
 
         if ( empty( $content ) ) {
             wp_send_json_error( array( 'message' => __( 'No content to improve.', 'seovela' ) ) );
@@ -657,7 +585,7 @@ Requirements:
      */
     public function ajax_write_content() {
         // Verify nonce
-        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'seovela_ai_nonce' ) ) {
+        if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['nonce'] ) ), 'seovela_ai_nonce' ) ) {
             wp_send_json_error( array( 'message' => __( 'Security check failed.', 'seovela' ) ) );
         }
 
@@ -666,10 +594,10 @@ Requirements:
             wp_send_json_error( array( 'message' => __( 'You do not have permission to perform this action.', 'seovela' ) ) );
         }
 
-        $topic = isset( $_POST['topic'] ) ? sanitize_text_field( $_POST['topic'] ) : '';
-        $content_type = isset( $_POST['content_type'] ) ? sanitize_text_field( $_POST['content_type'] ) : 'article';
-        $focus_keyword = isset( $_POST['focus_keyword'] ) ? sanitize_text_field( $_POST['focus_keyword'] ) : '';
-        $tone = isset( $_POST['tone'] ) ? sanitize_text_field( $_POST['tone'] ) : 'professional';
+        $topic = isset( $_POST['topic'] ) ? sanitize_text_field( wp_unslash( $_POST['topic'] ) ) : '';
+        $content_type = isset( $_POST['content_type'] ) ? sanitize_text_field( wp_unslash( $_POST['content_type'] ) ) : 'article';
+        $focus_keyword = isset( $_POST['focus_keyword'] ) ? sanitize_text_field( wp_unslash( $_POST['focus_keyword'] ) ) : '';
+        $tone = isset( $_POST['tone'] ) ? sanitize_text_field( wp_unslash( $_POST['tone'] ) ) : 'professional';
 
         if ( empty( $topic ) ) {
             wp_send_json_error( array( 'message' => __( 'Please provide a topic to write about.', 'seovela' ) ) );
@@ -690,7 +618,7 @@ Requirements:
     public function ajax_optimize_title_legacy() {
         check_ajax_referer( 'seovela_ai_nonce', 'nonce' );
 
-        $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+        $post_id = isset( $_POST['post_id'] ) ? intval( wp_unslash( $_POST['post_id'] ) ) : 0;
 
         if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
             wp_send_json_error( array( 'message' => __( 'Permission denied', 'seovela' ) ) );
@@ -715,7 +643,7 @@ Requirements:
     public function ajax_optimize_description_legacy() {
         check_ajax_referer( 'seovela_ai_nonce', 'nonce' );
 
-        $post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+        $post_id = isset( $_POST['post_id'] ) ? intval( wp_unslash( $_POST['post_id'] ) ) : 0;
 
         if ( ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
             wp_send_json_error( array( 'message' => __( 'Permission denied', 'seovela' ) ) );
@@ -879,6 +807,9 @@ Requirements:
     /**
      * Stream response from Claude
      *
+     * Uses WordPress HTTP API (wp_remote_post). The full response is fetched
+     * and then sent as an SSE event to the client.
+     *
      * @param string $prompt The prompt to send.
      */
     private function stream_claude( $prompt ) {
@@ -892,78 +823,56 @@ Requirements:
             return;
         }
 
-        $payload = wp_json_encode( array(
-            'model'      => $model,
-            'max_tokens' => 4096,
-            'stream'     => true,
-            'messages'   => array(
-                array(
-                    'role'    => 'user',
-                    'content' => $prompt,
-                ),
+        $response = wp_remote_post( $this->claude_endpoint, array(
+            'timeout'   => 120,
+            'headers'   => array(
+                'Content-Type'      => 'application/json',
+                'x-api-key'         => $api_key,
+                'anthropic-version' => '2023-06-01',
             ),
-            'system'      => 'You are an expert SEO content writer. Output clean HTML content without markdown formatting. Do not wrap content in code blocks.',
-            'temperature' => floatval( get_option( 'seovela_ai_temperature', 0.7 ) ),
+            'body'      => wp_json_encode( array(
+                'model'       => $model,
+                'max_tokens'  => 4096,
+                'messages'    => array(
+                    array(
+                        'role'    => 'user',
+                        'content' => $prompt,
+                    ),
+                ),
+                'system'      => 'You are an expert SEO content writer. Output clean HTML content without markdown formatting. Do not wrap content in code blocks.',
+                'temperature' => floatval( get_option( 'seovela_ai_temperature', 0.7 ) ),
+            ) ),
+            'sslverify' => true,
         ) );
 
-        $ca_path = $this->get_ca_bundle_path();
-        $ch = curl_init( $this->claude_endpoint ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_init -- Required for SSE streaming.
-
-        $curl_opts = array( // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt_array
-            CURLOPT_HTTPHEADER     => array(
-                'Content-Type: application/json',
-                'x-api-key: ' . $api_key,
-                'anthropic-version: 2023-06-01',
-            ),
-            CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => $payload,
-            CURLOPT_RETURNTRANSFER => false,
-            CURLOPT_TIMEOUT        => 120,
-            CURLOPT_WRITEFUNCTION  => function( $curl, $chunk ) {
-                $lines = explode( "\n", $chunk );
-                foreach ( $lines as $line ) {
-                    $line = trim( $line );
-                    if ( strpos( $line, 'data: ' ) === 0 ) {
-                        $data = substr( $line, 6 );
-                        if ( $data === '[DONE]' ) {
-                            continue;
-                        }
-                        $json = json_decode( $data, true );
-                        if ( $json && isset( $json['type'] ) && $json['type'] === 'content_block_delta' && isset( $json['delta']['text'] ) ) {
-                            $content = $json['delta']['text'];
-                            echo "data: " . wp_json_encode( array( 'content' => $content ) ) . "\n\n";
-                            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-                            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-                        } elseif ( $json && isset( $json['type'] ) && $json['type'] === 'error' ) {
-                            $err_msg = isset( $json['error']['message'] ) ? $json['error']['message'] : 'Claude API error';
-                            echo "data: " . wp_json_encode( array( 'error' => $err_msg ) ) . "\n\n";
-                            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-                            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-                        }
-                    }
-                }
-                return strlen( $chunk );
-            },
-        );
-
-        if ( ! empty( $ca_path ) && file_exists( $ca_path ) ) {
-            $curl_opts[ CURLOPT_SSL_VERIFYPEER ] = true;
-            $curl_opts[ CURLOPT_SSL_VERIFYHOST ] = 2;
-            $curl_opts[ CURLOPT_CAINFO ]         = $ca_path;
+        if ( is_wp_error( $response ) ) {
+            echo "data: " . wp_json_encode( array( 'error' => 'Connection error: ' . $response->get_error_message() ) ) . "\n\n";
+            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+            return;
         }
 
-        curl_setopt_array( $ch, $curl_opts ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_setopt_array
+        $status_code = wp_remote_retrieve_response_code( $response );
+        $body        = json_decode( wp_remote_retrieve_body( $response ), true );
 
-        curl_exec( $ch ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_exec
+        if ( 200 !== $status_code ) {
+            $err_msg = isset( $body['error']['message'] ) ? $body['error']['message'] : 'Claude API error (HTTP ' . $status_code . ')';
+            echo "data: " . wp_json_encode( array( 'error' => $err_msg ) ) . "\n\n";
+            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+            return;
+        }
 
-        if ( curl_errno( $ch ) ) {
-            $curl_error = curl_error( $ch );
-            echo "data: " . wp_json_encode( array( 'error' => 'Connection error: ' . $curl_error ) ) . "\n\n";
+        if ( isset( $body['content'][0]['text'] ) ) {
+            $content = $body['content'][0]['text'];
+            echo "data: " . wp_json_encode( array( 'content' => $content ) ) . "\n\n";
+            @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+            @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+        } else {
+            echo "data: " . wp_json_encode( array( 'error' => 'Invalid response from Claude.' ) ) . "\n\n";
             @ob_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
             @flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
         }
-
-        curl_close( $ch ); // phpcs:ignore WordPress.WP.AlternativeFunctions.curl_curl_close
     }
 
     /**

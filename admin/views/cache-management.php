@@ -94,7 +94,8 @@ if ( isset( $_POST['seovela_clear_cache'] ) && check_admin_referer( 'seovela_cle
 	</div>
 </div>
 
-<style>
+<?php
+wp_add_inline_style( 'seovela-admin', '
 .seovela-cache-management h3 {
 	font-size: 20px;
 	margin-bottom: 20px;
@@ -109,5 +110,6 @@ if ( isset( $_POST['seovela_clear_cache'] ) && check_admin_referer( 'seovela_cle
 .seovela-cache-management .widefat tr:nth-child(even) {
 	background: #f9f9f9;
 }
-</style>
+' );
+?>
 

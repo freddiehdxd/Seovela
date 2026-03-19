@@ -56,69 +56,82 @@ class Seovela_Settings {
 
         // Indexing settings
         register_setting( 'seovela_indexing_settings', 'seovela_global_noindex', array(
-            'type'    => 'boolean',
-            'default' => false,
+            'type'              => 'boolean',
+            'default'           => false,
+            'sanitize_callback' => 'rest_sanitize_boolean',
         ) );
 
         register_setting( 'seovela_indexing_settings', 'seovela_global_nofollow', array(
-            'type'    => 'boolean',
-            'default' => false,
+            'type'              => 'boolean',
+            'default'           => false,
+            'sanitize_callback' => 'rest_sanitize_boolean',
         ) );
 
         // Module toggles
         register_setting( 'seovela_modules', 'seovela_meta_enabled', array(
-            'type'    => 'boolean',
-            'default' => true,
+            'type'              => 'boolean',
+            'default'           => true,
+            'sanitize_callback' => 'rest_sanitize_boolean',
         ) );
 
         register_setting( 'seovela_modules', 'seovela_sitemap_enabled', array(
-            'type'    => 'boolean',
-            'default' => true,
+            'type'              => 'boolean',
+            'default'           => true,
+            'sanitize_callback' => 'rest_sanitize_boolean',
         ) );
 
         register_setting( 'seovela_modules', 'seovela_schema_enabled', array(
-            'type'    => 'boolean',
-            'default' => true,
+            'type'              => 'boolean',
+            'default'           => true,
+            'sanitize_callback' => 'rest_sanitize_boolean',
         ) );
 
         register_setting( 'seovela_modules', 'seovela_optimizer_enabled', array(
-            'type'    => 'boolean',
-            'default' => true,
+            'type'              => 'boolean',
+            'default'           => true,
+            'sanitize_callback' => 'rest_sanitize_boolean',
         ) );
 
         register_setting( 'seovela_modules', 'seovela_redirects_enabled', array(
-            'type'    => 'boolean',
-            'default' => true,
+            'type'              => 'boolean',
+            'default'           => true,
+            'sanitize_callback' => 'rest_sanitize_boolean',
         ) );
 
         register_setting( 'seovela_modules', 'seovela_404_monitor_enabled', array(
-            'type'    => 'boolean',
-            'default' => true,
+            'type'              => 'boolean',
+            'default'           => true,
+            'sanitize_callback' => 'rest_sanitize_boolean',
         ) );
 
         register_setting( 'seovela_modules', 'seovela_ai_enabled', array(
-            'type'    => 'boolean',
-            'default' => false,
+            'type'              => 'boolean',
+            'default'           => false,
+            'sanitize_callback' => 'rest_sanitize_boolean',
         ) );
 
         register_setting( 'seovela_modules', 'seovela_internal_links_enabled', array(
-            'type'    => 'boolean',
-            'default' => true,
+            'type'              => 'boolean',
+            'default'           => true,
+            'sanitize_callback' => 'rest_sanitize_boolean',
         ) );
 
         register_setting( 'seovela_modules', 'seovela_image_seo_enabled', array(
-            'type'    => 'boolean',
-            'default' => true,
+            'type'              => 'boolean',
+            'default'           => true,
+            'sanitize_callback' => 'rest_sanitize_boolean',
         ) );
 
         register_setting( 'seovela_modules', 'seovela_gsc_integration_enabled', array(
-            'type'    => 'boolean',
-            'default' => false,
+            'type'              => 'boolean',
+            'default'           => false,
+            'sanitize_callback' => 'rest_sanitize_boolean',
         ) );
 
         register_setting( 'seovela_modules', 'seovela_llms_txt_enabled', array(
-            'type'    => 'boolean',
-            'default' => true,
+            'type'              => 'boolean',
+            'default'           => true,
+            'sanitize_callback' => 'rest_sanitize_boolean',
         ) );
 
         // LLMS Txt settings

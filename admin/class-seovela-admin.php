@@ -294,7 +294,7 @@ class Seovela_Admin {
      */
     public function enqueue_assets( $hook ) {
         // Check if we're on a Seovela page by checking the page parameter
-        $current_page = isset( $_GET['page'] ) ? sanitize_text_field( $_GET['page'] ) : '';
+        $current_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
 
         // List of all Seovela page slugs
         $seovela_pages = array(
@@ -435,7 +435,7 @@ class Seovela_Admin {
      */
     public function render_settings() {
         $allowed_tabs = array( 'meta', 'sitemap', 'schema', 'indexing', 'ai' );
-        $active_tab   = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'meta'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only tab navigation.
+        $active_tab   = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'meta'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only tab navigation.
 
         if ( ! in_array( $active_tab, $allowed_tabs, true ) ) {
             $active_tab = 'meta';
@@ -480,7 +480,7 @@ class Seovela_Admin {
      * Hub page providing access to Internal Links, Image SEO, Import/Export, and LLMS Txt.
      */
     public function render_tools() {
-        $active_tool = isset( $_GET['tool'] ) ? sanitize_key( $_GET['tool'] ) : 'overview';
+        $active_tool = isset( $_GET['tool'] ) ? sanitize_key( wp_unslash( $_GET['tool'] ) ) : 'overview';
 
         switch ( $active_tool ) {
             case 'import-export':

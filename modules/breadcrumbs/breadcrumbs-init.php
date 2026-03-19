@@ -134,7 +134,7 @@ function seovela_output_breadcrumb_schema() {
 	}
 
 	echo '<script type="application/ld+json">' . "\n";
-	echo wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT );
+	echo wp_json_encode( $schema );
 	echo "\n" . '</script>' . "\n";
 }
 add_action( 'wp_head', 'seovela_output_breadcrumb_schema', 20 );

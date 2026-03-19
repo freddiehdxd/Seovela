@@ -137,7 +137,7 @@ class Seovela_Import_Export {
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( __( 'You do not have permission to export settings.', 'seovela' ) );
+			wp_die( esc_html__( 'You do not have permission to export settings.', 'seovela' ) );
 		}
 
 		$settings    = $this->get_all_settings();
@@ -154,7 +154,7 @@ class Seovela_Import_Export {
 		header( 'Pragma: no-cache' );
 		header( 'Expires: 0' );
 
-		echo wp_json_encode( $export_data, JSON_PRETTY_PRINT );
+		echo wp_json_encode( $export_data );
 		exit;
 	}
 
@@ -641,7 +641,7 @@ class Seovela_Import_Export {
 		}
 
 		$source = isset( $_POST['source'] ) ? sanitize_text_field( wp_unslash( $_POST['source'] ) ) : '';
-		$offset = isset( $_POST['offset'] ) ? absint( $_POST['offset'] ) : 0;
+		$offset = isset( $_POST['offset'] ) ? absint( wp_unslash( $_POST['offset'] ) ) : 0;
 		$step   = isset( $_POST['step'] ) ? sanitize_text_field( wp_unslash( $_POST['step'] ) ) : 'posts';
 
 		if ( ! in_array( $source, array( 'yoast', 'rankmath' ), true ) ) {

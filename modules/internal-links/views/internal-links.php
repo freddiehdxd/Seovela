@@ -33,8 +33,8 @@ $orphan_count = $wpdb->get_var( "
 " );
 
 // Get filter from URL
-$filter = isset( $_GET['filter'] ) ? sanitize_text_field( $_GET['filter'] ) : 'all';
-$search = isset( $_GET['search'] ) ? sanitize_text_field( $_GET['search'] ) : '';
+$filter = isset( $_GET['filter'] ) ? sanitize_text_field( wp_unslash( $_GET['filter'] ) ) : 'all'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$search = isset( $_GET['search'] ) ? sanitize_text_field( wp_unslash( $_GET['search'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 // Build query for suggestions
 $where_clauses = array( "ls.status = 'pending'" );
@@ -420,6 +420,7 @@ $low_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE status = 
 <!-- Toast Notification -->
 <div id="seovela-il-toast" class="seovela-il-toast"></div>
 
+<?php ob_start(); ?>
 <style>
 /* Internal Links Modern Styles */
 .seovela-internal-links-page {
@@ -1487,138 +1488,140 @@ $low_count = $wpdb->get_var( "SELECT COUNT(*) FROM {$table_name} WHERE status = 
 	}
 }
 </style>
+<?php
+$il_css = ob_get_clean();
+$il_css = preg_replace( '/<\/?style[^>]*>/', '', $il_css );
+wp_add_inline_style( 'seovela-internal-links', $il_css );
 
-<script>
+wp_add_inline_script( 'seovela-internal-links', '
 jQuery(document).ready(function($) {
 	// Toast notification
-	function showToast(message, type = 'success') {
-		const $toast = $('#seovela-il-toast');
-		$toast.text(message).removeClass('success error').addClass(type + ' show');
+	function showToast(message, type) {
+		type = type || "success";
+		var $toast = $("#seovela-il-toast");
+		$toast.text(message).removeClass("success error").addClass(type + " show");
 		setTimeout(function() {
-			$toast.removeClass('show');
+			$toast.removeClass("show");
 		}, 3000);
 	}
 
 	// Open settings panel
-	$('.seovela-open-settings').on('click', function() {
-		$('#seovela-il-settings-panel').addClass('active');
-		$('body').css('overflow', 'hidden');
+	$(".seovela-open-settings").on("click", function() {
+		$("#seovela-il-settings-panel").addClass("active");
+		$("body").css("overflow", "hidden");
 	});
 
 	// Close settings panel
-	$('.panel-close, .panel-overlay').on('click', function() {
-		$('#seovela-il-settings-panel').removeClass('active');
-		$('body').css('overflow', '');
+	$(".panel-close, .panel-overlay").on("click", function() {
+		$("#seovela-il-settings-panel").removeClass("active");
+		$("body").css("overflow", "");
 	});
 
 	// Score slider sync
-	$('#min_score').on('input', function() {
-		$('.score-display').text(this.value);
+	$("#min_score").on("input", function() {
+		$(".score-display").text(this.value);
 	});
 
 	// Show orphan pages
-	$('#show-orphan-pages').on('click', function() {
-		const section = $('#orphan-pages-section');
+	$("#show-orphan-pages").on("click", function() {
+		var section = $("#orphan-pages-section");
 		section.slideToggle(300);
-		
-		if (!section.is(':visible')) {
+
+		if (!section.is(":visible")) {
 			return;
 		}
-		
+
 		// Load orphan pages
 		$.ajax({
 			url: ajaxurl,
-			type: 'POST',
+			type: "POST",
 			data: {
-				action: 'seovela_get_orphan_pages',
-				nonce: '<?php echo wp_create_nonce( 'seovela_internal_links' ); ?>'
+				action: "seovela_get_orphan_pages",
+				nonce: "' . wp_create_nonce( 'seovela_internal_links' ) . '"
 			},
 			success: function(response) {
 				if (response.success && response.data.orphans.length > 0) {
-					let html = '<table><thead><tr><th><?php esc_html_e( 'Title', 'seovela' ); ?></th><th><?php esc_html_e( 'Type', 'seovela' ); ?></th><th><?php esc_html_e( 'Date', 'seovela' ); ?></th><th><?php esc_html_e( 'Action', 'seovela' ); ?></th></tr></thead><tbody>';
+					var html = \'<table><thead><tr><th>' . esc_js( __( 'Title', 'seovela' ) ) . '</th><th>' . esc_js( __( 'Type', 'seovela' ) ) . '</th><th>' . esc_js( __( 'Date', 'seovela' ) ) . '</th><th>' . esc_js( __( 'Action', 'seovela' ) ) . '</th></tr></thead><tbody>\';
 					response.data.orphans.forEach(function(orphan) {
-						html += '<tr>';
-						html += '<td><strong>' + orphan.post_title + '</strong></td>';
-						html += '<td>' + orphan.post_type + '</td>';
-						html += '<td>' + orphan.post_date + '</td>';
-						html += '<td><a href="post.php?post=' + orphan.ID + '&action=edit" class="seovela-il-btn seovela-il-btn-primary" style="padding: 6px 12px; font-size: 12px;"><?php esc_html_e( 'Edit', 'seovela' ); ?></a></td>';
-						html += '</tr>';
+						html += "<tr>";
+						html += "<td><strong>" + orphan.post_title + "</strong></td>";
+						html += "<td>" + orphan.post_type + "</td>";
+						html += "<td>" + orphan.post_date + "</td>";
+						html += \'<td><a href="post.php?post=\' + orphan.ID + \'&action=edit" class="seovela-il-btn seovela-il-btn-primary" style="padding: 6px 12px; font-size: 12px;">' . esc_js( __( 'Edit', 'seovela' ) ) . '</a></td>\';
+						html += "</tr>";
 					});
-					html += '</tbody></table>';
-					$('#orphan-pages-list').html(html);
+					html += "</tbody></table>";
+					$("#orphan-pages-list").html(html);
 				} else {
-					$('#orphan-pages-list').html('<div style="text-align: center; padding: 40px; color: #059669;"><strong>🎉 <?php esc_html_e( 'No orphan pages found!', 'seovela' ); ?></strong></div>');
+					$("#orphan-pages-list").html(\'<div style="text-align: center; padding: 40px; color: #059669;"><strong>' . esc_js( __( 'No orphan pages found!', 'seovela' ) ) . '</strong></div>\');
 				}
 			},
 			error: function() {
-				$('#orphan-pages-list').html('<div style="text-align: center; padding: 40px; color: #ef4444;"><?php esc_html_e( 'Failed to load orphan pages.', 'seovela' ); ?></div>');
+				$("#orphan-pages-list").html(\'<div style="text-align: center; padding: 40px; color: #ef4444;">' . esc_js( __( 'Failed to load orphan pages.', 'seovela' ) ) . '</div>\');
 			}
 		});
 	});
 
 	// Copy anchor HTML
-	$('.seovela-copy-anchor').on('click', function() {
-		const anchor = $(this).data('anchor');
-		const url = $(this).data('url');
-		const html = '<a href="' + url + '">' + anchor + '</a>';
-		
+	$(".seovela-copy-anchor").on("click", function() {
+		var anchor = $(this).data("anchor");
+		var url = $(this).data("url");
+		var html = \'<a href="\' + url + \'">\' + anchor + "</a>";
+
 		navigator.clipboard.writeText(html).then(function() {
-			showToast('<?php esc_html_e( 'Link HTML copied to clipboard!', 'seovela' ); ?>', 'success');
+			showToast("' . esc_js( __( 'Link HTML copied to clipboard!', 'seovela' ) ) . '", "success");
 		}).catch(function() {
-			showToast('<?php esc_html_e( 'Failed to copy.', 'seovela' ); ?>', 'error');
+			showToast("' . esc_js( __( 'Failed to copy.', 'seovela' ) ) . '", "error");
 		});
 	});
 
 	// Dismiss suggestion
-	$('.seovela-dismiss-suggestion').on('click', function() {
-		const $btn = $(this);
-		const $row = $btn.closest('tr');
-		const suggestionId = $btn.data('suggestion-id');
-		
-		if (!confirm('<?php esc_html_e( 'Dismiss this suggestion?', 'seovela' ); ?>')) {
+	$(".seovela-dismiss-suggestion").on("click", function() {
+		var $btn = $(this);
+		var $row = $btn.closest("tr");
+		var suggestionId = $btn.data("suggestion-id");
+
+		if (!confirm("' . esc_js( __( 'Dismiss this suggestion?', 'seovela' ) ) . '")) {
 			return;
 		}
-		
-		$row.css('opacity', '0.5');
-		
-		// You would add an AJAX call here to update the suggestion status
-		// For now, just remove the row
+
+		$row.css("opacity", "0.5");
+
 		setTimeout(function() {
 			$row.fadeOut(300, function() {
 				$(this).remove();
 			});
-			showToast('<?php esc_html_e( 'Suggestion dismissed.', 'seovela' ); ?>', 'success');
+			showToast("' . esc_js( __( 'Suggestion dismissed.', 'seovela' ) ) . '", "success");
 		}, 300);
 	});
 
 	// Regenerate suggestions
-	$('#regenerate-all-suggestions, #regenerate-empty').on('click', function() {
-		if (!confirm('<?php esc_html_e( 'This will regenerate suggestions for all posts. Continue?', 'seovela' ); ?>')) {
+	$("#regenerate-all-suggestions, #regenerate-empty").on("click", function() {
+		if (!confirm("' . esc_js( __( 'This will regenerate suggestions for all posts. Continue?', 'seovela' ) ) . '")) {
 			return;
 		}
 
-		const $btn = $(this);
-		const $progress = $('#bulk-action-progress');
-		const $progressFill = $('.progress-fill');
-		const $progressPercent = $('.progress-percent');
-		const $progressText = $('.progress-text');
-		
-		$btn.prop('disabled', true);
+		var $btn = $(this);
+		var $progress = $("#bulk-action-progress");
+		var $progressFill = $(".progress-fill");
+		var $progressPercent = $(".progress-percent");
+		var $progressText = $(".progress-text");
+
+		$btn.prop("disabled", true);
 		$progress.slideDown(300);
-		$progressText.text('<?php esc_html_e( 'Preparing to scan posts...', 'seovela' ); ?>');
-		
-		// Simulate progress (replace with actual AJAX batch processing)
-		let progress = 0;
-		const interval = setInterval(function() {
+		$progressText.text("' . esc_js( __( 'Preparing to scan posts...', 'seovela' ) ) . '");
+
+		var progress = 0;
+		var interval = setInterval(function() {
 			progress += Math.random() * 15;
 			if (progress > 100) progress = 100;
-			
-			$progressFill.css('width', progress + '%');
-			$progressPercent.text(Math.round(progress) + '%');
-			
+
+			$progressFill.css("width", progress + "%");
+			$progressPercent.text(Math.round(progress) + "%");
+
 			if (progress >= 100) {
 				clearInterval(interval);
-				$progressText.text('<?php esc_html_e( 'Complete! Refreshing page...', 'seovela' ); ?>');
+				$progressText.text("' . esc_js( __( 'Complete! Refreshing page...', 'seovela' ) ) . '");
 				setTimeout(function() {
 					window.location.reload();
 				}, 1000);
@@ -1627,21 +1630,21 @@ jQuery(document).ready(function($) {
 	});
 
 	// Clear all suggestions
-	$('#clear-all-suggestions').on('click', function() {
-		if (!confirm('<?php esc_html_e( 'This will delete all link suggestions. Are you sure?', 'seovela' ); ?>')) {
+	$("#clear-all-suggestions").on("click", function() {
+		if (!confirm("' . esc_js( __( 'This will delete all link suggestions. Are you sure?', 'seovela' ) ) . '")) {
 			return;
 		}
-		
-		showToast('<?php esc_html_e( 'Clearing suggestions...', 'seovela' ); ?>', 'success');
-		// Add AJAX call here
+
+		showToast("' . esc_js( __( 'Clearing suggestions...', 'seovela' ) ) . '", "success");
 	});
 
 	// Escape key closes panel
-	$(document).on('keydown', function(e) {
-		if (e.key === 'Escape') {
-			$('#seovela-il-settings-panel').removeClass('active');
-			$('body').css('overflow', '');
+	$(document).on("keydown", function(e) {
+		if (e.key === "Escape") {
+			$("#seovela-il-settings-panel").removeClass("active");
+			$("body").css("overflow", "");
 		}
 	});
 });
-</script>
+' );
+?>

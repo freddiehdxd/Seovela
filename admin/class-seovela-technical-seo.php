@@ -112,7 +112,7 @@ class Seovela_Technical_SEO_Admin {
 	public function render_redirects_page() {
 		// Get redirects
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Pagination/search params, no state change.
-		$page = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
+		$page = isset( $_GET['paged'] ) ? max( 1, absint( wp_unslash( $_GET['paged'] ) ) ) : 1;
 		$per_page = 20;
 		$offset = ( $page - 1 ) * $per_page;
 
@@ -139,7 +139,7 @@ class Seovela_Technical_SEO_Admin {
 	public function render_404_monitor_page() {
 		// Get 404 logs
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Pagination/search params, no state change.
-		$page = isset( $_GET['paged'] ) ? max( 1, absint( $_GET['paged'] ) ) : 1;
+		$page = isset( $_GET['paged'] ) ? max( 1, absint( wp_unslash( $_GET['paged'] ) ) ) : 1;
 		$per_page = 20;
 		$offset = ( $page - 1 ) * $per_page;
 
@@ -210,7 +210,7 @@ class Seovela_Technical_SEO_Admin {
 			wp_send_json_error( array( 'message' => __( 'Permission denied', 'seovela' ) ) );
 		}
 
-		$redirect_id = isset( $_POST['redirect_id'] ) ? intval( $_POST['redirect_id'] ) : 0;
+		$redirect_id = isset( $_POST['redirect_id'] ) ? intval( wp_unslash( $_POST['redirect_id'] ) ) : 0;
 
 		$data = array(
 			'source_url'    => isset( $_POST['source_url'] ) ? sanitize_text_field( wp_unslash( $_POST['source_url'] ) ) : '',
@@ -239,7 +239,7 @@ class Seovela_Technical_SEO_Admin {
 			wp_send_json_error( array( 'message' => __( 'Permission denied', 'seovela' ) ) );
 		}
 
-		$redirect_id = isset( $_POST['redirect_id'] ) ? intval( $_POST['redirect_id'] ) : 0;
+		$redirect_id = isset( $_POST['redirect_id'] ) ? intval( wp_unslash( $_POST['redirect_id'] ) ) : 0;
 
 		$result = $this->redirects->delete_redirect( $redirect_id );
 
@@ -260,8 +260,8 @@ class Seovela_Technical_SEO_Admin {
 			wp_send_json_error( array( 'message' => __( 'Permission denied', 'seovela' ) ) );
 		}
 
-		$redirect_id = isset( $_POST['redirect_id'] ) ? intval( $_POST['redirect_id'] ) : 0;
-		$enabled = isset( $_POST['enabled'] ) ? intval( $_POST['enabled'] ) : 0;
+		$redirect_id = isset( $_POST['redirect_id'] ) ? intval( wp_unslash( $_POST['redirect_id'] ) ) : 0;
+		$enabled = isset( $_POST['enabled'] ) ? intval( wp_unslash( $_POST['enabled'] ) ) : 0;
 
 		$result = $this->redirects->update_redirect( $redirect_id, array( 'enabled' => $enabled ) );
 
@@ -282,7 +282,7 @@ class Seovela_Technical_SEO_Admin {
 			wp_send_json_error( array( 'message' => __( 'Permission denied', 'seovela' ) ) );
 		}
 
-		$log_id = isset( $_POST['log_id'] ) ? intval( $_POST['log_id'] ) : 0;
+		$log_id = isset( $_POST['log_id'] ) ? intval( wp_unslash( $_POST['log_id'] ) ) : 0;
 
 		$result = $this->monitor_404->delete_log( $log_id );
 
@@ -303,7 +303,7 @@ class Seovela_Technical_SEO_Admin {
 			wp_send_json_error( array( 'message' => __( 'Permission denied', 'seovela' ) ) );
 		}
 
-		$log_id = isset( $_POST['log_id'] ) ? intval( $_POST['log_id'] ) : 0;
+		$log_id = isset( $_POST['log_id'] ) ? intval( wp_unslash( $_POST['log_id'] ) ) : 0;
 
 		$result = $this->monitor_404->mark_resolved( $log_id );
 
@@ -324,7 +324,7 @@ class Seovela_Technical_SEO_Admin {
 			wp_send_json_error( array( 'message' => __( 'Permission denied', 'seovela' ) ) );
 		}
 
-		$log_id = isset( $_POST['log_id'] ) ? intval( $_POST['log_id'] ) : 0;
+		$log_id = isset( $_POST['log_id'] ) ? intval( wp_unslash( $_POST['log_id'] ) ) : 0;
 		$target_url = isset( $_POST['target_url'] ) ? esc_url_raw( wp_unslash( $_POST['target_url'] ) ) : '';
 
 		// Get 404 log
@@ -361,7 +361,7 @@ class Seovela_Technical_SEO_Admin {
 		check_ajax_referer( 'seovela_redirects', 'nonce' );
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( __( 'Permission denied', 'seovela' ) );
+			wp_die( esc_html__( 'Permission denied', 'seovela' ) );
 		}
 
 		$csv = $this->redirects->export_csv();
@@ -432,7 +432,7 @@ class Seovela_Technical_SEO_Admin {
 		}
 
 		$settings = array(
-			'cleanup_days'    => isset( $_POST['cleanup_days'] ) ? intval( $_POST['cleanup_days'] ) : 30,
+			'cleanup_days'    => isset( $_POST['cleanup_days'] ) ? intval( wp_unslash( $_POST['cleanup_days'] ) ) : 30,
 			'redirect_url'    => isset( $_POST['redirect_url'] ) ? esc_url_raw( wp_unslash( $_POST['redirect_url'] ) ) : '',
 			'redirect_enabled' => ! empty( $_POST['redirect_enabled'] ) ? 1 : 0,
 		);

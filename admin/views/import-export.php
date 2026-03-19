@@ -19,7 +19,7 @@ settings_errors( 'seovela_import' );
 settings_errors( 'seovela_migration' );
 
 // Active tab
-$active_ie_tab = isset( $_GET['ie_tab'] ) ? sanitize_key( $_GET['ie_tab'] ) : 'export';
+$active_ie_tab = isset( $_GET['ie_tab'] ) ? sanitize_key( wp_unslash( $_GET['ie_tab'] ) ) : 'export'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only tab navigation.
 ?>
 
 <div class="seovela-premium-page">
@@ -225,29 +225,31 @@ $active_ie_tab = isset( $_GET['ie_tab'] ) ? sanitize_key( $_GET['ie_tab'] ) : 'e
     </div><!-- .seovela-page-body -->
 </div><!-- .seovela-premium-page -->
 
-<style>
+<?php
+wp_add_inline_style( 'seovela-admin', '
 .seovela-ie-content {
     display: none;
 }
 .seovela-ie-content.active {
     display: block;
 }
-</style>
+' );
 
-<script>
+wp_add_inline_script( 'seovela-admin', '
 jQuery(document).ready(function($) {
     // Tab switching
-    $('.seovela-ie-tab').on('click', function(e) {
+    $(".seovela-ie-tab").on("click", function(e) {
         e.preventDefault();
-        var tab = $(this).data('tab');
+        var tab = $(this).data("tab");
 
         // Update tabs
-        $('.seovela-ie-tab').removeClass('active');
-        $(this).addClass('active');
+        $(".seovela-ie-tab").removeClass("active");
+        $(this).addClass("active");
 
         // Update content
-        $('.seovela-ie-content').removeClass('active');
-        $('#seovela-ie-' + tab).addClass('active');
+        $(".seovela-ie-content").removeClass("active");
+        $("#seovela-ie-" + tab).addClass("active");
     });
 });
-</script>
+' );
+?>

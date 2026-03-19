@@ -346,76 +346,78 @@ $estimated_links = min( $total_posts, $posts_limit * count( $selected_post_types
     </footer>
 </div>
 
-<script>
+<?php
+wp_add_inline_script( 'seovela-admin', '
 jQuery(document).ready(function($) {
     // Update stats in real-time
     function updateStats() {
-        var postTypesCount = $('.seovela-post-type-checkbox:checked').length;
-        var taxonomiesCount = $('.seovela-taxonomy-checkbox:checked').length;
-        
-        $('#seovela-selected-posts').text(postTypesCount);
-        $('#seovela-selected-taxonomies').text(taxonomiesCount);
+        var postTypesCount = $(".seovela-post-type-checkbox:checked").length;
+        var taxonomiesCount = $(".seovela-taxonomy-checkbox:checked").length;
+
+        $("#seovela-selected-posts").text(postTypesCount);
+        $("#seovela-selected-taxonomies").text(taxonomiesCount);
     }
 
     // Toggle post types
-    $('#seovela-toggle-post-types').on('click', function() {
-        var checkboxes = $('.seovela-post-type-checkbox');
-        var allChecked = checkboxes.length === checkboxes.filter(':checked').length;
-        checkboxes.prop('checked', !allChecked).trigger('change');
+    $("#seovela-toggle-post-types").on("click", function() {
+        var checkboxes = $(".seovela-post-type-checkbox");
+        var allChecked = checkboxes.length === checkboxes.filter(":checked").length;
+        checkboxes.prop("checked", !allChecked).trigger("change");
     });
 
     // Toggle taxonomies
-    $('#seovela-toggle-taxonomies').on('click', function() {
-        var checkboxes = $('.seovela-taxonomy-checkbox');
-        var allChecked = checkboxes.length === checkboxes.filter(':checked').length;
-        checkboxes.prop('checked', !allChecked).trigger('change');
+    $("#seovela-toggle-taxonomies").on("click", function() {
+        var checkboxes = $(".seovela-taxonomy-checkbox");
+        var allChecked = checkboxes.length === checkboxes.filter(":checked").length;
+        checkboxes.prop("checked", !allChecked).trigger("change");
     });
 
     // Checkbox card styling
-    $('.seovela-llms-checkbox-card input[type="checkbox"]').on('change', function() {
-        $(this).closest('.seovela-llms-checkbox-card').toggleClass('checked', this.checked);
+    $(".seovela-llms-checkbox-card input[type=\'checkbox\']").on("change", function() {
+        $(this).closest(".seovela-llms-checkbox-card").toggleClass("checked", this.checked);
         updateStats();
     });
 
     // Slider sync with display
-    $('#seovela-limit-slider').on('input', function() {
-        $('#seovela-limit-display').text(this.value);
+    $("#seovela-limit-slider").on("input", function() {
+        $("#seovela-limit-display").text(this.value);
     });
 
     // Copy URL
-    $('.seovela-copy-url-btn').on('click', function() {
-        var url = $(this).data('url');
+    $(".seovela-copy-url-btn").on("click", function() {
+        var url = $(this).data("url");
         var $btn = $(this);
-        
+
         navigator.clipboard.writeText(url).then(function() {
-            $btn.addClass('copied');
-            $btn.find('svg').html('<polyline points="20 6 9 17 4 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>');
-            
+            $btn.addClass("copied");
+            $btn.find("svg").html(\'<polyline points="20 6 9 17 4 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>\');
+
             setTimeout(function() {
-                $btn.removeClass('copied');
-                $btn.find('svg').html('<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>');
+                $btn.removeClass("copied");
+                $btn.find("svg").html(\'<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>\');
             }, 2000);
         });
     });
 
     // Reset options
-    $('#seovela-reset-llms-options').on('click', function() {
-        if (confirm('<?php echo esc_js( __( 'Reset all LLMS Txt settings to defaults?', 'seovela' ) ); ?>')) {
-            $('.seovela-post-type-checkbox').prop('checked', false);
-            $('input[value="post"], input[value="page"]').filter('.seovela-post-type-checkbox').prop('checked', true).trigger('change');
-            $('.seovela-taxonomy-checkbox').prop('checked', false).trigger('change');
-            $('#seovela-limit-slider').val('260');
-            $('#seovela-limit-display').text('260');
-            $('textarea[name="seovela_llms_txt_additional_content"]').val('');
+    $("#seovela-reset-llms-options").on("click", function() {
+        if (confirm("' . esc_js( __( 'Reset all LLMS Txt settings to defaults?', 'seovela' ) ) . '")) {
+            $(".seovela-post-type-checkbox").prop("checked", false);
+            $("input[value=\'post\'], input[value=\'page\']").filter(".seovela-post-type-checkbox").prop("checked", true).trigger("change");
+            $(".seovela-taxonomy-checkbox").prop("checked", false).trigger("change");
+            $("#seovela-limit-slider").val("260");
+            $("#seovela-limit-display").text("260");
+            $("textarea[name=\'seovela_llms_txt_additional_content\']").val("");
         }
     });
 
     // Form submit animation
-    $('#seovela-llms-txt-form').on('submit', function() {
-        $(this).find('.seovela-llms-btn-primary').addClass('seovela-llms-btn-loading');
-        $('.seovela-llms-footer .seovela-llms-btn-primary').addClass('seovela-llms-btn-loading');
+    $("#seovela-llms-txt-form").on("submit", function() {
+        $(this).find(".seovela-llms-btn-primary").addClass("seovela-llms-btn-loading");
+        $(".seovela-llms-footer .seovela-llms-btn-primary").addClass("seovela-llms-btn-loading");
     });
 });
-</script>
+' );
+?>
 
 <?php

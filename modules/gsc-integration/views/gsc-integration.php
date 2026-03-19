@@ -22,7 +22,7 @@ $connected_email = $gsc->get_connected_email( $user_id );
 $property = $gsc->get_property( $user_id );
 
 // Check for success message
-$just_connected = isset( $_GET['connected'] ) && $_GET['connected'] === '1';
+$just_connected = isset( $_GET['connected'] ) && sanitize_text_field( wp_unslash( $_GET['connected'] ) ) === '1'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display flag.
 
 // Get sites if connected but no property selected
 $sites = array();
@@ -569,7 +569,8 @@ if ( $is_connected && $has_property ) {
 	<?php endif; ?>
 </div>
 
-<style>
+<?php
+wp_add_inline_style( 'seovela-gsc', '
 /* GSC Page Styles - Centralized OAuth Version */
 :root {
 	--gsc-primary: #4285F4;
@@ -1373,4 +1374,5 @@ if ( $is_connected && $has_property ) {
 @media (max-width: 480px) {
 	.gsc-features-grid { grid-template-columns: 1fr; }
 }
-</style>
+' );
+?>

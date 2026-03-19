@@ -402,9 +402,9 @@ class Seovela_Metabox {
 
         $ai_configured = $this->is_ai_configured();
         ?>
-        <div class="seovela-metabox">
-            <style>
-                /* Critical inline styles — full styles in metabox.css */
+        <?php
+            wp_add_inline_style( 'seovela-metabox', '
+                /* Critical inline styles - full styles in metabox.css */
                 .seovela-tabs-nav{display:flex;align-items:center;gap:0;background:#f8f9fa;border-bottom:2px solid #e5e7eb;padding:0 4px;overflow-x:auto}
                 .seovela-tab-btn{display:inline-flex;align-items:center;gap:6px;padding:12px 16px;background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;cursor:pointer;font-size:13px;font-weight:500;color:#64748b;white-space:nowrap;transition:all .2s}
                 .seovela-tab-btn:hover{color:#334155}
@@ -440,7 +440,9 @@ class Seovela_Metabox {
                 .seovela-og-preview-title{font-size:16px;font-weight:600;color:#1c1e21;line-height:1.3;margin-bottom:4px}
                 .seovela-og-preview-desc{font-size:14px;color:#65676b;line-height:1.4}
                 @media(max-width:782px){.seovela-tab-btn span{display:none}.seovela-tab-btn.active span{display:inline}}
-            </style>
+            ' );
+        ?>
+        <div class="seovela-metabox">
 
             <!-- Tab Navigation -->
             <div class="seovela-tabs-nav">
@@ -819,41 +821,43 @@ class Seovela_Metabox {
 
         </div>
 
-        <script>
+        <?php
+        wp_add_inline_script( 'seovela-metabox', '
         (function(){
             /* Tab switching */
-            document.querySelectorAll('.seovela-tab-btn').forEach(function(btn){
-                btn.addEventListener('click', function(){
-                    var tab = this.getAttribute('data-tab');
-                    this.closest('.seovela-metabox').querySelectorAll('.seovela-tab-btn').forEach(function(b){b.classList.remove('active');});
-                    this.classList.add('active');
-                    this.closest('.seovela-metabox').querySelectorAll('.seovela-tab-panel').forEach(function(p){
-                        p.classList.toggle('active', p.getAttribute('data-panel') === tab);
+            document.querySelectorAll(".seovela-tab-btn").forEach(function(btn){
+                btn.addEventListener("click", function(){
+                    var tab = this.getAttribute("data-tab");
+                    this.closest(".seovela-metabox").querySelectorAll(".seovela-tab-btn").forEach(function(b){b.classList.remove("active");});
+                    this.classList.add("active");
+                    this.closest(".seovela-metabox").querySelectorAll(".seovela-tab-panel").forEach(function(p){
+                        p.classList.toggle("active", p.getAttribute("data-panel") === tab);
                     });
                 });
             });
 
             /* Social sub-tab switching */
-            document.querySelectorAll('.seovela-social-tab').forEach(function(btn){
-                btn.addEventListener('click', function(){
-                    var social = this.getAttribute('data-social');
-                    this.closest('.seovela-social-subtabs').querySelectorAll('.seovela-social-tab').forEach(function(b){b.classList.remove('active');});
-                    this.classList.add('active');
-                    this.closest('.seovela-tab-panel').querySelectorAll('.seovela-social-panel').forEach(function(p){
-                        p.classList.toggle('active', p.getAttribute('data-social-panel') === social);
+            document.querySelectorAll(".seovela-social-tab").forEach(function(btn){
+                btn.addEventListener("click", function(){
+                    var social = this.getAttribute("data-social");
+                    this.closest(".seovela-social-subtabs").querySelectorAll(".seovela-social-tab").forEach(function(b){b.classList.remove("active");});
+                    this.classList.add("active");
+                    this.closest(".seovela-tab-panel").querySelectorAll(".seovela-social-panel").forEach(function(p){
+                        p.classList.toggle("active", p.getAttribute("data-social-panel") === social);
                     });
                 });
             });
 
             /* Robot chip toggle visual */
-            document.querySelectorAll('.seovela-robot-chip input[type="checkbox"]').forEach(function(cb){
-                cb.addEventListener('change', function(){
-                    this.closest('.seovela-robot-chip').classList.toggle('checked', this.checked);
+            document.querySelectorAll(".seovela-robot-chip input[type=\'checkbox\']").forEach(function(cb){
+                cb.addEventListener("change", function(){
+                    this.closest(".seovela-robot-chip").classList.toggle("checked", this.checked);
                 });
             });
 
         })();
-        </script>
+        ' );
+        ?>
         <?php
     }
 

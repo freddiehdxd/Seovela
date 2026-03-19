@@ -207,10 +207,10 @@ class Seovela_Gsc_Integration {
 			return;
 		}
 
-		// Chart.js for graphs
+		// Chart.js for graphs (bundled locally — download chart.umd.min.js v4.4.1 to assets/js/chart.min.js)
 		wp_enqueue_script(
 			'chartjs',
-			'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js',
+			plugins_url( 'assets/js/chart.min.js', dirname( dirname( __FILE__ ) ) ),
 			array(),
 			'4.4.1',
 			true
@@ -1159,7 +1159,7 @@ class Seovela_Gsc_Integration {
 			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'seovela' ) ) );
 		}
 		
-		$days = isset( $_POST['days'] ) ? intval( $_POST['days'] ) : 30;
+		$days = isset( $_POST['days'] ) ? intval( wp_unslash( $_POST['days'] ) ) : 30;
 		$user_id = get_current_user_id();
 		$stats = $this->get_site_stats( $days, $user_id );
 		$chart_data = $this->get_chart_data( $days, $user_id );
@@ -1181,7 +1181,7 @@ class Seovela_Gsc_Integration {
 		}
 		
 		$user_id = get_current_user_id();
-		$limit = isset( $_POST['limit'] ) ? intval( $_POST['limit'] ) : 10;
+		$limit = isset( $_POST['limit'] ) ? intval( wp_unslash( $_POST['limit'] ) ) : 10;
 		$order_by = isset( $_POST['order_by'] ) ? sanitize_text_field( wp_unslash( $_POST['order_by'] ) ) : 'clicks';
 		
 		$queries = $this->get_top_queries( $limit, $order_by, $user_id );

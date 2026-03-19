@@ -56,13 +56,14 @@ $redirect_enabled = isset( $settings_404['redirect_enabled'] ) ? $settings_404['
 			</div>
 
 			<!-- Tabs in header -->
+			<?php $current_status = isset( $_GET['status'] ) ? sanitize_text_field( wp_unslash( $_GET['status'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
 			<div class="seovela-page-header-tabs">
-				<a href="<?php echo esc_url( add_query_arg( 'status', 'unresolved' ) ); ?>" class="seovela-header-tab <?php echo ( ! isset( $_GET['status'] ) || $_GET['status'] !== 'resolved' ) ? 'active' : ''; ?>">
+				<a href="<?php echo esc_url( add_query_arg( 'status', 'unresolved' ) ); ?>" class="seovela-header-tab <?php echo ( empty( $current_status ) || $current_status !== 'resolved' ) ? 'active' : ''; ?>">
 					<span class="dashicons dashicons-flag"></span>
 					<?php esc_html_e( 'Unresolved', 'seovela' ); ?>
 					<span class="tab-badge"><?php echo esc_html( $statistics['unresolved'] ); ?></span>
 				</a>
-				<a href="<?php echo esc_url( add_query_arg( 'status', 'resolved' ) ); ?>" class="seovela-header-tab <?php echo ( isset( $_GET['status'] ) && $_GET['status'] === 'resolved' ) ? 'active' : ''; ?>">
+				<a href="<?php echo esc_url( add_query_arg( 'status', 'resolved' ) ); ?>" class="seovela-header-tab <?php echo ( $current_status === 'resolved' ) ? 'active' : ''; ?>">
 					<span class="dashicons dashicons-yes-alt"></span>
 					<?php esc_html_e( 'Resolved', 'seovela' ); ?>
 				</a>
@@ -77,10 +78,10 @@ $redirect_enabled = isset( $settings_404['redirect_enabled'] ) ? $settings_404['
 			<div class="seovela-search-box">
 				<form method="get">
 					<input type="hidden" name="page" value="seovela-404-monitor">
-					<?php if ( isset( $_GET['status'] ) ) : ?>
-						<input type="hidden" name="status" value="<?php echo esc_attr( $_GET['status'] ); ?>">
+					<?php if ( ! empty( $current_status ) ) : ?>
+						<input type="hidden" name="status" value="<?php echo esc_attr( $current_status ); ?>">
 					<?php endif; ?>
-					<input type="search" name="search" value="<?php echo esc_attr( isset( $_GET['search'] ) ? $_GET['search'] : '' ); ?>" placeholder="<?php esc_attr_e( 'Search URLs...', 'seovela' ); ?>">
+					<input type="search" name="search" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( isset( $_GET['search'] ) ? $_GET['search'] : '' ) ) ); ?>" placeholder="<?php esc_attr_e( 'Search URLs...', 'seovela' ); ?>">
 					<button type="submit" class="button">
 						<span class="dashicons dashicons-search"></span>
 					</button>
@@ -153,7 +154,7 @@ $redirect_enabled = isset( $settings_404['redirect_enabled'] ) ? $settings_404['
 								</div>
 								<p>
 									<?php
-									if ( isset( $_GET['status'] ) && $_GET['status'] === 'resolved' ) {
+									if ( $current_status === 'resolved' ) {
 										esc_html_e( 'No resolved 404 logs found.', 'seovela' );
 									} else {
 										esc_html_e( 'No 404 errors logged yet. Great job!', 'seovela' );
@@ -172,11 +173,12 @@ $redirect_enabled = isset( $settings_404['redirect_enabled'] ) ? $settings_404['
 			<div class="seovela-pagination">
 				<?php
 				$args = array( 'paged' => '%#%' );
-				if ( isset( $_GET['status'] ) ) {
-					$args['status'] = $_GET['status'];
+				if ( ! empty( $current_status ) ) {
+					$args['status'] = rawurlencode( $current_status );
 				}
-				if ( isset( $_GET['search'] ) ) {
-					$args['search'] = $_GET['search'];
+				$current_search = isset( $_GET['search'] ) ? sanitize_text_field( wp_unslash( $_GET['search'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				if ( ! empty( $current_search ) ) {
+					$args['search'] = rawurlencode( $current_search );
 				}
 
 				echo paginate_links( array(
@@ -298,14 +300,15 @@ $redirect_enabled = isset( $settings_404['redirect_enabled'] ) ? $settings_404['
 	</div>
 </div>
 
-<script>
+<?php
+wp_add_inline_script( 'seovela-admin', '
 var seovela404Monitor = {
-	ajaxUrl: '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>',
-	nonce: '<?php echo esc_js( wp_create_nonce( 'seovela_404_monitor' ) ); ?>'
+	ajaxUrl: "' . esc_js( admin_url( 'admin-ajax.php' ) ) . '",
+	nonce: "' . esc_js( wp_create_nonce( 'seovela_404_monitor' ) ) . '"
 };
-</script>
+' );
 
-<style>
+wp_add_inline_style( 'seovela-admin', '
 /* 404 Monitor - Page-specific styles */
 /* (Header, stats, breadcrumb handled by unified premium CSS in admin.css) */
 
@@ -938,4 +941,5 @@ var seovela404Monitor = {
 		right: -100%;
 	}
 }
-</style>
+' );
+?>

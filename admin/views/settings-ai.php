@@ -11,9 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Handle settings save
-if ( isset( $_POST['seovela_save_ai_settings'] ) && wp_verify_nonce( $_POST['seovela_ai_nonce'], 'seovela_save_ai_settings' ) ) {
+if ( isset( $_POST['seovela_save_ai_settings'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['seovela_ai_nonce'] ) ), 'seovela_save_ai_settings' ) ) {
     // Save AI Provider (validate against allowlist)
-    $ai_provider = isset( $_POST['seovela_ai_provider'] ) ? sanitize_text_field( $_POST['seovela_ai_provider'] ) : 'openai';
+    $ai_provider = isset( $_POST['seovela_ai_provider'] ) ? sanitize_text_field( wp_unslash( $_POST['seovela_ai_provider'] ) ) : 'openai';
     $allowed_providers = array( 'openai', 'gemini', 'claude' );
     if ( ! in_array( $ai_provider, $allowed_providers, true ) ) {
         $ai_provider = 'openai';
@@ -21,32 +21,32 @@ if ( isset( $_POST['seovela_save_ai_settings'] ) && wp_verify_nonce( $_POST['seo
     update_option( 'seovela_ai_provider', $ai_provider );
     
     // Save OpenAI settings (encrypt API key, skip if placeholder mask submitted)
-    $openai_key_input = isset( $_POST['seovela_openai_api_key'] ) ? sanitize_text_field( $_POST['seovela_openai_api_key'] ) : '';
+    $openai_key_input = isset( $_POST['seovela_openai_api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['seovela_openai_api_key'] ) ) : '';
     if ( ! empty( $openai_key_input ) && strpos( $openai_key_input, '****' ) === false ) {
         update_option( 'seovela_openai_api_key', Seovela_Helpers::encrypt( $openai_key_input ) );
     }
-    $openai_model = isset( $_POST['seovela_openai_model'] ) ? sanitize_text_field( $_POST['seovela_openai_model'] ) : 'gpt-5-mini';
+    $openai_model = isset( $_POST['seovela_openai_model'] ) ? sanitize_text_field( wp_unslash( $_POST['seovela_openai_model'] ) ) : 'gpt-5-mini';
     update_option( 'seovela_openai_model', $openai_model );
     
     // Save Gemini settings (encrypt API key)
-    $gemini_key_input = isset( $_POST['seovela_gemini_api_key'] ) ? sanitize_text_field( $_POST['seovela_gemini_api_key'] ) : '';
+    $gemini_key_input = isset( $_POST['seovela_gemini_api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['seovela_gemini_api_key'] ) ) : '';
     if ( ! empty( $gemini_key_input ) && strpos( $gemini_key_input, '****' ) === false ) {
         update_option( 'seovela_gemini_api_key', Seovela_Helpers::encrypt( $gemini_key_input ) );
     }
-    $gemini_model = isset( $_POST['seovela_gemini_model'] ) ? sanitize_text_field( $_POST['seovela_gemini_model'] ) : 'gemini-3-flash-preview';
+    $gemini_model = isset( $_POST['seovela_gemini_model'] ) ? sanitize_text_field( wp_unslash( $_POST['seovela_gemini_model'] ) ) : 'gemini-3-flash-preview';
     update_option( 'seovela_gemini_model', $gemini_model );
     
     // Save Claude settings (encrypt API key)
-    $claude_key_input = isset( $_POST['seovela_claude_api_key'] ) ? sanitize_text_field( $_POST['seovela_claude_api_key'] ) : '';
+    $claude_key_input = isset( $_POST['seovela_claude_api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['seovela_claude_api_key'] ) ) : '';
     if ( ! empty( $claude_key_input ) && strpos( $claude_key_input, '****' ) === false ) {
         update_option( 'seovela_claude_api_key', Seovela_Helpers::encrypt( $claude_key_input ) );
     }
-    $claude_model = isset( $_POST['seovela_claude_model'] ) ? sanitize_text_field( $_POST['seovela_claude_model'] ) : 'claude-sonnet-4-6';
+    $claude_model = isset( $_POST['seovela_claude_model'] ) ? sanitize_text_field( wp_unslash( $_POST['seovela_claude_model'] ) ) : 'claude-sonnet-4-6';
     update_option( 'seovela_claude_model', $claude_model );
     
     // Save AI generation settings
-    $ai_temperature = isset( $_POST['seovela_ai_temperature'] ) ? floatval( $_POST['seovela_ai_temperature'] ) : 0.7;
-    $ai_post_types = isset( $_POST['seovela_ai_post_types'] ) ? array_map( 'sanitize_text_field', $_POST['seovela_ai_post_types'] ) : array( 'post', 'page' );
+    $ai_temperature = isset( $_POST['seovela_ai_temperature'] ) ? floatval( wp_unslash( $_POST['seovela_ai_temperature'] ) ) : 0.7;
+    $ai_post_types = isset( $_POST['seovela_ai_post_types'] ) ? array_map( 'sanitize_text_field', wp_unslash( $_POST['seovela_ai_post_types'] ) ) : array( 'post', 'page' );
     update_option( 'seovela_ai_temperature', $ai_temperature );
     update_option( 'seovela_ai_post_types', $ai_post_types );
     
@@ -608,7 +608,8 @@ $claude_configured = ! empty( $claude_key_raw );
     </div><!-- .seovela-page-body -->
 </div><!-- .seovela-premium-page -->
 
-<style>
+<?php
+wp_add_inline_style( 'seovela-admin', '
 /* AI Settings Page Styles */
 .seovela-provider-cards {
     display: grid;
@@ -885,59 +886,60 @@ $claude_configured = ! empty( $claude_key_raw );
 .seovela-pricing-item li:last-child {
     border-bottom: none;
 }
-</style>
+' );
 
-<script>
+wp_add_inline_script( 'seovela-admin', '
 jQuery(document).ready(function($) {
     // Provider selection
-    $('input[name="seovela_ai_provider"]').on('change', function() {
+    $("input[name=\'seovela_ai_provider\']").on("change", function() {
         var provider = $(this).val();
-        
+
         // Update card states
-        $('.seovela-provider-card').removeClass('active');
-        $(this).closest('.seovela-provider-card').addClass('active');
-        
+        $(".seovela-provider-card").removeClass("active");
+        $(this).closest(".seovela-provider-card").addClass("active");
+
         // Toggle config panels
-        $('#openai-config, #gemini-config, #claude-config').slideUp(200);
-        $('#' + provider + '-config').slideDown(200);
+        $("#openai-config, #gemini-config, #claude-config").slideUp(200);
+        $("#" + provider + "-config").slideDown(200);
     });
-    
+
     // Test API connection
-    $('.seovela-test-key').on('click', function() {
+    $(".seovela-test-key").on("click", function() {
         var $button = $(this);
-        var provider = $button.data('provider');
+        var provider = $button.data("provider");
         var originalText = $button.text();
-        
-        $button.text('<?php esc_html_e( 'Testing...', 'seovela' ); ?>').prop('disabled', true);
-        
+
+        $button.text("' . esc_js( __( 'Testing...', 'seovela' ) ) . '").prop("disabled", true);
+
         $.ajax({
             url: ajaxurl,
-            type: 'POST',
+            type: "POST",
             data: {
-                action: 'seovela_test_ai_connection',
+                action: "seovela_test_ai_connection",
                 provider: provider,
-                api_key: provider === 'openai' ? $('#seovela_openai_api_key').val() : (provider === 'claude' ? $('#seovela_claude_api_key').val() : $('#seovela_gemini_api_key').val()),
-                nonce: '<?php echo wp_create_nonce( 'seovela_test_ai' ); ?>'
+                api_key: provider === "openai" ? $("#seovela_openai_api_key").val() : (provider === "claude" ? $("#seovela_claude_api_key").val() : $("#seovela_gemini_api_key").val()),
+                nonce: "' . wp_create_nonce( 'seovela_test_ai' ) . '"
             },
             success: function(response) {
                 if (response.success) {
-                    alert('<?php esc_html_e( 'Connection successful! API key is valid.', 'seovela' ); ?>');
+                    alert("' . esc_js( __( 'Connection successful! API key is valid.', 'seovela' ) ) . '");
                 } else {
-                    alert('<?php esc_html_e( 'Connection failed: ', 'seovela' ); ?>' + response.data.message);
+                    alert("' . esc_js( __( 'Connection failed: ', 'seovela' ) ) . '" + response.data.message);
                 }
             },
             error: function() {
-                alert('<?php esc_html_e( 'Connection test failed. Please try again.', 'seovela' ); ?>');
+                alert("' . esc_js( __( 'Connection test failed. Please try again.', 'seovela' ) ) . '");
             },
             complete: function() {
-                $button.text(originalText).prop('disabled', false);
+                $button.text(originalText).prop("disabled", false);
             }
         });
     });
-    
+
     // Temperature slider
-    $('#seovela_ai_temperature').on('input', function() {
-        $('.seovela-range-value').text($(this).val());
+    $("#seovela_ai_temperature").on("input", function() {
+        $(".seovela-range-value").text($(this).val());
     });
 });
-</script>
+' );
+?>

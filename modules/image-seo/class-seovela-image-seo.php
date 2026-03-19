@@ -1598,8 +1598,8 @@ class Seovela_Image_Seo {
 			wp_send_json_error( array( 'message' => __( 'Permission denied', 'seovela' ) ) );
 		}
 
-		$offset = isset( $_POST['offset'] ) ? absint( $_POST['offset'] ) : 0;
-		$limit = isset( $_POST['limit'] ) ? absint( $_POST['limit'] ) : 50;
+		$offset = isset( $_POST['offset'] ) ? absint( wp_unslash( $_POST['offset'] ) ) : 0;
+		$limit = isset( $_POST['limit'] ) ? absint( wp_unslash( $_POST['limit'] ) ) : 50;
 
 		global $wpdb;
 
@@ -1649,7 +1649,7 @@ class Seovela_Image_Seo {
 			wp_send_json_error( array( 'message' => __( 'Permission denied', 'seovela' ) ) );
 		}
 
-		$attachment_id = isset( $_POST['attachment_id'] ) ? intval( $_POST['attachment_id'] ) : 0;
+		$attachment_id = isset( $_POST['attachment_id'] ) ? intval( wp_unslash( $_POST['attachment_id'] ) ) : 0;
 		$attributes = array();
 
 		if ( isset( $_POST['alt'] ) ) {
@@ -1685,7 +1685,7 @@ class Seovela_Image_Seo {
 		}
 
 		$action_type = isset( $_POST['action_type'] ) ? sanitize_text_field( wp_unslash( $_POST['action_type'] ) ) : '';
-		$attachment_ids = isset( $_POST['attachment_ids'] ) ? array_map( 'intval', (array) $_POST['attachment_ids'] ) : array();
+		$attachment_ids = isset( $_POST['attachment_ids'] ) ? array_map( 'intval', (array) wp_unslash( $_POST['attachment_ids'] ) ) : array();
 		$filter = isset( $_POST['filter'] ) ? sanitize_text_field( wp_unslash( $_POST['filter'] ) ) : 'all';
 
 		// If no specific IDs, get from filter
@@ -1782,7 +1782,7 @@ class Seovela_Image_Seo {
 			wp_send_json_error( array( 'message' => __( 'Permission denied', 'seovela' ) ) );
 		}
 
-		$attachment_ids = isset( $_POST['attachment_ids'] ) ? array_map( 'intval', $_POST['attachment_ids'] ) : array();
+		$attachment_ids = isset( $_POST['attachment_ids'] ) ? array_map( 'intval', wp_unslash( $_POST['attachment_ids'] ) ) : array();
 
 		if ( empty( $attachment_ids ) ) {
 			// Get all convertible images
@@ -1844,7 +1844,7 @@ class Seovela_Image_Seo {
 		$settings = array(
 			'enabled'              => ! empty( $_POST['enabled'] ),
 			'auto_process_upload'  => ! empty( $_POST['auto_process_upload'] ),
-			'size_threshold'       => isset( $_POST['size_threshold'] ) ? absint( $_POST['size_threshold'] ) : 200,
+			'size_threshold'       => isset( $_POST['size_threshold'] ) ? absint( wp_unslash( $_POST['size_threshold'] ) ) : 200,
 			'separator'            => isset( $_POST['separator'] ) ? sanitize_text_field( wp_unslash( $_POST['separator'] ) ) : ' - ',
 			// Alt text
 			'alt_template'         => isset( $_POST['alt_template'] ) ? sanitize_text_field( wp_unslash( $_POST['alt_template'] ) ) : '',
@@ -1868,7 +1868,7 @@ class Seovela_Image_Seo {
 			'overwrite_description'   => ! empty( $_POST['overwrite_description'] ),
 			// WebP
 			'enable_webp_conversion' => ! empty( $_POST['enable_webp_conversion'] ),
-			'webp_quality'           => isset( $_POST['webp_quality'] ) ? absint( $_POST['webp_quality'] ) : 85,
+			'webp_quality'           => isset( $_POST['webp_quality'] ) ? absint( wp_unslash( $_POST['webp_quality'] ) ) : 85,
 			'webp_library'           => isset( $_POST['webp_library'] ) ? sanitize_text_field( wp_unslash( $_POST['webp_library'] ) ) : 'auto',
 			'convert_on_upload'      => ! empty( $_POST['convert_on_upload'] ),
 			'replace_original'       => ! empty( $_POST['replace_original'] ),
@@ -1907,7 +1907,7 @@ class Seovela_Image_Seo {
 			wp_send_json_error( array( 'message' => __( 'Permission denied', 'seovela' ) ) );
 		}
 
-		$attachment_id = isset( $_POST['attachment_id'] ) ? intval( $_POST['attachment_id'] ) : 0;
+		$attachment_id = isset( $_POST['attachment_id'] ) ? intval( wp_unslash( $_POST['attachment_id'] ) ) : 0;
 		$attribute = isset( $_POST['attribute'] ) ? sanitize_text_field( wp_unslash( $_POST['attribute'] ) ) : 'alt';
 
 		$settings = $this->get_settings();
@@ -1937,8 +1937,8 @@ class Seovela_Image_Seo {
 		$args = array(
 			'filter'  => isset( $_POST['filter'] ) ? sanitize_text_field( wp_unslash( $_POST['filter'] ) ) : 'all',
 			'search'  => isset( $_POST['search'] ) ? sanitize_text_field( wp_unslash( $_POST['search'] ) ) : '',
-			'limit'   => isset( $_POST['limit'] ) ? absint( $_POST['limit'] ) : 50,
-			'offset'  => isset( $_POST['offset'] ) ? absint( $_POST['offset'] ) : 0,
+			'limit'   => isset( $_POST['limit'] ) ? absint( wp_unslash( $_POST['limit'] ) ) : 50,
+			'offset'  => isset( $_POST['offset'] ) ? absint( wp_unslash( $_POST['offset'] ) ) : 0,
 			'orderby' => isset( $_POST['orderby'] ) ? sanitize_text_field( wp_unslash( $_POST['orderby'] ) ) : 'ID',
 			'order'   => isset( $_POST['order'] ) ? sanitize_text_field( wp_unslash( $_POST['order'] ) ) : 'DESC',
 		);
@@ -2204,34 +2204,34 @@ AddType image/webp .webp
 			$html .= '<img src="' . esc_url( $webp_url ) . '" style="width:100%;height:100%;object-fit:cover;">';
 			$html .= '</div>';
 			$html .= '<div style="flex:1;">';
-			$html .= '<div style="font-weight:600;color:#166534;margin-bottom:4px;">' . __( 'WebP Version Available', 'seovela' ) . '</div>';
+			$html .= '<div style="font-weight:600;color:#166534;margin-bottom:4px;">' . esc_html__( 'WebP Version Available', 'seovela' ) . '</div>';
 			$html .= '<div style="font-size:12px;color:#15803d;">';
-			$html .= sprintf( __( 'Size: %s (-%d%% from original)', 'seovela' ), size_format( $webp_size ), $savings );
+			$html .= esc_html( sprintf( __( 'Size: %s (-%d%% from original)', 'seovela' ), size_format( $webp_size ), $savings ) );
 			$html .= '</div>';
 			$html .= '<div style="font-size:11px;color:#64748b;margin-top:4px;">';
-			$html .= '<a href="' . esc_url( $webp_url ) . '" target="_blank" style="color:#6366f1;">' . __( 'View WebP', 'seovela' ) . '</a>';
+			$html .= '<a href="' . esc_url( $webp_url ) . '" target="_blank" style="color:#6366f1;">' . esc_html__( 'View WebP', 'seovela' ) . '</a>';
 			$html .= '</div>';
 			$html .= '</div>';
 			$html .= '</div>';
 		} else {
 			$html = '<div style="display:flex;align-items:center;gap:12px;padding:10px;background:#fef3c7;border:1px solid #fcd34d;border-radius:6px;">';
 			$html .= '<div style="flex:1;">';
-			$html .= '<div style="font-weight:500;color:#92400e;margin-bottom:8px;">' . __( 'No WebP version yet', 'seovela' ) . '</div>';
+			$html .= '<div style="font-weight:500;color:#92400e;margin-bottom:8px;">' . esc_html__( 'No WebP version yet', 'seovela' ) . '</div>';
 			$html .= '<button type="button" class="button seovela-convert-webp-attachment" data-id="' . esc_attr( $post->ID ) . '">';
-			$html .= __( 'Convert to WebP', 'seovela' );
+			$html .= esc_html__( 'Convert to WebP', 'seovela' );
 			$html .= '</button>';
 			$html .= '</div>';
 			$html .= '</div>';
 			
-			// Add inline script for this button
-			$html .= '<script>
+			// Register inline script for the convert button via wp_add_inline_script.
+			wp_add_inline_script( 'seovela-admin', '
 				jQuery(document).ready(function($) {
 					$(".seovela-convert-webp-attachment").on("click", function(e) {
 						e.preventDefault();
 						var $btn = $(this);
 						var id = $btn.data("id");
 						$btn.prop("disabled", true).text("' . esc_js( __( 'Converting...', 'seovela' ) ) . '");
-						
+
 						$.post(ajaxurl, {
 							action: "seovela_convert_single_webp",
 							attachment_id: id,
@@ -2246,7 +2246,7 @@ AddType image/webp .webp
 						});
 					});
 				});
-			</script>';
+			' );
 		}
 
 		$form_fields['seovela_webp'] = array(
@@ -2262,8 +2262,7 @@ AddType image/webp .webp
 	 * Add script to Media Library for WebP conversion buttons
 	 */
 	public function media_library_webp_script() {
-		?>
-		<style>
+		wp_add_inline_style( 'seovela-admin', '
 			.seovela-convert-webp-btn.loading {
 				opacity: 0.7;
 				pointer-events: none;
@@ -2271,41 +2270,41 @@ AddType image/webp .webp
 			.column-seovela_webp {
 				width: 100px;
 			}
-		</style>
-		<script>
+		' );
+
+		wp_add_inline_script( 'seovela-admin', '
 		jQuery(document).ready(function($) {
-			$(document).on('click', '.seovela-convert-webp-btn', function(e) {
+			$(document).on("click", ".seovela-convert-webp-btn", function(e) {
 				e.preventDefault();
 				var $btn = $(this);
-				var id = $btn.data('id');
-				
-				$btn.addClass('loading').text('<?php echo esc_js( __( 'Converting...', 'seovela' ) ); ?>');
-				
+				var id = $btn.data("id");
+
+				$btn.addClass("loading").text("' . esc_js( __( 'Converting...', 'seovela' ) ) . '");
+
 				$.post(ajaxurl, {
-					action: 'seovela_convert_single_webp',
+					action: "seovela_convert_single_webp",
 					attachment_id: id,
-					nonce: '<?php echo wp_create_nonce( 'seovela_convert_webp' ); ?>'
+					nonce: "' . wp_create_nonce( 'seovela_convert_webp' ) . '"
 				}, function(response) {
 					if (response.success) {
 						// Replace button with success badge
 						$btn.replaceWith(
-							'<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:#dcfce7;color:#166534;border-radius:4px;font-size:12px;font-weight:500;">' +
-							'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>' +
-							response.data.webp_size + ' <span style="opacity:0.7;">(-' + response.data.savings_percent + '%)</span>' +
-							'</span>'
+							\'<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:#dcfce7;color:#166534;border-radius:4px;font-size:12px;font-weight:500;">\' +
+							\'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>\' +
+							response.data.webp_size + \' <span style="opacity:0.7;">(-\' + response.data.savings_percent + \'%)</span>\' +
+							\'</span>\'
 						);
 					} else {
-						alert(response.data.message || 'Conversion failed');
-						$btn.removeClass('loading').text('<?php echo esc_js( __( 'Convert', 'seovela' ) ); ?>');
+						alert(response.data.message || "Conversion failed");
+						$btn.removeClass("loading").text("' . esc_js( __( 'Convert', 'seovela' ) ) . '");
 					}
 				}).fail(function() {
-					alert('Error during conversion');
-					$btn.removeClass('loading').text('<?php echo esc_js( __( 'Convert', 'seovela' ) ); ?>');
+					alert("Error during conversion");
+					$btn.removeClass("loading").text("' . esc_js( __( 'Convert', 'seovela' ) ) . '");
 				});
 			});
 		});
-		</script>
-		<?php
+		' );
 	}
 
 	/**
@@ -2318,7 +2317,7 @@ AddType image/webp .webp
 			wp_send_json_error( array( 'message' => __( 'Permission denied', 'seovela' ) ) );
 		}
 
-		$attachment_id = isset( $_POST['attachment_id'] ) ? intval( $_POST['attachment_id'] ) : 0;
+		$attachment_id = isset( $_POST['attachment_id'] ) ? intval( wp_unslash( $_POST['attachment_id'] ) ) : 0;
 		if ( ! $attachment_id ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid attachment ID', 'seovela' ) ) );
 		}

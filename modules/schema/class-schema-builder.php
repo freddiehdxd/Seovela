@@ -301,11 +301,11 @@ class Seovela_Schema_Builder {
 
         // If single schema, return as-is
         if ( count( $schemas ) === 1 ) {
-            return wp_json_encode( $schemas[0], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+            return wp_json_encode( $schemas[0] );
         }
 
         // Multiple schemas: wrap in array
-        return wp_json_encode( $schemas, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES );
+        return wp_json_encode( $schemas );
     }
 
     /**
@@ -329,7 +329,7 @@ class Seovela_Schema_Builder {
             }
 
             echo '<script type="application/ld+json">' . "\n";
-            echo wp_json_encode( $schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT );
+            echo wp_json_encode( $schema );
             echo "\n" . '</script>' . "\n";
         }
     }

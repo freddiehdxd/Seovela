@@ -54,7 +54,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="seovela-search-box">
 			<form method="get">
 				<input type="hidden" name="page" value="seovela-redirects">
-				<input type="search" name="search" value="<?php echo esc_attr( isset( $_GET['search'] ) ? $_GET['search'] : '' ); ?>" placeholder="<?php esc_attr_e( 'Search redirects...', 'seovela' ); ?>">
+				<input type="search" name="search" value="<?php echo esc_attr( sanitize_text_field( wp_unslash( isset( $_GET['search'] ) ? $_GET['search'] : '' ) ) ); ?>" placeholder="<?php esc_attr_e( 'Search redirects...', 'seovela' ); ?>">
 				<button type="submit" class="button"><?php esc_html_e( 'Search', 'seovela' ); ?></button>
 			</form>
 		</div>
@@ -225,14 +225,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div>
 </div>
 
-<script>
+<?php
+wp_add_inline_script( 'seovela-admin', '
 // Fallback if localization fails
-if (typeof seovelaRedirects === 'undefined') {
+if (typeof seovelaRedirects === "undefined") {
     var seovelaRedirects = {
-        ajaxUrl: '<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>',
-        nonce: '<?php echo esc_js( wp_create_nonce( 'seovela_redirects' ) ); ?>'
+        ajaxUrl: "' . esc_js( admin_url( 'admin-ajax.php' ) ) . '",
+        nonce: "' . esc_js( wp_create_nonce( 'seovela_redirects' ) ) . '"
     };
 }
-</script>
-
-
+' );
+?>

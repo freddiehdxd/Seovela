@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Handle regenerate sitemap
-if ( isset( $_POST['seovela_regenerate_sitemap'] ) && wp_verify_nonce( $_POST['seovela_sitemap_nonce'], 'seovela_regenerate_sitemap' ) ) {
+if ( isset( $_POST['seovela_regenerate_sitemap'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['seovela_sitemap_nonce'] ) ), 'seovela_regenerate_sitemap' ) ) {
     flush_rewrite_rules();
     add_settings_error( 'seovela_sitemap', 'sitemap_regenerated', __( 'Sitemap regenerated successfully!', 'seovela' ), 'success' );
 }

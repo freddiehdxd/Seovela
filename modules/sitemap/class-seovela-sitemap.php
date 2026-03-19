@@ -891,200 +891,195 @@ class Seovela_Sitemap {
 	 * @return string XSL content.
 	 */
 	private function generate_xsl() {
-		$site_name  = esc_html( get_bloginfo( 'name' ) );
+		$site_name   = esc_html( get_bloginfo( 'name' ) );
 		$seovela_url = 'https://seovela.com';
 
-		// Using HEREDOC for readability.
-		$xsl = <<<'XSL'
-<?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="2.0"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-	xmlns:sitemap="http://www.sitemaps.org/schemas/sitemap/0.9"
-	xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-
-<xsl:output method="html" version="1.0" encoding="UTF-8" indent="yes" />
-
-<xsl:template match="/">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-	<title>Seovela XML Sitemap</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta name="robots" content="noindex, follow" />
-	<style type="text/css">
-		* { margin: 0; padding: 0; box-sizing: border-box; }
-		body {
-			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
-			color: #333;
-			background: #f4f6f9;
-			padding: 0;
-		}
-		.header {
-			background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);
-			color: #fff;
-			padding: 30px 40px;
-		}
-		.header h1 {
-			font-size: 24px;
-			font-weight: 700;
-			margin-bottom: 6px;
-		}
-		.header p {
-			font-size: 14px;
-			opacity: 0.85;
-		}
-		.header a { color: #93c5fd; text-decoration: none; }
-		.header a:hover { text-decoration: underline; }
-		.content {
-			max-width: 1200px;
-			margin: 30px auto;
-			padding: 0 20px;
-		}
-		.summary {
-			background: #fff;
-			border: 1px solid #e2e8f0;
-			border-radius: 8px;
-			padding: 16px 24px;
-			margin-bottom: 20px;
-			font-size: 14px;
-			color: #64748b;
-		}
-		.summary strong { color: #1e3a5f; }
-		table {
-			width: 100%;
-			background: #fff;
-			border-collapse: collapse;
-			border-radius: 8px;
-			overflow: hidden;
-			border: 1px solid #e2e8f0;
-			font-size: 14px;
-		}
-		th {
-			background: #f8fafc;
-			text-align: left;
-			padding: 12px 16px;
-			font-weight: 600;
-			color: #475569;
-			border-bottom: 2px solid #e2e8f0;
-		}
-		td {
-			padding: 10px 16px;
-			border-bottom: 1px solid #f1f5f9;
-			word-break: break-all;
-		}
-		tr:hover td { background: #f8fafc; }
-		td a { color: #2563eb; text-decoration: none; }
-		td a:hover { text-decoration: underline; }
-		.footer {
-			text-align: center;
-			padding: 30px;
-			font-size: 13px;
-			color: #94a3b8;
-		}
-		.badge {
-			display: inline-block;
-			background: #e0f2fe;
-			color: #0369a1;
-			font-size: 11px;
-			padding: 2px 8px;
-			border-radius: 10px;
-			font-weight: 600;
-		}
-	</style>
-</head>
-<body>
-	<div class="header">
-		<h1>Seovela XML Sitemap</h1>
-		<p>
-XSL;
+		$xsl  = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+		$xsl .= '<xsl:stylesheet version="2.0"' . "\n";
+		$xsl .= '	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"' . "\n";
+		$xsl .= '	xmlns:sitemap="http://www.sitemaps.org/schemas/sitemap/0.9"' . "\n";
+		$xsl .= '	xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
+		$xsl .= "\n";
+		$xsl .= '<xsl:output method="html" version="1.0" encoding="UTF-8" indent="yes" />' . "\n";
+		$xsl .= "\n";
+		$xsl .= '<xsl:template match="/">' . "\n";
+		$xsl .= '<html xmlns="http://www.w3.org/1999/xhtml">' . "\n";
+		$xsl .= '<head>' . "\n";
+		$xsl .= '	<title>Seovela XML Sitemap</title>' . "\n";
+		$xsl .= '	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' . "\n";
+		$xsl .= '	<meta name="robots" content="noindex, follow" />' . "\n";
+		$xsl .= '	<style type="text/css">' . "\n";
+		$xsl .= '		* { margin: 0; padding: 0; box-sizing: border-box; }' . "\n";
+		$xsl .= '		body {' . "\n";
+		$xsl .= '			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;' . "\n";
+		$xsl .= '			color: #333;' . "\n";
+		$xsl .= '			background: #f4f6f9;' . "\n";
+		$xsl .= '			padding: 0;' . "\n";
+		$xsl .= '		}' . "\n";
+		$xsl .= '		.header {' . "\n";
+		$xsl .= '			background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 100%);' . "\n";
+		$xsl .= '			color: #fff;' . "\n";
+		$xsl .= '			padding: 30px 40px;' . "\n";
+		$xsl .= '		}' . "\n";
+		$xsl .= '		.header h1 {' . "\n";
+		$xsl .= '			font-size: 24px;' . "\n";
+		$xsl .= '			font-weight: 700;' . "\n";
+		$xsl .= '			margin-bottom: 6px;' . "\n";
+		$xsl .= '		}' . "\n";
+		$xsl .= '		.header p {' . "\n";
+		$xsl .= '			font-size: 14px;' . "\n";
+		$xsl .= '			opacity: 0.85;' . "\n";
+		$xsl .= '		}' . "\n";
+		$xsl .= '		.header a { color: #93c5fd; text-decoration: none; }' . "\n";
+		$xsl .= '		.header a:hover { text-decoration: underline; }' . "\n";
+		$xsl .= '		.content {' . "\n";
+		$xsl .= '			max-width: 1200px;' . "\n";
+		$xsl .= '			margin: 30px auto;' . "\n";
+		$xsl .= '			padding: 0 20px;' . "\n";
+		$xsl .= '		}' . "\n";
+		$xsl .= '		.summary {' . "\n";
+		$xsl .= '			background: #fff;' . "\n";
+		$xsl .= '			border: 1px solid #e2e8f0;' . "\n";
+		$xsl .= '			border-radius: 8px;' . "\n";
+		$xsl .= '			padding: 16px 24px;' . "\n";
+		$xsl .= '			margin-bottom: 20px;' . "\n";
+		$xsl .= '			font-size: 14px;' . "\n";
+		$xsl .= '			color: #64748b;' . "\n";
+		$xsl .= '		}' . "\n";
+		$xsl .= '		.summary strong { color: #1e3a5f; }' . "\n";
+		$xsl .= '		table {' . "\n";
+		$xsl .= '			width: 100%;' . "\n";
+		$xsl .= '			background: #fff;' . "\n";
+		$xsl .= '			border-collapse: collapse;' . "\n";
+		$xsl .= '			border-radius: 8px;' . "\n";
+		$xsl .= '			overflow: hidden;' . "\n";
+		$xsl .= '			border: 1px solid #e2e8f0;' . "\n";
+		$xsl .= '			font-size: 14px;' . "\n";
+		$xsl .= '		}' . "\n";
+		$xsl .= '		th {' . "\n";
+		$xsl .= '			background: #f8fafc;' . "\n";
+		$xsl .= '			text-align: left;' . "\n";
+		$xsl .= '			padding: 12px 16px;' . "\n";
+		$xsl .= '			font-weight: 600;' . "\n";
+		$xsl .= '			color: #475569;' . "\n";
+		$xsl .= '			border-bottom: 2px solid #e2e8f0;' . "\n";
+		$xsl .= '		}' . "\n";
+		$xsl .= '		td {' . "\n";
+		$xsl .= '			padding: 10px 16px;' . "\n";
+		$xsl .= '			border-bottom: 1px solid #f1f5f9;' . "\n";
+		$xsl .= '			word-break: break-all;' . "\n";
+		$xsl .= '		}' . "\n";
+		$xsl .= '		tr:hover td { background: #f8fafc; }' . "\n";
+		$xsl .= '		td a { color: #2563eb; text-decoration: none; }' . "\n";
+		$xsl .= '		td a:hover { text-decoration: underline; }' . "\n";
+		$xsl .= '		.footer {' . "\n";
+		$xsl .= '			text-align: center;' . "\n";
+		$xsl .= '			padding: 30px;' . "\n";
+		$xsl .= '			font-size: 13px;' . "\n";
+		$xsl .= '			color: #94a3b8;' . "\n";
+		$xsl .= '		}' . "\n";
+		$xsl .= '		.badge {' . "\n";
+		$xsl .= '			display: inline-block;' . "\n";
+		$xsl .= '			background: #e0f2fe;' . "\n";
+		$xsl .= '			color: #0369a1;' . "\n";
+		$xsl .= '			font-size: 11px;' . "\n";
+		$xsl .= '			padding: 2px 8px;' . "\n";
+		$xsl .= '			border-radius: 10px;' . "\n";
+		$xsl .= '			font-weight: 600;' . "\n";
+		$xsl .= '		}' . "\n";
+		$xsl .= '	</style>' . "\n";
+		$xsl .= '</head>' . "\n";
+		$xsl .= '<body>' . "\n";
+		$xsl .= '	<div class="header">' . "\n";
+		$xsl .= '		<h1>Seovela XML Sitemap</h1>' . "\n";
+		$xsl .= '		<p>' . "\n";
 
 		$xsl .= 'Generated by <a href="' . esc_url( $seovela_url ) . '">Seovela SEO Plugin</a> for ' . $site_name;
 
-		$xsl .= <<<'XSL'
-</p>
-	</div>
-	<div class="content">
-
-	<!-- Sitemap Index -->
-	<xsl:if test="sitemap:sitemapindex">
-		<div class="summary">
-			This is the main <strong>sitemap index</strong>. It references
-			<strong><xsl:value-of select="count(sitemap:sitemapindex/sitemap:sitemap)" /></strong>
-			sub-sitemaps.
-		</div>
-		<table>
-			<thead>
-				<tr>
-					<th>#</th>
-					<th>Sitemap URL</th>
-					<th>Last Modified</th>
-				</tr>
-			</thead>
-			<tbody>
-				<xsl:for-each select="sitemap:sitemapindex/sitemap:sitemap">
-					<tr>
-						<td><xsl:value-of select="position()" /></td>
-						<td><a href="{sitemap:loc}"><xsl:value-of select="sitemap:loc" /></a></td>
-						<td>
-							<xsl:if test="sitemap:lastmod">
-								<xsl:value-of select="substring(sitemap:lastmod, 1, 10)" />
-							</xsl:if>
-						</td>
-					</tr>
-				</xsl:for-each>
-			</tbody>
-		</table>
-	</xsl:if>
-
-	<!-- URL Set -->
-	<xsl:if test="sitemap:urlset">
-		<div class="summary">
-			This sitemap contains
-			<strong><xsl:value-of select="count(sitemap:urlset/sitemap:url)" /></strong>
-			URLs.
-		</div>
-		<table>
-			<thead>
-				<tr>
-					<th>#</th>
-					<th>URL</th>
-					<th>Images</th>
-					<th>Last Modified</th>
-					<th>Change Freq</th>
-					<th>Priority</th>
-				</tr>
-			</thead>
-			<tbody>
-				<xsl:for-each select="sitemap:urlset/sitemap:url">
-					<tr>
-						<td><xsl:value-of select="position()" /></td>
-						<td><a href="{sitemap:loc}"><xsl:value-of select="sitemap:loc" /></a></td>
-						<td>
-							<xsl:if test="count(image:image) &gt; 0">
-								<span class="badge"><xsl:value-of select="count(image:image)" /></span>
-							</xsl:if>
-						</td>
-						<td>
-							<xsl:if test="sitemap:lastmod">
-								<xsl:value-of select="substring(sitemap:lastmod, 1, 10)" />
-							</xsl:if>
-						</td>
-						<td><xsl:value-of select="sitemap:changefreq" /></td>
-						<td><xsl:value-of select="sitemap:priority" /></td>
-					</tr>
-				</xsl:for-each>
-			</tbody>
-		</table>
-	</xsl:if>
-
-	</div>
-	<div class="footer">
-		Seovela XML Sitemap — generated dynamically.
-	</div>
-</body>
-</html>
-</xsl:template>
-</xsl:stylesheet>
-XSL;
+		$xsl .= '</p>' . "\n";
+		$xsl .= '	</div>' . "\n";
+		$xsl .= '	<div class="content">' . "\n";
+		$xsl .= "\n";
+		$xsl .= '	<!-- Sitemap Index -->' . "\n";
+		$xsl .= '	<xsl:if test="sitemap:sitemapindex">' . "\n";
+		$xsl .= '		<div class="summary">' . "\n";
+		$xsl .= '			This is the main <strong>sitemap index</strong>. It references' . "\n";
+		$xsl .= '			<strong><xsl:value-of select="count(sitemap:sitemapindex/sitemap:sitemap)" /></strong>' . "\n";
+		$xsl .= '			sub-sitemaps.' . "\n";
+		$xsl .= '		</div>' . "\n";
+		$xsl .= '		<table>' . "\n";
+		$xsl .= '			<thead>' . "\n";
+		$xsl .= '				<tr>' . "\n";
+		$xsl .= '					<th>#</th>' . "\n";
+		$xsl .= '					<th>Sitemap URL</th>' . "\n";
+		$xsl .= '					<th>Last Modified</th>' . "\n";
+		$xsl .= '				</tr>' . "\n";
+		$xsl .= '			</thead>' . "\n";
+		$xsl .= '			<tbody>' . "\n";
+		$xsl .= '				<xsl:for-each select="sitemap:sitemapindex/sitemap:sitemap">' . "\n";
+		$xsl .= '					<tr>' . "\n";
+		$xsl .= '						<td><xsl:value-of select="position()" /></td>' . "\n";
+		$xsl .= '						<td><a href="{sitemap:loc}"><xsl:value-of select="sitemap:loc" /></a></td>' . "\n";
+		$xsl .= '						<td>' . "\n";
+		$xsl .= '							<xsl:if test="sitemap:lastmod">' . "\n";
+		$xsl .= '								<xsl:value-of select="substring(sitemap:lastmod, 1, 10)" />' . "\n";
+		$xsl .= '							</xsl:if>' . "\n";
+		$xsl .= '						</td>' . "\n";
+		$xsl .= '					</tr>' . "\n";
+		$xsl .= '				</xsl:for-each>' . "\n";
+		$xsl .= '			</tbody>' . "\n";
+		$xsl .= '		</table>' . "\n";
+		$xsl .= '	</xsl:if>' . "\n";
+		$xsl .= "\n";
+		$xsl .= '	<!-- URL Set -->' . "\n";
+		$xsl .= '	<xsl:if test="sitemap:urlset">' . "\n";
+		$xsl .= '		<div class="summary">' . "\n";
+		$xsl .= '			This sitemap contains' . "\n";
+		$xsl .= '			<strong><xsl:value-of select="count(sitemap:urlset/sitemap:url)" /></strong>' . "\n";
+		$xsl .= '			URLs.' . "\n";
+		$xsl .= '		</div>' . "\n";
+		$xsl .= '		<table>' . "\n";
+		$xsl .= '			<thead>' . "\n";
+		$xsl .= '				<tr>' . "\n";
+		$xsl .= '					<th>#</th>' . "\n";
+		$xsl .= '					<th>URL</th>' . "\n";
+		$xsl .= '					<th>Images</th>' . "\n";
+		$xsl .= '					<th>Last Modified</th>' . "\n";
+		$xsl .= '					<th>Change Freq</th>' . "\n";
+		$xsl .= '					<th>Priority</th>' . "\n";
+		$xsl .= '				</tr>' . "\n";
+		$xsl .= '			</thead>' . "\n";
+		$xsl .= '			<tbody>' . "\n";
+		$xsl .= '				<xsl:for-each select="sitemap:urlset/sitemap:url">' . "\n";
+		$xsl .= '					<tr>' . "\n";
+		$xsl .= '						<td><xsl:value-of select="position()" /></td>' . "\n";
+		$xsl .= '						<td><a href="{sitemap:loc}"><xsl:value-of select="sitemap:loc" /></a></td>' . "\n";
+		$xsl .= '						<td>' . "\n";
+		$xsl .= '							<xsl:if test="count(image:image) &gt; 0">' . "\n";
+		$xsl .= '								<span class="badge"><xsl:value-of select="count(image:image)" /></span>' . "\n";
+		$xsl .= '							</xsl:if>' . "\n";
+		$xsl .= '						</td>' . "\n";
+		$xsl .= '						<td>' . "\n";
+		$xsl .= '							<xsl:if test="sitemap:lastmod">' . "\n";
+		$xsl .= '								<xsl:value-of select="substring(sitemap:lastmod, 1, 10)" />' . "\n";
+		$xsl .= '							</xsl:if>' . "\n";
+		$xsl .= '						</td>' . "\n";
+		$xsl .= '						<td><xsl:value-of select="sitemap:changefreq" /></td>' . "\n";
+		$xsl .= '						<td><xsl:value-of select="sitemap:priority" /></td>' . "\n";
+		$xsl .= '					</tr>' . "\n";
+		$xsl .= '				</xsl:for-each>' . "\n";
+		$xsl .= '			</tbody>' . "\n";
+		$xsl .= '		</table>' . "\n";
+		$xsl .= '	</xsl:if>' . "\n";
+		$xsl .= "\n";
+		$xsl .= '	</div>' . "\n";
+		$xsl .= '	<div class="footer">' . "\n";
+		$xsl .= '		Seovela XML Sitemap — generated dynamically.' . "\n";
+		$xsl .= '	</div>' . "\n";
+		$xsl .= '</body>' . "\n";
+		$xsl .= '</html>' . "\n";
+		$xsl .= '</xsl:template>' . "\n";
+		$xsl .= '</xsl:stylesheet>';
 
 		return $xsl;
 	}

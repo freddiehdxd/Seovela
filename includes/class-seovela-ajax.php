@@ -54,12 +54,12 @@ class Seovela_Ajax {
 		}
 
 		// Get data from request
-		$post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
-		$focus_keyword = isset( $_POST['focus_keyword'] ) ? sanitize_text_field( $_POST['focus_keyword'] ) : '';
-		$title = isset( $_POST['title'] ) ? sanitize_text_field( $_POST['title'] ) : '';
-		$description = isset( $_POST['description'] ) ? sanitize_textarea_field( $_POST['description'] ) : '';
-		$content = isset( $_POST['content'] ) ? wp_kses_post( $_POST['content'] ) : '';
-		$url = isset( $_POST['url'] ) ? esc_url_raw( $_POST['url'] ) : '';
+		$post_id = isset( $_POST['post_id'] ) ? intval( wp_unslash( $_POST['post_id'] ) ) : 0;
+		$focus_keyword = isset( $_POST['focus_keyword'] ) ? sanitize_text_field( wp_unslash( $_POST['focus_keyword'] ) ) : '';
+		$title = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
+		$description = isset( $_POST['description'] ) ? sanitize_textarea_field( wp_unslash( $_POST['description'] ) ) : '';
+		$content = isset( $_POST['content'] ) ? wp_kses_post( wp_unslash( $_POST['content'] ) ) : '';
+		$url = isset( $_POST['url'] ) ? esc_url_raw( wp_unslash( $_POST['url'] ) ) : '';
 
 		// Load SEO scorer
 		require_once SEOVELA_PLUGIN_DIR . 'modules/content-analysis/class-seo-scorer.php';
@@ -93,7 +93,7 @@ class Seovela_Ajax {
 		}
 
 		// Get post ID
-		$post_id = isset( $_POST['post_id'] ) ? intval( $_POST['post_id'] ) : 0;
+		$post_id = isset( $_POST['post_id'] ) ? intval( wp_unslash( $_POST['post_id'] ) ) : 0;
 
 		if ( ! $post_id ) {
 			wp_send_json_error( array( 'message' => __( 'Invalid post ID', 'seovela' ) ) );
